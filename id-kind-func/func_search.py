@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-func_search.py
+func_search.py -- Search for functions to replace a lookup table.
+
+See http://www.oilshell.org/blog/2016/12/23.html
 """
 
 from collections import Counter, defaultdict
@@ -82,6 +84,7 @@ def FunctionBody(f):
 
 
 def TestFunc(f):
+  """See if a given function has the desired distribution of return values."""
   print(f)
   print(FunctionBody(f))
 
@@ -108,17 +111,12 @@ def TestFunc(f):
   print()
 
 
-def Dominates(dist, desired_dist):
-  """
+def NumDeficits(dist, desired_dist):
+  """Return the number of kinds that are too small.
+
   Args:
     dist: array sorted in reverse order
     desired_dist: ditto
-
-    They don't have
-
-  Returns:
-    Whether there some subset of "dist" in which each element can be mapped to
-    an element of "desired_dist", and the element in "dist" is always greater.
   """
   #need = set(desired_dist)
   n = len(desired_dist)
@@ -144,20 +142,16 @@ def ScoreFunction(hist):
     #print('%d - %d is too small' % (0, min(func_range)))
     return
 
-  num_deficits = Dominates(dist, DESIRED_DIST)
+  num_deficits = NumDeficits(dist, DESIRED_DIST)
   #print('n = %d, deficit %d' % (i, deficit))
   if num_deficits <= 1:
-    print('YES')
+    print('Kind that are too small: %d' % num_deficits)
     d = Deficit(DESIRED_DIST, dist)
 
     Show('func range', func_range)
     Show('want dist', DESIRED_DIST)
     Show('have dist', dist)
     Show('deficit', d)
-
-    if num_deficits == 0:
-      #raise RuntimeError('found exact solution')
-      pass
 
   return num_deficits
 
@@ -325,22 +319,24 @@ def f4_5(tok, i, j, k):
 
 
 def Form4(f):
-  #return
   deficit1 = 0
   min_deficit = 256
   # 2^5 bits * 3 -- less than 2^8 * 2
   for i in range(-16, 16):
     for j in range(-16, 16):
       for k in range(-16, 16):
-        #hist = Hist(lambda tok: f(tok, i))
         hist = Hist(lambda tok: f(tok, i, j, k))
         num_deficits = ScoreFunction(hist)
         if num_deficits == 1:
           deficit1 += 1
         if num_deficits in (0, 1):
           print('num deficits %d, i = %d, j = %d, k = %d' % (num_deficits, i, j, k))
+          print('')
+        if num_deficits == 0:
+          raise RuntimeError('Found exact solution')
         if num_deficits is not None:
           min_deficit = min(min_deficit, num_deficits)
+
   print('Min deficit: %d' % min_deficit)
   print('number of solutions with a deficit of 1: %d' % deficit1)
 
@@ -358,20 +354,6 @@ def Search():
   TestFunc(ik7)
   TestFunc(LookupKind1)
   TestFunc(LookupKind2)
-
-  # Search for functions that return around 21 values.  OK that is a
-  # first way to winnow it.
-
-  # NO this doesn't quite make sense.  You want to compute the entire
-  # histogram over 255 values.  And then see which functions "dominate" the
-  # DESIRED_DIST?
-  # def Dominates(dist, desired_dist):
-  # pass
-
-  # Throw out early:
-  # - need more than 21 values in the range of the function
-  # - start from the BIGGEST.  It has to be bigger than the biggest.
-
 
   Form1(f1)
   Form1(g1)
@@ -442,5 +424,5 @@ if __name__ == '__main__':
   try:
     main(sys.argv)
   except RuntimeError as e:
-    print('FATAL: %s' % e, file=sys.stderr)
+    print('ABORT: %s' % e, file=sys.stderr)
     sys.exit(1)

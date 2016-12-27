@@ -17,15 +17,17 @@ readonly CLANG=~/install/clang+llvm-3.8.0-x86_64-linux-gnu-ubuntu-14.04/bin/clan
 
 build-run() {
   local name=$1
+  #CXX=$CLANG
   CXX=c++ 
-  CXX=$CLANG
 
+  mkdir -p _tmp
   $CXX -std=c++11 -O3 -o _tmp/$name $name.cc
   #chmod +x _tmp/ik7
   _tmp/ik7
 }
 
 ik7() {
+  set -o xtrace
   build-run ik7
 }
 
