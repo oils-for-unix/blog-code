@@ -32,22 +32,34 @@ ik7() {
   build-run $GCC ik7
 }
 
+# http://blog.reverberate.org/2009/07/giving-up-on-at-style-assembler-syntax.html
+# Using Intel syntax so I can google instruction names.
 dump-func() {
   local bin=${1:-_tmp/ik7}
-  objdump -d $bin | grep --after-context 15 LookupKind
+  objdump -M intel -d $bin | grep --after-context 12 LookupKind
 }
 
 compare-gcc-clang() {
+  set -o xtrace
   build-run $GCC ik7 _tmp/ik7-gcc
   build-run $CLANG ik7 _tmp/ik7-clang
+  set +o xtrace
 
   echo ---
   echo GCC
+  echo
   dump-func _tmp/ik7-gcc
   echo
+
   echo ---
   echo Clang
+  echo
   dump-func _tmp/ik7-clang
+}
+
+show-versions() {
+  $GCC --version
+  $CLANG --version
 }
 
 
