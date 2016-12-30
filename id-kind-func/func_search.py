@@ -69,7 +69,7 @@ def Deficit(want, need):
 
 def Show(label, a):
   sys.stdout.write('%12s' % label)
-  print(''.join('%5d' % item for item in a))
+  print(''.join('%4d' % item for item in a))
 
 
 def Hist(f):
@@ -145,7 +145,7 @@ def ScoreFunction(hist):
   num_deficits = NumDeficits(dist, DESIRED_DIST)
   #print('n = %d, deficit %d' % (i, deficit))
   if num_deficits <= 1:
-    print('Kind that are too small: %d' % num_deficits)
+    print("Kinds that don't fit: %d" % num_deficits)
     d = Deficit(DESIRED_DIST, dist)
 
     Show('func range', func_range)
