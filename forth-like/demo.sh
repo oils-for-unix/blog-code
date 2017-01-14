@@ -1,5 +1,10 @@
 #!/bin/bash
 #
+# Problems:
+# - Builtin vs external: need $0
+# - $(seq $n) should be builtin.  {1..$n} doesn't work, because brace expansion
+#   happens before variable expansion.
+#
 # Usage:
 #   ./demo.sh <function name>
 
