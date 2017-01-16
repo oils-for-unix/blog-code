@@ -23,7 +23,10 @@ hist-demo() {
 
 # NOTE: not safe
 awk-html-rows() {
-  awk '{print "<tr> <td>" $1 "</td> <td>" $2 "</td> </tr>"}'
+  awk '
+    BEGIN { print "<tr> <td>Count</td> <td>Name</td> </tr>"}
+          { print "<tr> <td>" $1 "</td> <td>" $2 "</td> </tr>"}
+  '
 }
 
 hist-pipeline-demo() {
@@ -31,6 +34,7 @@ hist-pipeline-demo() {
 }
 
 shell-html-rows() {
+  echo "<tr> <td>Count</td> <td>Name</td> </tr>"
   while read count name; do
     echo "<tr> <td>$count</td> <td>$name</td> </tr>"
   done
@@ -43,9 +47,11 @@ while-pipeline-demo() {
 inline-demo() {
   { echo foo; echo bar; echo foo; } | 
   sort | uniq -c | sort -r -n       |
-  while read count name; do
-    echo "<tr> <td>$count</td> <td>$name</td> </tr>"
-  done
+  { echo "<tr> <td>Count</td> <td>Name</td> </tr>";
+    while read count name; do
+      echo "<tr> <td>$count</td> <td>$name</td> </tr>"
+    done
+  }
 }
 
 
