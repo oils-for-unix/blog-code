@@ -9,29 +9,21 @@ import sys
 import time
 
 
-def retry(*args):
-  n = args[0]
-  f = args[1]
-  a = args[2:]
-
+def retry(n, f, *args):
   for i in range(n):
-    f(*a)
+    f(*args)
 
 
-def hello_sleep(*args):
+def hello_sleep(t):
   print 'hello'
-  time.sleep(args[0])
+  time.sleep(t)
 
 
 def retry_demo():
   retry(5, hello_sleep, 0.1)
 
 
-def timeout(*args):
-  seconds = args[0]
-  f = args[1]
-  a = args[2:]
-
+def timeout(seconds, f, *a):
   # TODO: Set SIGALARM or something
   print 'Running %s with args %s with timeout of %f' % (f, a, seconds)
   f(*a)
