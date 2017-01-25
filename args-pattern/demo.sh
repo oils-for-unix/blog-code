@@ -7,6 +7,11 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+# TODO:
+# - find example
+# - chroot example
+
+
 parallel-each() {
   xargs -P 4 -n 1 -- $0 "$@"
 }
