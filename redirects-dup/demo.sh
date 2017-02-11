@@ -87,4 +87,22 @@ EOF
 # oil:
 # ./stdout_stderr.py !1 > $>[tr A-Z a-z > $out] !2 > $>[tr A-Z a-z > $err]
 
+# TODO:
+# - Make some graphviz diagrams of the descriptor table?
+
+order-matters() {
+  echo ---
+  ./stdout_stderr.py >/dev/null 2>&1  # neither on console
+  echo ---
+  ./stdout_stderr.py 2>&1 >/dev/null  # STDERR on console
+}
+
+strace-order-matters() {
+  echo ===
+  strace -e open,dup2,fcntl sh -c './stdout_stderr.py >/dev/null 2>&1'
+  echo ===
+  strace -e open,dup2,fcntl sh -c './stdout_stderr.py 2>&1 >/dev/null'
+}
+
+
 "$@"
