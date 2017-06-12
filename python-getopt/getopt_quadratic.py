@@ -10,7 +10,7 @@ import sys
 
 def main(argv):
   n = int(argv[1])
-  long_argv = ['-o', 'FOO'] * n
+  long_argv = argv[2:] * n
   opts, long_argv = getopt.getopt(long_argv, 'o:')
   print(len(opts))
 
