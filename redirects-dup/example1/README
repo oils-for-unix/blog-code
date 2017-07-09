@@ -1,1 +1,1 @@
-This example shows why you need to save fd 0 (stdout) before redirecting.
+This example shows why you need to save fd 1 (stdout) before redirecting.
