@@ -1,4 +1,4 @@
 #!/bin/sh
 
-./r1.sh > out1.txt
+./r1.sh > out2.txt
 

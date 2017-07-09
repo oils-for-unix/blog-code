@@ -1,6 +1,6 @@
 #!/bin/bash
 
 echo one
-echo two >out2.txt
+echo two >out1.txt
 echo three
 
