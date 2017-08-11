@@ -45,4 +45,53 @@ testIsElf() {
   done
 }
 
+#
+# From Yetus
+#
+
+doWork() {
+  echo 'FOO'
+  echo 'BAR'
+  echo
+}
+
+doWorkAndLog() {
+  # https://github.com/apache/yetus/blob/10d4d13cc95a814eac97a976a8de525531ac986a/precommit/core.d/builtin-bugsystem.sh#L50
+  if [[ -n "${CONSOLE_REPORT_FILE}" ]]; then
+    echo "--- Logging to ${CONSOLE_REPORT_FILE}"
+    exec 6>&1 1>"${CONSOLE_REPORT_FILE}"
+  fi
+
+  doWork
+
+  if [[ -n "${CONSOLE_REPORT_FILE}" ]]; then
+    exec 1>&6 6>&-
+    echo "--- Contents of ${CONSOLE_REPORT_FILE}:"
+    cat "${CONSOLE_REPORT_FILE}"
+  fi
+}
+
+doWorkAndLogSimple() {
+  if [[ -n "${CONSOLE_REPORT_FILE}" ]]; then
+    echo "--- Logging to ${CONSOLE_REPORT_FILE}"
+    doWork > ${CONSOLE_REPORT_FILE}
+    echo "--- Contents of ${CONSOLE_REPORT_FILE}:"
+    cat "${CONSOLE_REPORT_FILE}"
+  else
+    doWork
+  fi
+}
+
+testDoWorkAndLog() {
+  set +o nounset
+
+  doWorkAndLog
+  CONSOLE_REPORT_FILE=/tmp/$0-$$.log doWorkAndLog
+
+  echo --- SIMPLE VERSION ---
+
+  doWorkAndLogSimple
+  CONSOLE_REPORT_FILE=/tmp/$0-$$.log doWorkAndLogSimple
+}
+
 "$@"
