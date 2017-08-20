@@ -1,10 +1,9 @@
 default: main
 
 %.d: %.c
-	@set -e; rm -f $@; \
-	$(CC) -M $(CPPFLAGS) $< > $@.$$$$; \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	@set -e; rm -f $@; cc_tmp=$@.mm; \
+	$(CC) -M $(CPPFLAGS) $< > $$cc_tmp; \
+	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $$cc_tmp > $@;
 
 
 SOURCES = main.c
