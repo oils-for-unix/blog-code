@@ -7,6 +7,10 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+#
+# Improving the Style of Shell from Nix Package Manager
+#
+
 # from https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/setup.sh#L318
 
 # Return success if the specified file is an ELF object.
@@ -46,7 +50,7 @@ testIsElf() {
 }
 
 #
-# From Yetus
+# Improving the Style of Shell from Apache Yetus
 #
 
 doWork() {
