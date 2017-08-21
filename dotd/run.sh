@@ -13,22 +13,60 @@ clean() {
   rm -v -f main.d main.d.mm main.o main
 }
 
-demo() {
-  make 
+change-header() {
+  echo '#include "newdep.h"' >> defs.h
+
+  # Override it
+  echo '#define EXIT_CODE 100' > newdep.h
+}
+
+run-main() {
   set +o errexit
   ./main
   echo "status: $?"
   echo
+}
 
-  echo "--- main.d.mm ---"
-  cat main.d.mm
+show-file() {
+  local path=$1
+  echo "--- $path ---"
+  cat $path
   echo
+}
 
-  echo "--- main.d ---"
-  cat main.d
-  echo
-
+demo() {
   clean
+
+  git checkout defs.h newdep.h  # revert it
+  show-file defs.h
+  show-file newdep.h
+
+  make "$@"
+  run-main
+
+  show-file main.d.mm
+  show-file main.d
+
+  change-header
+  show-file defs.h
+  show-file newdep.h
+
+  make "$@"
+  run-main
+
+  show-file main.d.mm
+  show-file main.d
+
+  #clean
+}
+
+# Trying without the %.d rule.  This seems wrong on two counts:
+# https://news.ycombinator.com/item?id=15061615
+#
+# Hm but it works?  
+
+demo-short() {
+  demo -f short.mk
 }
 
 "$@"
