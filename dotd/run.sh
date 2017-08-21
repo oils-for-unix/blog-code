@@ -108,5 +108,44 @@ preprocessor-deps() {
   # TODO: I don't think there's way to compile and generate .d to a custom name?  Two outputs?
 }
 
+trace-procs() {
+  local prefix=$1
+  shift
+
+  rm -f $prefix.*
+  strace -ff -e 'execve' -o $prefix -- "$@"
+  ls -l $prefix.*
+  head $prefix.*
+}
+
+# TODO: Does Clang work the same way?
+trace-gcc() {
+  # /usr/lib/gcc/x86_64-linux-gnu/5/cc1
+  # Hm -MD invokes cc1 with -MD main.d?  It takes an arg?
+  # Forks assembler0
+  mkdir -p _tmp
+  local prefix=_tmp/gcc
+  trace-procs $prefix gcc -c main.c -MD
+
+}
+
+# Both of these invoke cc1.  That is odd.  They just pass flags straight
+# through.  -MD takes and argument though.
+trace-cpp() {
+  trace-procs _tmp/cpp cpp main.c -M -MF my_custom_name3.d
+
+  rm _tmp/cpp*
+
+  trace-procs _tmp/cpp cpp main.c -MD my_custom_name4.d
+}
+
+# NOTES:
+# - This feels wrong because we couldn't set up a sandbox with just deps.  Deps
+# should be known, even in a full build?
+# - Is it specific to the C preprocessor?  The logic is that if a new
+# dependency was added, then an #include must have been added, so the timestamp
+# must have changed.
+# - It's focused on .c files and not .h files.  .c files are translation units.
+
 
 "$@"
