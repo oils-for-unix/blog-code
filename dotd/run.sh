@@ -94,6 +94,14 @@ flags() {
   show-file main.d
 }
 
+# Hm this doesn't seem to output a .d file if there's a compile error.  But it's a simple case.
+compile-error() {
+  rm -f compile-error.d
+  set +o errexit
+  gcc -MD compile-error.c
+  ls -l
+}
+
 # Invoke the preprocessor directly
 preprocessor-deps() {
   # How to write it to a file, but not preprocess?
@@ -127,6 +135,18 @@ trace-gcc() {
   local prefix=_tmp/gcc
   trace-procs $prefix gcc -c main.c -MD
 
+  rm -f $prefix.*
+
+  # How many processes?  FOUR.
+  # 1. cc1 main.d main.c -> tmp file with assembly
+  # 2. as -o main.o /tmp/ccoPSa4.s.  (Also it does 4 execve() calls, instead of using evecvpe?)
+  # 3. cc1 foo.d foo.c -> tmp file with assembly
+  # 4. as -o  foo.o /tmp/ccoPS5a4.s (same name?)
+  #
+  # Hm yes that is a lot of format juggling!
+
+  touch foo.c
+  trace-procs $prefix gcc -c main.c foo.c -MD
 }
 
 # Both of these invoke cc1.  That is odd.  They just pass flags straight
@@ -146,6 +166,48 @@ trace-cpp() {
 # dependency was added, then an #include must have been added, so the timestamp
 # must have changed.
 # - It's focused on .c files and not .h files.  .c files are translation units.
+
+# Questions:
+# - How should OPy 'import' integrate witih Makefile?  How does Go do it?
+# Their object format is different.
+
+# Page from 2000, updated 4/2017.
+# http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/
+
+# - They're using the "Combined method" that's different than the GNU Make Manual
+# - Lots of other flags, not just -MD
+# - They use "mv" for .Td to to .d ?  Why?
+#   because gcc is incapable of generating two outputs!  What a horrible
+#   syntax!
+#
+# I think this is for out of tree builds:
+#
+# -MT $@ set the name of the target in the generated dependency file
+# -MD or -MMD : generate as a side effect of compilation, not INSTEAD of compilation
+# -MP: adds a target for each prequisite, to avoid errors when deleting files
+# -MF: write location to temporary file
+#
+# POSTCOMPILE:
+# mv - so we don't have corrupted half-files (but doesn't this happen for all
+# build rules?  The build system should take care of it)  But it says that
+#   compilation failures can leave a half-formed dependency file.  Geez.  gcc
+#   should fail to generate a dependency file if compilation fails, but maybe
+#   it doesn't.  Could you check its exit code too?
+# touch - so that the .o file  and .d file are newer?
+#
+# This scheme is full of hacks to get around Make!  mv is definitely one.  This
+# is "naive style vs. pedantic style".
+#
+# You can also just flags to CFLAGS instead of having DEPFLAGS
+
+
+# Critiques:
+# - gcc flags are horrible  -- lots of gymnastics to to out of tree builds instead of -MD
+# - gcc semantics are bad -- if it truly leaves a broken file (not able to reproduce this)
+# - the protocol is bad: makefile snippets
+
+
+
 
 
 "$@"
