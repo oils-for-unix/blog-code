@@ -13,11 +13,13 @@ clean() {
   rm -v -f main.d main.d.mm main.o main
 }
 
-change-header() {
-  echo '#include "newdep.h"' >> defs.h
+edit-files() {
+  #echo '#include "newdep.h"' >> defs.h
 
   # Override it
-  echo '#define EXIT_CODE 100' > newdep.h
+  #echo '#define EXIT_CODE 100' > newdep.h
+
+  sed -i 's|/\*HERE\*/|#include "defs.h"|g' main.c
 }
 
 run-main() {
@@ -37,9 +39,10 @@ show-file() {
 demo() {
   clean
 
-  git checkout defs.h newdep.h  # revert it
-  show-file defs.h
-  show-file newdep.h
+  git checkout main.c defs.h newdep.h  # revert it
+  show-file main.c
+  #show-file defs.h
+  #show-file newdep.h
 
   make "$@"
   run-main
@@ -47,9 +50,10 @@ demo() {
   show-file main.d.mm
   show-file main.d
 
-  change-header
-  show-file defs.h
-  show-file newdep.h
+  edit-files
+  show-file main.c
+  #show-file defs.h
+  #show-file newdep.h
 
   make "$@"
   run-main
