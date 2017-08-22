@@ -132,10 +132,12 @@ _trace-one() {
   rm -f _tmp/sflag.*
   strace -ff -e 'execve' -o _tmp/sflag  -s $strsize -- /bin/echo "$@" || true
   head _tmp/sflag.*
+  echo
 }
 
 # Conclusion: If a string is less than 32, it prints ... at the end the arg
 # list, even if there are no more args!
+
 test-s-flag() {
   for strsize in 2 4 8 16; do
     echo "--- strsize: $strsize ---"
@@ -145,10 +147,27 @@ test-s-flag() {
   echo
   echo
 
-  # Numargs is half the str size?
-  for numargs in 2 4 8 16 32 64; do
-    echo "--- numargs: $numargs ---"
-    _trace-one 16 $(seq $numargs)
+  # See print_array in util.c in strace
+  # https://github.com/strace/strace.git
+
+  # const kernel_ulong_t abbrev_end =
+  # (abbrev(tcp) && max_strlen < nmemb) ?
+  # start_addr + elem_size * max_strlen : end_addr;
+  # kernel_ulong_t cur;
+  # this isn't what I'm observing!
+
+  readonly LIMITS=( 2 4 8 16 )
+  #readonly LIMITS=( 64 )
+  for strsize in "${LIMITS[@]}"; do
+    echo
+    echo "=== strsize: $strsize ==="
+    echo
+    local begin=$(( strsize / 2 - 1 ))
+    #local begin=0
+    for numargs in $(seq $begin $strsize); do
+      echo "--- strsize: $strsize --- numargs: $numargs ---"
+      _trace-one $strsize $(seq $((numargs - 1)))  # -1 to account for /binm/echo
+    done
   done
 }
 
