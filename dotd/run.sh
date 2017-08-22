@@ -121,9 +121,35 @@ trace-procs() {
   shift
 
   rm -f $prefix.*
-  strace -ff -e 'execve' -o $prefix -- "$@"
-  ls -l $prefix.*
+  strace -ff -e 'execve' -o $prefix -s 64 -- "$@" || true
+  #ls -l $prefix.*
   head $prefix.*
+}
+
+_trace-one() {
+  local strsize=$1
+  shift
+  rm -f _tmp/sflag.*
+  strace -ff -e 'execve' -o _tmp/sflag  -s $strsize -- /bin/echo "$@" || true
+  head _tmp/sflag.*
+}
+
+# Conclusion: If a string is less than 32, it prints ... at the end the arg
+# list, even if there are no more args!
+test-s-flag() {
+  for strsize in 2 4 8 16; do
+    echo "--- strsize: $strsize ---"
+    _trace-one $strsize a b c
+  done
+
+  echo
+  echo
+
+  # Numargs is half the str size?
+  for numargs in 2 4 8 16 32 64; do
+    echo "--- numargs: $numargs ---"
+    _trace-one 16 $(seq $numargs)
+  done
 }
 
 # TODO: Does Clang work the same way?
