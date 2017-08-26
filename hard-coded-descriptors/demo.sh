@@ -36,6 +36,16 @@ isElfSimple() {
   [[ "$magic" =~ ELF ]]
 }
 
+isElfSimpleWithStdin() {
+  seq 3 > /tmp/3.txt
+  while read line; do
+    echo $line
+    isElfSimple /bin/true && echo YES
+    isElfSimple $0 || echo NO
+    echo
+  done < /tmp/3.txt
+}
+
 compareIsElf() {
   local path=$1
   isELF "$path" && echo "YES isELF $path" || echo "NO isELF $path"
