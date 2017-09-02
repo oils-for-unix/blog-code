@@ -7,6 +7,10 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+#
+# Improving the Style of Shell from Nix Package Manager
+#
+
 # from https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/setup.sh#L318
 
 # Return success if the specified file is an ELF object.
@@ -32,6 +36,16 @@ isElfSimple() {
   [[ "$magic" =~ ELF ]]
 }
 
+isElfSimpleWithStdin() {
+  seq 3 > /tmp/3.txt
+  while read line; do
+    echo $line
+    isElfSimple /bin/true && echo YES
+    isElfSimple $0 || echo NO
+    echo
+  done < /tmp/3.txt
+}
+
 compareIsElf() {
   local path=$1
   isELF "$path" && echo "YES isELF $path" || echo "NO isELF $path"
@@ -46,7 +60,7 @@ testIsElf() {
 }
 
 #
-# From Yetus
+# Improving the Style of Shell from Apache Yetus
 #
 
 doWork() {
