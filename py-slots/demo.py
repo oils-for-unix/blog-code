@@ -30,7 +30,8 @@ def Compute(points):
   total = 0
   # Test attribute access speed
   for p in points:
-    total += p.x + p.y
+    total += p.x 
+    total += p.y
   return total
 
 
@@ -44,7 +45,8 @@ def LCompute(points):
   total = 0
   # Test attribute access speed
   for p in points:
-    total += p.x01234567890123456789 + p.y01234567890123456789
+    total += p.x01234567890123456789
+    total += p.y01234567890123456789
   return total
 
 
@@ -55,14 +57,6 @@ class LPointSlots(object):
   def __init__(self, x, y):
     self.x01234567890123456789 = x
     self.y01234567890123456789 = y
-
-
-def Compute(points):
-  total = 0
-  # Test attribute access speed
-  for p in points:
-    total += p.x + p.y
-  return total
 
 
 def main(argv):
