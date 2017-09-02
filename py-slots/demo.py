@@ -3,6 +3,7 @@
 demo.py
 """
 
+import dis
 import os
 import subprocess
 import sys
@@ -34,11 +35,14 @@ def Compute(points):
 
 
 def main(argv):
-  p = Point(5, 10)
-  ps = PointSlots(5, 10)
-
+  #p = Point(5, 10)
+  #ps = PointSlots(5, 10)
   #p.z = 99
   #ps.z = 99  # not allowed
+
+  if argv[1] == 'dis':
+    dis.dis(Compute)
+    return
 
   class_name = argv[1]
   n = int(argv[2])
