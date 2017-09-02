@@ -29,15 +29,11 @@ compare() {
 
   export SHOW_MEM=1
 
-  ./demo.py Point $n &
-  #show-mem $!
-  wait
-
-  echo '------'
-
-  ./demo.py PointSlots $n &
-  #show-mem $!
-  wait
+  # Measurably slower with long variable names!  Dict lookups are slower.
+  for class in Point PointSlots LPoint LPointSlots; do
+    echo "--- $class ---"
+    ./demo.py $class $n
+  done
 }
 
 "$@"

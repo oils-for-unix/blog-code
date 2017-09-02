@@ -34,6 +34,37 @@ def Compute(points):
   return total
 
 
+class LPoint(object):
+  def __init__(self, x, y):
+    self.x01234567890123456789 = x
+    self.y01234567890123456789 = y
+
+
+def LCompute(points):
+  total = 0
+  # Test attribute access speed
+  for p in points:
+    total += p.x01234567890123456789 + p.y01234567890123456789
+  return total
+
+
+# Are slots like a struct?
+class LPointSlots(object):
+  __slots__ = ('x01234567890123456789', 'y01234567890123456789')
+
+  def __init__(self, x, y):
+    self.x01234567890123456789 = x
+    self.y01234567890123456789 = y
+
+
+def Compute(points):
+  total = 0
+  # Test attribute access speed
+  for p in points:
+    total += p.x + p.y
+  return total
+
+
 def main(argv):
   #p = Point(5, 10)
   #ps = PointSlots(5, 10)
@@ -49,19 +80,27 @@ def main(argv):
 
   if class_name == 'Point':
     cls = Point
+    compute_func = Compute
   elif class_name == 'PointSlots':
     cls = PointSlots
+    compute_func = Compute
+  elif class_name == 'LPoint':
+    cls = LPoint
+    compute_func = LCompute
+  elif class_name == 'LPointSlots':
+    cls = LPointSlots
+    compute_func = LCompute
   else:
     raise AssertionError
 
-  print 'Creating %d points...' % n
+  print 'Creating %d %s instances...' % (n, class_name)
   points = []
   for i in xrange(n):
     o = cls(i, i)
     points.append(o)
 
   start_time = time.time()
-  total = Compute(points)
+  total = compute_func(points)
   elapsed = time.time() - start_time
   print 'Computed %d from %d points in %.1f ms' % (total, n, elapsed * 1000)
 
