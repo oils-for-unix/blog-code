@@ -50,6 +50,21 @@ def LCompute(points):
   return total
 
 
+def ComputeList(intlist, n):
+  total = 0
+  for i in xrange(0, n*2, 2):
+    total += intlist[i]
+    total += intlist[i+1]
+  return total
+
+
+def ComputeFlatList(intlist, n):
+  total = 0
+  for i in intlist:
+    total += i
+  return total
+
+
 # Are slots like a struct?
 class LPointSlots(object):
   __slots__ = ('x01234567890123456789', 'y01234567890123456789')
@@ -71,6 +86,36 @@ def main(argv):
 
   class_name = argv[1]
   n = int(argv[2])
+
+  # Do List Comparison.  It's a little faster at ~67 ms vs ~83 for Point and
+  # ~73 for PointSlots.  Not overwhelmingly faster though.
+  # So there are bigger overheads than the name to number issue?
+
+  if class_name == '<list>':
+    intlist = range(n * 2)
+    start_time = time.time()
+    total = ComputeList(intlist, n)
+    elapsed = time.time() - start_time
+    print 'Computed %d from %d points in %.1f ms' % (total, n, elapsed * 1000)
+    return
+
+  if class_name == '<flatlist>':  # ~49 ms on 1M entries
+    intlist = range(n * 2)
+    start_time = time.time()
+    total = ComputeFlatList(intlist, n)
+    elapsed = time.time() - start_time
+    print 'Computed %d from %d points in %.1f ms' % (total, n, elapsed * 1000)
+    return
+
+  # ~13 ms on 1M entries.  So interpreter loop overhead dominates attribute
+  # access in this case!
+  if class_name == '<sum_c>':
+    intlist = range(n * 2)
+    start_time = time.time()
+    total = sum(intlist)
+    elapsed = time.time() - start_time
+    print 'Computed %d from %d points in %.1f ms' % (total, n, elapsed * 1000)
+    return
 
   if class_name == 'Point':
     cls = Point
