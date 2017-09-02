@@ -17,7 +17,7 @@ class Point(object):
 
 
 # Are slots like a struct?
-class PointStruct(object):
+class PointSlots(object):
   __slots__ = ('x', 'y')
 
   def __init__(self, x, y):
@@ -35,7 +35,7 @@ def Compute(points):
 
 def main(argv):
   p = Point(5, 10)
-  ps = PointStruct(5, 10)
+  ps = PointSlots(5, 10)
 
   #p.z = 99
   #ps.z = 99  # not allowed
@@ -45,8 +45,8 @@ def main(argv):
 
   if class_name == 'Point':
     cls = Point
-  elif class_name == 'PointStruct':
-    cls = PointStruct
+  elif class_name == 'PointSlots':
+    cls = PointSlots
   else:
     raise AssertionError
 
