@@ -35,7 +35,7 @@ compare() {
 
   echo '------'
 
-  ./demo.py PointStruct $n &
+  ./demo.py PointSlots $n &
   #show-mem $!
   wait
 }
