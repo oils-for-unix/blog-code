@@ -50,25 +50,25 @@ def main(argv):
   else:
     raise AssertionError
 
-  # Create a bunch of objects
+  print 'Creating %d points...' % n
   points = []
   for i in xrange(n):
     o = cls(i, i)
     points.append(o)
-  print 'Created %d points' % len(points)
 
   start_time = time.time()
   total = Compute(points)
-  print 'Total:', total
-  print 'Elapsed: %.3f' % (time.time() - start_time)
+  elapsed = time.time() - start_time
+  print 'Computed %d from %d points in %.1f ms' % (total, n, elapsed * 1000)
 
   # Both 64?  getsizeof() isn't recursive
   #print sys.getsizeof(p)
   #print sys.getsizeof(ps)
 
-  pat = '^VmPeak'
-  argv = ['grep', pat, '/proc/%d/status' % os.getpid()]
-  subprocess.call(argv)
+  if os.getenv('SHOW_MEM'):
+    pat = '^VmPeak'
+    argv = ['grep', pat, '/proc/%d/status' % os.getpid()]
+    subprocess.call(argv)
 
 
 if __name__ == '__main__':

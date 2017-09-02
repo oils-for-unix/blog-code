@@ -21,9 +21,13 @@ show-mem() {
 # vs.
 # VmPeak:   146004 kB
 
+# TODO: Use your coverage build from cpython-silce to instrument it?
+
 compare() {
   #local n=100000
   local n=1000000
+
+  export SHOW_MEM=1
 
   ./demo.py Point $n &
   #show-mem $!
