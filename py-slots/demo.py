@@ -6,6 +6,8 @@ demo.py
 import os
 import subprocess
 import sys
+import timeit
+import time
 
 
 class Point(object):
@@ -21,6 +23,14 @@ class PointStruct(object):
   def __init__(self, x, y):
     self.x = x
     self.y = y
+
+
+def Compute(points):
+  total = 0
+  # Test attribute access speed
+  for p in points:
+    total += p.x + p.y
+  return total
 
 
 def main(argv):
@@ -40,18 +50,25 @@ def main(argv):
   else:
     raise AssertionError
 
-  objs = []
+  # Create a bunch of objects
+  points = []
   for i in xrange(n):
-    o = cls(i, i*i)
-    objs.append(o)
+    o = cls(i, i)
+    points.append(o)
+  print 'Created %d points' % len(points)
 
-  print sys.getsizeof(p)
-  print sys.getsizeof(ps)
+  start_time = time.time()
+  total = Compute(points)
+  print 'Total:', total
+  print 'Elapsed: %.3f' % (time.time() - start_time)
 
-  print len(objs)
-  argv = ['grep', '^Vm', '/proc/%d/status' % os.getpid()]
+  # Both 64?  getsizeof() isn't recursive
+  #print sys.getsizeof(p)
+  #print sys.getsizeof(ps)
+
+  pat = '^VmPeak'
+  argv = ['grep', pat, '/proc/%d/status' % os.getpid()]
   subprocess.call(argv)
-  print 'DONE'
 
 
 if __name__ == '__main__':

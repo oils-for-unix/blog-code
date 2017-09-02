@@ -22,12 +22,14 @@ show-mem() {
 # VmPeak:   146004 kB
 
 compare() {
-  local n=100000
-  #local n=1000000
+  #local n=100000
+  local n=1000000
 
   ./demo.py Point $n &
   #show-mem $!
   wait
+
+  echo '------'
 
   ./demo.py PointStruct $n &
   #show-mem $!
