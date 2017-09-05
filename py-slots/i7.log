@@ -1,0 +1,22 @@
+--- <list> ---
+Computed 19999900000 from 100000 points in 6.6 ms
+--- <flatlist> ---
+Computed 19999900000 from 100000 points in 7.2 ms
+--- <sum_c> ---
+Computed 19999900000 from 100000 points in 1.8 ms
+--- Point ---
+VmPeak:	   64272 kB
+Creating 100000 Point instances...
+Computed 9999900000 from 100000 points in 8.4 ms
+--- PointSlots ---
+VmPeak:	   35600 kB
+Creating 100000 PointSlots instances...
+Computed 9999900000 from 100000 points in 7.7 ms
+--- LPoint ---
+VmPeak:	   64272 kB
+Creating 100000 LPoint instances...
+Computed 9999900000 from 100000 points in 8.4 ms
+--- LPointSlots ---
+VmPeak:	   35600 kB
+Creating 100000 LPointSlots instances...
+Computed 9999900000 from 100000 points in 7.3 ms
