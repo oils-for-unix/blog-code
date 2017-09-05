@@ -87,6 +87,13 @@ def main(argv):
     dis.dis(Compute)
     return
 
+  if argv[1] == 'dis2':
+    def FunctionUsingModule(paths):
+      for p in paths:  # multiple LOAD_ATTR in a loop.
+        print os.path.exists(p)
+    dis.dis(FunctionUsingModule)
+    return
+
   class_name = argv[1]
   n = int(argv[2])
 
