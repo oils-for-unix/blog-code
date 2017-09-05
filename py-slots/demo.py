@@ -59,6 +59,9 @@ def ComputeList(intlist, n):
 
 
 def ComputeFlatList(intlist, n):
+  """
+  NOTE: Does NOT do intlist[i] at all.
+  """
   total = 0
   for i in intlist:
     total += i
