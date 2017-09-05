@@ -24,8 +24,8 @@ show-mem() {
 # TODO: Use your coverage build from cpython-silce to instrument it?
 
 compare() {
-  #local n=100000
-  local n=1000000
+  local n=100000
+  #local n=1000000
 
   export SHOW_MEM=1
 
