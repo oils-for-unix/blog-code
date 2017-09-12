@@ -14,6 +14,7 @@ def UseLocalBeforeAssigned():
 
 
 # Using y from closing scope, but not mutating it.
+# "Add" outlives MakeAdder.
 def MakeAdder(y):
   def Add(x):
     return x + y
@@ -29,6 +30,15 @@ def MakeCounter():
     count += x
     return count
   return Inc
+
+
+# Using x from enclosing scope.  But inner function doesn't outlive the outer.
+def FilterDemo():
+  x = 3
+  mylist = range(5)
+
+  f = filter(lambda item: item != x, mylist)
+  return list(f)
 
 
 def main(argv):
@@ -48,6 +58,10 @@ def main(argv):
   inc = MakeCounter()
   print(inc(3))
   print(inc(5))
+
+  print()
+
+  print(FilterDemo())
 
 
 if __name__ == '__main__':
