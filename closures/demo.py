@@ -40,6 +40,23 @@ def FilterDemo():
   f = filter(lambda item: item != x, mylist)
   return list(f)
 
+# This is very weird to me.  score is just a local variable that's mutated by
+# one of 4 buttons?  No explicit state?
+
+# https://www.python.org/dev/peps/pep-3104/
+
+def make_scoreboard(frame, score=0):
+    label = Label(frame)
+    label.pack()
+    for i in [-10, -1, 1, 10]:
+        def increment(step=i):
+            score = score + step  # fails with UnboundLocalError
+            label['text'] = score
+        button = Button(frame, text='%+d' % i, command=increment)
+        button.pack()
+    return label
+
+
 
 def main(argv):
   try:
