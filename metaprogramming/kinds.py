@@ -32,13 +32,18 @@ def GenClassParser(name, n):
   """After lexer, before parser."""
   # Use tokenize module?  Construct them manually?  But Python doesn't really
   # have access to its own tokenizer.
+
+  # 1. create tokens.
+  # 2. invoke parser
+  # 3. run compiler module
   pass
 
 
 def GenClassAst(name, n):
   """After parser, before compiler."""
   print ast
-  # compile()?
+  # 1. create ast data structures?
+  # 2. run compiler module?
   pass
 
 
