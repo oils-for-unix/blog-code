@@ -10,7 +10,7 @@ escape-segments() {
 import cgi, re, sys
 
 print re.sub(
-  r"\x00(.*)\x01", 
+  r"\x01(.*)\x02", 
   lambda match: cgi.escape(match.group(1)),
   sys.stdin.read())
 '
@@ -30,12 +30,12 @@ EOF
 
   # - a trick for HTML escaping (avoid XSS): surround %s with unlikely bytes,
   #   \x00 and \x01.  Then pipe Python to escape.
-  local format='
+  local format=$'
   <tr>
-    <td><a href="https://github.com/oilshell/blog-code/commit/%H">%h</a> </td>
-    <td class="subject">%x00%s%x01</td>
+    <td> <a href="https://github.com/oilshell/blog-code/commit/%H">%h</a> </td>
+    <td>\x01%s\x02</td>
   </tr>'
-  git log -n 3 --pretty="format:$format" | escape-segments
+  git log -n 5 --pretty="format:$format" | escape-segments
 
   cat <<EOF
     </table>
