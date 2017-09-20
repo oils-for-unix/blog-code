@@ -17,19 +17,10 @@ print re.sub(
 }
 
 git-log-html() {
-  cat <<EOF
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Git Log</title>
-  </head>
-  <body>
-    <h1>Git Log</h1>
-    <table width="100%">
-EOF
+  echo '<table>'
 
   # - a trick for HTML escaping (avoid XSS): surround %s with unlikely bytes,
-  #   \x00 and \x01.  Then pipe Python to escape.
+  #   0x01 and 0x02.  Then pipe Python to escape.
   local format=$'
   <tr>
     <td> <a href="https://github.com/oilshell/blog-code/commit/%H">%h</a> </td>
@@ -37,11 +28,7 @@ EOF
   </tr>'
   git log -n 5 --pretty="format:$format" | escape-segments
 
-  cat <<EOF
-    </table>
-  </body>
-</html>
-EOF
+  echo '</table>'
 }
 
 # Remember: http://www.oilshell.org/blog/2017/08/12.html
