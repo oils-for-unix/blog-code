@@ -32,11 +32,20 @@ test-check-nul() {
   python -c "print '\1'" | check-nul || echo NO
 }
 
+count-nul() {
+  # -o puts every match on its own line.  grep -o -c doesn't work.
+  od -A n -t x1 | grep -o '00' | wc -l
+}
+
+test-count-nul() {
+  python -c "print '\0x\0\0'" | count-nul
+  python -c "print '\1'" | count-nul
+}
+
 git-log-html() {
   echo '<table cellpadding=5>'
 
-  # - a trick for HTML escaping (avoid XSS): surround %s with unlikely bytes,
-  #   0x01 and 0x02.  Then pipe Python to escape.
+  local num_fields=2  # 2 fields contain arbitrary text
   local format='
   <tr>
     <td> <a href="https://github.com/oilshell/blog-code/commit/%H">%h</a> </td>
@@ -49,19 +58,27 @@ git-log-html() {
   </tr>
   '
 
-  local plain='%H %ad %an %B'
-  if git log --pretty="format:$plain" "$@" | check-nul; then
-    echo 1>&2 "FATAL: git log contains NUL characters"
+  local num_entries=5
+  git log -n $num_entries --pretty="format:$format" > tmp.bin
+
+  local nul_count expected
+  nul_count=$(count-nul < tmp.bin)
+  expected=$(( num_entries * num_fields * 2 ))  
+
+  if test "$nul_count" -ne "$expected"; then
+    echo 1>&2 "Expected $expected NUL characters, got $nul_count"
     return 1
   fi
-  git log "$@" --pretty="format:$format" | escape-segments
+
+  # Writes HTML to stdout.
+  escape-segments < tmp.bin
 
   echo '</table>'
 }
 
 write-file() {
   # NOTE: with -n 5 there is a slight race condition.
-  git-log-html -n 5 > git-log-multiline.html
+  git-log-html > git-log-multiline.html
   echo "Wrote git-log-multiline.html"
 }
 
