@@ -20,18 +20,6 @@ print re.sub(
 '
 }
 
-# nul check with od.  Point-free style.
-check-nul() {
-  # -A n: no addresses
-  # -t x1: 1 byte hex addresses
-  od -A n -t x1 | grep 00 
-}
-
-test-check-nul() {
-  python -c "print '\0'" | check-nul && echo YES
-  python -c "print '\1'" | check-nul || echo NO
-}
-
 count-nul() {
   # -o puts every match on its own line.  grep -o -c doesn't work.
   od -A n -t x1 | grep -o '00' | wc -l
@@ -40,6 +28,20 @@ count-nul() {
 test-count-nul() {
   python -c "print '\0x\0\0'" | count-nul
   python -c "print '\1'" | count-nul
+}
+
+# Takes a file on stdin, and expected NUL count as $1.  Fails if they don't
+# match.
+expect-nul-count() {
+  local expected=$1
+
+  local nul_count=0
+  nul_count=$(count-nul)  # reads from stdin!
+
+  if test "$nul_count" -ne "$expected"; then
+    echo 1>&2 "Expected $expected NUL characters, got $nul_count"
+    return 1
+  fi
 }
 
 git-log-html() {
@@ -61,14 +63,8 @@ git-log-html() {
   local num_entries=5
   git log -n $num_entries --pretty="format:$format" > tmp.bin
 
-  local nul_count expected
-  nul_count=$(count-nul < tmp.bin)
-  expected=$(( num_entries * num_fields * 2 ))  
-
-  if test "$nul_count" -ne "$expected"; then
-    echo 1>&2 "Expected $expected NUL characters, got $nul_count"
-    return 1
-  fi
+  # Fails if we don't get the right number of NUL characters.
+  expect-nul-count $((num_entries * num_fields * 2)) < tmp.bin
 
   # Writes HTML to stdout.
   escape-segments < tmp.bin
