@@ -2,18 +2,21 @@
 
 TODO: [Parsing Bash is Undecidable](http://www.oilshell.org/blog/2016/10/20.html)
 
-TODO: [Example Code in Shell, Awk, and Make](http://www.oilshell.org/blog/2016/11/14.html)
-
 [andychu/pratt-parsing-demo](https://github.com/andychu/pratt-parsing-demo) (other repo) -- 
 [Pratt Parsing Without Prototypal Inheritance, Global Variables, Virtual Dispatch, or Java](http://www.oilshell.org/blog/2016/11/03.html)
+
+TODO: [Example Code in Shell, Awk, and Make](http://www.oilshell.org/blog/2016/11/14.html)
 
 [id-kind-func/](id-kind-func/) - [Four Functions and Enum Labelings](http://www.oilshell.org/blog/2016/12/26.html)
 
 [forth-like/](forth-like/) - [Shell Has a Forth-like Quality](http://www.oilshell.org/blog/2017/01/13.html)
 
-[point-free/]([point-free/]) - [Bernstein Chaining of ssh and su](http://www.oilshell.org/blog/2017/01/15.html)
+[point-free/](point-free/) - [Pipelines Support Vectorized, Point-Free, and Imperative Style](http://www.oilshell.org/blog/2017/01/15.html)
 
 [bernstein-fix/](bernstein-fix/) - [Bernstein Chaining of ssh and su](http://www.oilshell.org/blog/2017/01/31.html)
+
+[bourguet/operator_precedence_parsing][https://github.com/bourguet/operator_precedence_parsing] - 
+[Code for the Shunting Yard Algorithm, and More](http://www.oilshell.org/blog/2017/04/22.html)
 
 [hard-coded-descriptors/](hard-coded-descriptors/) - [Avoid Directly Manipulating File Descriptors in Shell](http://www.oilshell.org/blog/2017/08/12.html)
 
