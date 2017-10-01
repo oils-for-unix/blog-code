@@ -5,6 +5,8 @@ TODO: [Parsing Bash is Undecidable](http://www.oilshell.org/blog/2016/10/20.html
 [andychu/pratt-parsing-demo](https://github.com/andychu/pratt-parsing-demo) (other repo) -- 
 [Pratt Parsing Without Prototypal Inheritance, Global Variables, Virtual Dispatch, or Java](http://www.oilshell.org/blog/2016/11/03.html)
 
+TODO: [Thirteen Incorrect Ways and Two Awkward Ways to Use Arrays](http://www.oilshell.org/blog/2016/11/06.html)
+
 TODO: [Example Code in Shell, Awk, and Make](http://www.oilshell.org/blog/2016/11/14.html)
 
 [id-kind-func/](id-kind-func/) - [Four Functions and Enum Labelings](http://www.oilshell.org/blog/2016/12/26.html)
