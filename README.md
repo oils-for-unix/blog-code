@@ -15,7 +15,7 @@ TODO: [Example Code in Shell, Awk, and Make](http://www.oilshell.org/blog/2016/1
 
 [bernstein-fix/](bernstein-fix/) - [Bernstein Chaining of ssh and su](http://www.oilshell.org/blog/2017/01/31.html)
 
-[bourguet/operator_precedence_parsing][https://github.com/bourguet/operator_precedence_parsing] - 
+[bourguet/operator_precedence_parsing](https://github.com/bourguet/operator_precedence_parsing) - 
 [Code for the Shunting Yard Algorithm, and More](http://www.oilshell.org/blog/2017/04/22.html)
 
 [hard-coded-descriptors/](hard-coded-descriptors/) - [Avoid Directly Manipulating File Descriptors in Shell](http://www.oilshell.org/blog/2017/08/12.html)
