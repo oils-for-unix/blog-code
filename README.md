@@ -4,7 +4,7 @@ Code for http://oilshell.org/blog/
 
 [Parsing Bash is Undecidable](http://www.oilshell.org/blog/2016/10/20.html)
 
-[id-kind-func/][] - [Four Functions and Enum Labelings](http://www.oilshell.org/blog/2016/12/26.html)
+[id-kind-func/](id-kind-func/) - [Four Functions and Enum Labelings](http://www.oilshell.org/blog/2016/12/26.html)
 
 [forth-like/][] - [Shell Has a Forth-like Quality](http://www.oilshell.org/blog/2017/01/13.html)
 
