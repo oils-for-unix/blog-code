@@ -16,7 +16,7 @@ escape-html() {
   sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
 }
 
-git-log() {
+git-log-html() {
   echo '<pre>'
   log "Running git"
   git log -n 1 | escape-html
@@ -27,15 +27,15 @@ git-log() {
 main() {
   log ""
   log "*** Count output lines"
-  git-log | wc -l
+  git-log-html | wc -l
 
   log ""
   log "*** Write output to file"
-  git-log > out.html
+  git-log-html > out.html
 
   log ""
   log "*** Write output to file and log to file"
-  git-log > out2.html 2> log.txt
+  git-log-html > out2.html 2> log.txt
 
   log ""
   log "*** Test"
