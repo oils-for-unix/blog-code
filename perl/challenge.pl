@@ -6,7 +6,17 @@ use strict;
 use English;
 use autodie;
 
-sub f { open(my $h,"/bin/ls $_[0]|") ; print "--\n",(<$h>),"--\n";}
+sub f {
+  print "--\n";
+  open(my $h,"ls / |");
+  print (<$h>);
+  print "--\n";
+}
 
-open(my $o,">/tmp/out.txt") ; select $o ; f("/tmp") ;
-open($o,"| wc -l ")         ; select $o ; f("/tmp") ;
+open(my $o,">out.txt");
+select $o;
+f();
+
+open($o,"| wc -l ");
+select $o;
+f();
