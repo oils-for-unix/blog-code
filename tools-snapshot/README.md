@@ -1,7 +1,7 @@
 Oil Blog Tools Snapshot
 =======================
 
-A few people have asked how I make the oilshell.org site.
+A few people have asked how I make the [oilshell.org][] site.
 
 It uses the Unix philosophy; I describe some of the pieces at
 [oilshell.org/site.html](//oilshell.org/site.html).
@@ -67,7 +67,7 @@ Superficially, it looks messy.
 But I think it has a good architecture and has evolved well.  The pieces are
 small and compose well.
 
-The Knuth quote I mention in [this blog post][bespoke] about to re-editable or
+The Knuth quote I mention in [this blog post][bespoke] about re-editable or
 "bespoke" code is relevant.
 
 [bespoke]: http://www.oilshell.org/blog/2016/12/27.html
@@ -87,10 +87,10 @@ you need.
 
 ---
 
-On another note, I would really like [combine shell, Awk, and Make][] rather
-than have this cacophony of different langauges.  The [Oil
+On another note, I would really like [combine shell, Awk, and
+Make][shell-awk-make] and replace this cacophony of languages.  The [Oil
 language][oil-language] should also be able to take the place of short Python
-scripts.  (It won't be suitable for frameworks like Django.)
+scripts.  (Although it won't be suitable for frameworks like Django.)
 
 [shell-awk-make]: http://www.oilshell.org/blog/2016/11/13.html
 [oilshell.org]: //www.oilshell.org
