@@ -1,0 +1,159 @@
+#!/bin/bash
+#
+# Snippets for documents.
+
+# TODO: These should be set by "snip" I think.
+set -o errexit
+set -o nounset
+
+# This was a hack for markdown.pl.  I think it wanted the whole div on its own
+# line.
+div-on-own-line() {
+  sed -e 's|\(<div class="highlight">\)|&\n|g' \
+      -e 's|\(</div>\)|\n&|g'
+}
+
+# Workaround for
+# https://github.com/commonmark/CommonMark/issues/490
+#
+# CommonMark does this because they allow markdown nested inside HTML.
+
+fill-blank-lines() {
+  awk '
+  /^[ \t]*$/ { print "<!-- blank -->"; next }
+             { print }
+  '
+}
+
+test-fill-blank-lines() {
+  fill-blank-lines <<EOF
+def Foo()
+  if 0:
+    return
+
+  for i in x:
+    print i
+EOF
+}
+
+# Syntax highlighting with pygments.
+# It outputs <div class="highlight"><pre><span> ... (without line breaks.)
+syntax() {
+  local lexer=$1
+
+  # Blank lines
+  echo
+  # Read from stdin.
+  #pygmentize -f html -l $lexer | div-on-own-line
+  pygmentize -f html -l $lexer | fill-blank-lines
+  echo
+}
+
+test-syntax() {
+  syntax python <<EOF
+def Foo()
+  if 0:
+    return
+
+  for i in x:
+    print i
+EOF
+}
+
+# Just a normal pre block.  An alteranativ eto markdown indent.
+no-syntax() {
+  echo '<pre>'
+  cat
+  echo '</pre>'
+}
+
+# Syntax highlighting with pygments.
+listing() {
+  local path=$1
+  local lexer=${2:-}
+
+  if test -n "$lexer"; then
+    local filename=$(basename $path)
+    echo "<div style=\"text-align: right\">$filename</div>"
+
+    # Read from stdin.
+    #pygmentize -f html -l $lexer $path | div-on-own-line
+    pygmentize -f html -l $lexer $path | fill-blank-lines
+  else
+    cat $path 
+  fi
+}
+
+# Syntax highlight a shell command, and evaluate it with bash.
+sh-session() {
+  # Read from stdin.
+  local code=_tmp/sh_session_in.txt
+  local html=_tmp/sh_session.html
+  local output=_tmp/sh_session_output.txt
+
+  cat >$code
+  <$code  pygmentize -f html -l sh >$html
+  <$code  /bin/bash >$output 2>&1 || true  # supress errors
+
+  ./sh_session.py $html $output
+}
+
+# For cross-ref.html
+ref-entry() {
+  local tag=$1
+
+  read anchor
+  read url
+  cat <<EOF
+<a name=$tag>#$tag</a><br/>
+<a href="$url">$anchor</a> &mdash;
+EOF
+}
+
+# Link to cross ref
+ref() {
+  local tag=$1
+  read anchor
+  cat <<EOF
+<a href="/cross-ref.html?tag=$tag#$tag">$anchor</a>
+EOF
+}
+
+# Same name
+ref1() {
+  local tag=$1
+  cat <<EOF
+<a href="/cross-ref.html?tag=$tag#$tag">$tag</a>
+EOF
+}
+
+md-blog-tag() {
+  local tag=$1
+  cat <<EOF
+[$tag]: /blog/tags.html?tag=$tag#$tag
+EOF
+}
+
+# markdown cross reference
+md-ref1() {
+  local tag=$1
+  local md_tag=${2:-$tag}
+  cat <<EOF
+[$md_tag]: /cross-ref.html?tag=$tag#$tag
+EOF
+}
+
+# For including other snippets
+include() {
+  local path=$1
+  cat $path
+}
+
+oil-commit() {
+  local commit=$1
+  local abbrev=${commit:0:8}
+  echo "<code><a href=https://github.com/oilshell/oil/commit/$commit>$abbrev</a></code>"
+}
+
+"$@"
+

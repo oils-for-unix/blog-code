@@ -45,7 +45,7 @@ copy-snapshot() {
   local dest=../blog-code/tools-snapshot
 
   # A separate tool
-  cp -v ~/hg/zoo/bin/snip.py $dest
+  cp -v ~/hg/zoo/bin/snip.py Snip $dest
 
   mkdir -p $dest
   cp -v Makefile *.py {build,deps,files,latch,run}.sh $dest
@@ -53,10 +53,12 @@ copy-snapshot() {
   mkdir -p $dest/css
   cp -v css/*.css $dest/css
 
+  cp -v blog/*.md $dest/blog  # index and tags
+
   local post_dir=$dest/blog/2018/02
   mkdir -p $post_dir
   cp -v blog/2018/02/commonmark.md $post_dir
-  ln -s -v $post_dir/commonmark.md 14.md
+  ln -s -v commonmark.md $post_dir/14.md
 }
 
 "$@"

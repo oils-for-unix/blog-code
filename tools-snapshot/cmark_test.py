@@ -40,6 +40,17 @@ Another h4.
 ### Conclusion
 
 Concluding h3.
+
+<!-- The blank lines here show a problem that is papered over by fill-blank-lines
+     in Snip -->
+<div class="highlight"><pre><span></span>
+def f():
+  if 0:
+    return False
+
+  if 0:
+    return True
+</pre></div>
 """)
 
 class RenderTest(unittest.TestCase):
