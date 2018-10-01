@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+#
+# Refactoring / rewrite of original ddmin.py code from Andreas Zeller.
+
 from __future__ import print_function
 
 import re

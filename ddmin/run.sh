@@ -24,7 +24,7 @@ count() {
   wc -l *.py
 }
 
-compare() {
+compare-output() {
   diff -u <(./ddmin.py) <(./my_ddmin.py) 
 }
 
