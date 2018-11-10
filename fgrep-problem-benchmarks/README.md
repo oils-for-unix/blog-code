@@ -23,5 +23,5 @@ Simpler DFA for `"do" | "done" | "break"`
 re2c from fixed-strings.re2c.cc](//raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/fixed-strings.cc).
 Note that there are ~35 states `yy2` - `yy36`.
 
-[GrepFixedStrings() has 791 bytes of code](//raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/code-size.txt).  It has one or two variables, so all of them should fix in registers.
+[GrepFixedStrings() is compiled to 791 bytes of native code](//raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/code-size.txt).  It has one or two variables, so all of them should fix in registers.
 
