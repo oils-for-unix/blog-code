@@ -1,4 +1,4 @@
-# Code for http://oilshell.org/blog/
+# Code for the [Oil Shell Blog](http://oilshell.org/blog/)
 
 TODO: [Parsing Bash is Undecidable](http://www.oilshell.org/blog/2016/10/20.html)
 
@@ -44,3 +44,13 @@ TODO: [Example Code in Shell, Awk, and Make](http://www.oilshell.org/blog/2016/1
 [dotd/](dotd/) -- HN thread about Make
 
 [closures/](closures/) -- HN thread about use cases for closures
+
+[return-array/](return-array/)
+
+# 2018
+
+[perl/](perl/) -- Is Perl an Acceptable Shell?
+
+[tools-snapshot/](tools-snapshot/) -- A few people wanted to know whta tools I use to write the blog.
+
+[dmin/](ddmin/) -- Refactoring / rewriting the original ddmin Python code.
