@@ -43,8 +43,8 @@ Note that there are ~35 states `yy2` - `yy36`.
 | wc -l | 139 | 189 |
 | fgrep | 1,368  | 1,432 |
 | grep | 1,093 | 1,133 |
-| read:count-lines | 49 | 186 |
-| read:fixed-strings (re2c) | 1,211 | 1,347 |
+| read:count-lines (touch every byte in C++) | 49 | 186 |
+| read:fixed-strings (match with re2c) | 1,211 | 1,347 |
 | Python re | 5,781 | 5,946 |
 
 NOTE: Each benchmarks matches the same set of strings, but the output is
@@ -52,7 +52,7 @@ slightly different.  I did enough experiments to convince myself that this
 doesn't matter.  Aside from I/O, which we've accounted for, **matching** is the
 lion's share of the work, not say printing lines.
 
-## OBservations
+## Observations
 
 - grep is faster than native code!  I think this is because doesn't touch every
   byte.  It knows how to skip bytes in the fashion of Boyer-Moore.  See links
