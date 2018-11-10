@@ -13,5 +13,7 @@ See the top of `fixed-strings.sh` for instructions on running these benchmarks.
 
 [DFA for Benchmark Problem](https://raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/fixed-strings.png)
 
-![Simpler DFA For 3 Keywords](https://raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/trie.png)
+Simpler DFA for `"do" | "done" | "break"`
+
+![Simpler DFA](https://raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/trie.png)
 
