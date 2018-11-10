@@ -7,6 +7,9 @@
 #   ./fixed-strings.sh fetch-data
 #   ./fixed-strings.sh make-ten  # ten copies of the data
 #   ./fixed-strings.sh all-benchmarks
+#
+# Also useful:
+#   viz, vis-trie
 
 set -o nounset
 set -o pipefail
