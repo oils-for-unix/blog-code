@@ -115,6 +115,15 @@ update-re2c-keywords() {
   sed -i "s;.*__TO_REPLACE__.*;      $pat  // __TO_REPLACE__ ;g" fixed-strings.re2c.cc
 }
 
+describe-problem() {
+  echo "Matching this file:"
+  ls -l -h $TEN
+  echo
+  echo "Against ${#KEYWORDS[@]} keywords:"
+  echo "   ${KEYWORDS[@]}"
+  echo
+}
+
 # 9.3 seconds for "for line in f", but it has a loop.
 # 5.7 seconds for findall on the whole thing.
 python-re-benchmark() {
@@ -148,8 +157,6 @@ io-benchmark() {
 }
 
 grep-fixed-benchmark() {
-  echo "Matching text against ${#KEYWORDS[@]} keywords"
-
   # fgrep is slowest!
   # what if I increase the number of strings?
 
