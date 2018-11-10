@@ -15,7 +15,7 @@ See the top of `fixed-strings.sh` for instructions on running these benchmarks.
 
 Simpler DFA for `"do" | "done" | "break"`
 
-![Simpler DFA](//raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/trie.png)
+![Simpler DFA](https://raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/trie.png)
 
 ## Source Code and Generated
 
