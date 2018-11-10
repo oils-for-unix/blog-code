@@ -30,7 +30,7 @@ Note that there are ~35 states `yy2` - `yy36`.
 ## Approximate Results
 
 | Benchmark | User Space Time (ms) | Real Time (ms) |
-| --- | --- | --- |
+| --- | ---: | ---: |
 | cat | 0 | 46 |
 | wc -l | 139 | 189 |
 | fgrep | 1,368  | 1,432 |
