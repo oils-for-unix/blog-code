@@ -53,4 +53,6 @@ TODO: [Example Code in Shell, Awk, and Make](http://www.oilshell.org/blog/2016/1
 
 [tools-snapshot/](tools-snapshot/) -- A few people wanted to know whta tools I use to write the blog.
 
-[dmin/](ddmin/) -- Refactoring / rewriting the original ddmin Python code.
+[ddmin/](ddmin/) -- Refactoring / rewriting the original ddmin Python code.
+
+[fgrep-problem-benchmarks/](fgrep-problem-benchmarks/) -- Grew out of a discussion on the Aho-Corasick algorithm for matching a set of fixed strings.
