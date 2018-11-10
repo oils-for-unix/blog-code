@@ -2,10 +2,19 @@
 #
 # Usage:
 #   ./fixed-strings.sh <function name>
+#
+# Demo:
+#   ./fixed-strings.sh fetch-data
+#   ./fixed-strings.sh make-ten  # ten copies of the data
+#   ./fixed-strings.sh all-benchmarks
 
 set -o nounset
 set -o pipefail
 set -o errexit
+
+readonly ONE=_tmp/all-1.txt
+readonly TWO=_tmp/all-2.txt
+readonly TEN=_tmp/all-10.txt
 
 # ESSENTIAL BUG FIX FOR GREP
 export LC_ALL=C
@@ -18,6 +27,16 @@ banner() {
 
 re2c() {
   ~/git/oilshell/oil/_deps/re2c-1.0.3/re2c "$@"
+}
+
+publish-data() {
+  local name=$1
+  scp $ONE $name@$name.org:oilshell.org/share
+}
+
+fetch-data() {
+  mkdir -p _tmp
+  wget --directory _tmp https://www.oilshell.org/share/all-1.txt
 }
 
 # Compare re2c with fgrep.
@@ -40,10 +59,6 @@ make-manifest() {
   awk '{ print "/home/andy/git/oilshell/oil/" $2 }' $MANIFEST >  $ABS_PATHS
 }
 
-readonly ONE=_tmp/all-1.txt
-readonly TWO=_tmp/all-2.txt
-readonly TEN=_tmp/all-10.txt
-
 make-big() {
   # 34 MB of shell scripts!
   time xargs cat < $ABS_PATHS > $ONE
@@ -52,13 +67,19 @@ make-big() {
     echo _tmp/all-1.txt
   done | xargs cat > $TWO
 
+  make-ten
+
+  wc -l $ONE $TWO $TEN
+  ls -l -h $ONE $TWO $TEN
+}
+
+make-ten() {
   # 338 MB now!
   for i in $(seq 10); do
     echo _tmp/all-1.txt
   done | xargs cat > $TEN
 
-  wc -l $ONE $TWO $TEN
-  ls -l -h $ONE $TWO $TEN
+  ls -l -h $TEN
 }
 
 readonly KEYWORDS=(for while continue break if fi then else elif case esac do done)
