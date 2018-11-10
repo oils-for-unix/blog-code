@@ -17,3 +17,7 @@ Simpler DFA for `"do" | "done" | "break"`
 
 ![Simpler DFA](https://raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/trie.png)
 
+## Code Size
+
+[GrepFixedStrings() has 791 bytes of code](https://raw.githubusercontent.com/oilshell/blog-code/master/fgrep-problem-benchmarks/_gen/code-size.txt).  It has one or two variables, so all of them should fix in registers.
+

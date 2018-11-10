@@ -229,7 +229,7 @@ viz-trie() {
 
 # GrepFast() is 682 bytes only.
 code-size() {
-  ~/git/other/bloaty/bloaty -d symbols _tmp/fixed-strings
+  ~/git/other/bloaty/bloaty -d symbols _tmp/fixed-strings | tee _gen/code-size.txt
 }
 
 # grep is faster than both fgrep and the "optimal" DFA in native code
