@@ -63,5 +63,17 @@ lion's share of the work, not say printing lines.
 ### Links
 
 - [Why GNU Grep is Fast](https://lists.freebsd.org/pipermail/freebsd-current/2010-August/019310.html) ([Discussions](https://news.ycombinator.com/item?id=12351140))
+- [aho-corasick](https://github.com/BurntSushi/aho-corasick) library in Rust.
 
+### TODO
+
+- Measure running time of other regex implementations on the same problem.
+  (Pull requests accepted.)
+  - Are all backtracking engines slower than automata-based engines?
+  - Does interpreting vs. compiling make a difference?  `grep` is an
+    interpreter but it beats a compiler, probably due to the strings it does
+    **not** try to match.
+  - RE2, Rust, Go?
+- Plot running time vs. number of strings.  Right now we have a fixed set of 13
+  strings.  It would be nice to do 2, 10, 20, 30, etc.
 
