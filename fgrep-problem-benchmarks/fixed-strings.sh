@@ -136,6 +136,7 @@ fgrep-pat() { ./make_pat.py fgrep; }
 grep-pat() { ./make_pat.py grep; }
 ripgrep-pat() { ./make_pat.py ripgrep; }
 re2c-pat() { ./make_pat.py re2c; }
+re2-pat() { ./make_pat.py re2; }
 
 test-pat() {
   local k=_tmp/keywords.txt
@@ -243,6 +244,7 @@ egrep-syntax-comparison() {
 # I'm getting opposite results?  mmap() is a win?
 # https://lemire.me/blog/2012/06/26/which-is-fastest-read-fread-ifstream-or-mmap/
 
+# TODO: Always update the words here?
 re2c-fixed-benchmark() {
   local gen=_gen/fixed-strings.cc 
   local bin=_tmp/fixed-strings
@@ -276,8 +278,10 @@ re2c-fixed-benchmark() {
 }
 
 re2-fixed-benchmark() {
+  local words=_tmp/keywords.txt
+
   ./build.sh re2-grep
-  time _tmp/re2_grep "$(re2-pat)" $TEN >/dev/null
+  time _tmp/re2_grep "$(re2-pat < $words)" $TEN >/dev/null
 }
 
 all-benchmarks() {

@@ -3,11 +3,11 @@
 # Usage:
 #   ./setup.sh <function name>
 
+source common.sh
+
 set -o nounset
 set -o pipefail
 set -o errexit
-
-source common.sh
 
 download-re2() {
   mkdir -p _deps
