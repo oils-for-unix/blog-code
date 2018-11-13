@@ -344,22 +344,24 @@ download-ripgrep() {
 
 
 # All times are 'user' time, which is most of the 'real' time.
-#        re2c compile | re2c match time | ripgrep user time
-# n=2000       120 ms          2,499 ms            3,591 ms
-# n=3000       204 ms          2,574 ms            5,801 ms
-# n=4000       266 ms          2,563 ms            8,083 ms
-# n=5000       363 ms          2,638 ms           10,431 ms
-# n=6000       366 ms          2,659 ms           13,182 ms
+#        re2c compile | re2c code size | re2c match time | ripgrep user time
+# n=1000        66 ms          57 KiB           2,311 ms            1,803 ms
+# n=2000       120 ms                           2,499 ms            3,591 ms
+# n=3000       204 ms                           2,574 ms            5,801 ms
+# n=4000       266 ms                           2,563 ms            8,083 ms
+# n=5000       363 ms                           2,638 ms           10,431 ms
+# n=6000       366 ms                           2,659 ms           13,182 ms
 
 # re2c code size for n=6000 as measured by bloaty: 213 KiB.
 
 ripgrep-re2c() {
-  local n=6000
+  local n=1000
   sample $n
 
   update-re2c-keywords
-
   re2c-fixed-benchmark
+  code-size
+
   many-words-grep-benchmark
 }
 
