@@ -177,6 +177,14 @@ grep-fixed-benchmark() {
 
   banner 'GREP'
   time grep "$(grep-pat)" $TEN >/dev/null
+
+  # ripgrep fails on this file?  Unicode?
+  set +o errexit
+  if test -f $RG; then
+    banner 'RIPGREP'
+    time $RG "$(grep-pat)" $TEN >/dev/null
+    echo $?
+  fi
 }
 
 # symbols in OPT mode to see how bit it is
@@ -238,6 +246,13 @@ viz-trie() {
 # GrepFast() is 682 bytes only.
 code-size() {
   ~/git/other/bloaty/bloaty -d symbols _tmp/fixed-strings | tee _gen/code-size.txt
+}
+
+readonly RG=~/install/ripgrep-0.10.0-x86_64-unknown-linux-musl/rg
+
+download-ripgrep() {
+  wget --directory ~/install \
+    https://github.com/BurntSushi/ripgrep/releases/download/0.10.0/ripgrep-0.10.0-x86_64-unknown-linux-musl.tar.gz
 }
 
 # grep is faster than both fgrep and the "optimal" DFA in native code
