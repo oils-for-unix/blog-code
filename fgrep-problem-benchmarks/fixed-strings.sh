@@ -265,7 +265,9 @@ re2c-fixed-benchmark() {
 
   mkdir -p _gen
 
-  re2c -o $gen fixed-strings.re2c.cc
+  banner 'Compiling with re2c'
+  time re2c -o $gen fixed-strings.re2c.cc
+  banner 'Done'
 
   #g++ $DEBUG_FLAGS -o _tmp/fread _gen/fread.cc
   g++ $OPT_FLAGS -o $bin $gen
