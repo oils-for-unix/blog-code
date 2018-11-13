@@ -44,9 +44,9 @@ Note that there are ~35 states `yy2` - `yy36`.
 | fgrep | 1,368  | 1,432 |
 | grep | 1,093 | 1,133 |
 | ripgrep | 949 | 962 |
+| fixed-strings.cc read:count-lines (touch every byte in C++) | 49 | 186 |
+| fixed-strings.cc read:re2-match | 1,211 | 1,347 |
 | re2_grep.cc | 1,906 | 2,055 |
-| read:count-lines (touch every byte in C++) | 49 | 186 |
-| read:fixed-strings (match with re2c) | 1,211 | 1,347 |
 | Python re | 5,781 | 5,946 |
 
 NOTE: Each benchmarks matches the same set of strings, but the output is

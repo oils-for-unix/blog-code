@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
   int fd = fileno(f);
 
-  if (strcmp(action, "read:fixed-strings") == 0) {  // read
+  if (strcmp(action, "read:re2c-match") == 0) {  // read
     char* buf = (char*)malloc(num_bytes);
     size_t num_read = read(fd, buf, num_bytes);
 

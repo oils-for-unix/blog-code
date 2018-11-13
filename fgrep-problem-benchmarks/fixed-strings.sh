@@ -222,8 +222,8 @@ re2c-fixed-benchmark() {
   time $bin read:count-lines $TEN >/dev/null
 
   # 1214 ms.
-  banner 'read:fixed-strings'
-  time $bin read:fixed-strings $TEN >/dev/null
+  banner 'read:re2c-match'
+  time $bin read:re2c-match $TEN >/dev/null
 
   # Hm the mmap() is the thing that is slow here?  Not re2c?
   banner 'mmap'
