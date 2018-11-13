@@ -235,6 +235,9 @@ many-words-grep-benchmark() {
   wc -l _tmp/many-*
   md5sum _tmp/many-*
 
+
+  return
+
   banner 'NOTE: egrep blows up on large input!  May want to Ctrl-C.'
 
   if test -n "$COUNT_RESULTS"; then
@@ -338,5 +341,28 @@ download-ripgrep() {
 
 # TODO:
 # - Compare 2 keywords vs 10-20
+
+
+# All times are 'user' time, which is most of the 'real' time.
+#        re2c compile | re2c match time | ripgrep user time
+# n=2000       120 ms          2,499 ms            3,591 ms
+# n=3000       204 ms          2,574 ms            5,801 ms
+# n=4000       266 ms          2,563 ms            8,083 ms
+# n=5000       363 ms          2,638 ms           10,431 ms
+# n=6000       366 ms          2,659 ms           13,182 ms
+
+ripgrep-re2c() {
+  local n=6000
+  sample $n
+
+  update-re2c-keywords
+
+  re2c-fixed-benchmark
+  many-words-grep-benchmark
+}
+
+max-re2c-state() {
+  egrep -o 'yy[0-9]+' _gen/fixed-strings.cc | sort 
+}
 
 "$@"
