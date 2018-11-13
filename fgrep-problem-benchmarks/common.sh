@@ -37,6 +37,7 @@ sys.stdout.write(" | ".join(quoted))
 }
 
 many-words-re2c-pat() {
-  echo
+  readarray SAMPLED < _tmp/sampled.txt
+  re2c-pat "${SAMPLED[@]}"
 }
 

@@ -123,7 +123,8 @@ test-pat() {
 
 # Use a special marker in the code
 update-re2c-keywords() {
-  local pat="$(re2c-pat "${KEYWORDS[@]}")"
+  #local pat="$(re2c-pat "${KEYWORDS[@]}")"
+  local pat="$(many-words-re2c-pat)"
   sed -i "s;.*__TO_REPLACE__.*;      $pat  // __TO_REPLACE__ ;g" fixed-strings.re2c.cc
 }
 
