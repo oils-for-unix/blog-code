@@ -43,11 +43,15 @@ Note that there are ~35 states `yy2` - `yy36`.
 | wc -l | 139 | 189 |
 | fgrep | 1,368  | 1,432 |
 | grep | 1,093 | 1,133 |
-| ripgrep | 949 | 962 |
+| [ripgrep][] | 949 | 962 |
 | fixed-strings.cc read:count-lines (touch every byte in C++) | 49 | 186 |
-| fixed-strings.cc read:re2-match | 1,211 | 1,347 |
-| re2_grep.cc | 1,906 | 2,055 |
+| fixed-strings.cc read:re2c-match ([re2c][] compiler) | 1,211 | 1,347 |
+| re2_grep.cc ([RE2][] interpreter) | 1,906 | 2,055 |
 | Python re | 5,781 | 5,946 |
+
+[re2c]: http://re2c.org/
+[RE2]: https://github.com/google/re2
+[ripgrep]: https://github.com/BurntSushi/ripgrep
 
 NOTE: Each benchmarks matches the same set of strings, but the output is
 slightly different.  I did enough experiments to convince myself that this
