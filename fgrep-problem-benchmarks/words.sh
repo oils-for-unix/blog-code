@@ -37,8 +37,8 @@ for arg in sys.argv[1:]:
 
 # Use a special marker in the code
 update-re2c-keywords() {
-  #local pat="$(re2c-pat "${KEYWORDS[@]}")"
-  local pat="$(many-words-re2c-pat)"
+  local file=$1
+  local pat="$(./make_pat.py re2c < $file)"
   sed -i "s;.*__TO_REPLACE__.*;      $pat  // __TO_REPLACE__ ;g" fixed-strings.re2c.cc
 }
 

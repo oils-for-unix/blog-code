@@ -189,7 +189,8 @@ grep-fixed-benchmark() {
 # because it is able to search LESS of the line.  A match is more likely to
 # appear earlier in the line, even though there are fewer matches overall?
 many-words-grep-benchmark() {
-  local pat="$(many-words-pipe-pat)"
+  local file=$1
+  local pat="$(./make_pat.py ripgrep < $file)"
 
   rm -f _tmp/many-*
 
@@ -330,17 +331,17 @@ download-ripgrep() {
 # re2c code size for n=6000 as measured by bloaty: 213 KiB.
 
 ripgrep-re2c() {
-  local n=1000
-  write-sample $n
+  local n=${1:-1000}
 
-  update-re2c-keywords
-  re2c-fixed-benchmark
+  local words=_tmp/sampled-$n.txt
 
-  re2-fixed-benchmark
+  # ripgrep
+  many-words-grep-benchmark $words
+  re2-fixed-benchmark $words
 
+  update-re2c-keywords $words
+  re2c-fixed-benchmark $words
   code-size
-
-  many-words-grep-benchmark
 }
 
 max-re2c-state() {
