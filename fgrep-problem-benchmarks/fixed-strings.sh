@@ -167,11 +167,14 @@ io-benchmark() {
   time wc -l $TEN
 }
 
+readonly COUNT_RESULTS=''
+#readonly COUNT_RESULTS='1'
+
 grep-fixed-benchmark() {
   # fgrep is slowest!
   # what if I increase the number of strings?
 
-  if false; then
+  if test -n "$COUNT_RESULTS"; then
     echo 'FGREP number of results'
     fgrep "$(fgrep-pat)" $TEN | wc -l
   fi
@@ -181,7 +184,7 @@ grep-fixed-benchmark() {
 
   # Wow egrep is significantly slower than fgrep!
 
-  if false; then
+  if test -n "$COUNT_RESULTS"; then
     echo 'GREP number of results'
     grep "$(grep-pat)" $TEN | wc -l
   fi
@@ -191,6 +194,12 @@ grep-fixed-benchmark() {
 
   # ripgrep fails on this file?  Unicode?
   if test -f $RG; then
+
+    if test -n "$COUNT_RESULTS"; then
+      echo 'RIPGREP number of results'
+      $RG "$(ripgrep-pat)" $TEN | wc -l
+    fi
+
     banner 'RIPGREP'
     time $RG "$(ripgrep-pat)" $TEN >/dev/null
     echo $?
