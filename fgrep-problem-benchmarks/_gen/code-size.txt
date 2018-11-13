@@ -1,24 +1,24 @@
      VM SIZE                               FILE SIZE
  --------------                         --------------
-   0.0%       0 [section .debug_loc]     61.7Ki  44.5%
-   0.0%       0 [section .debug_info]    22.5Ki  16.3%
-  65.9%  20.1Ki GrepFixedStrings()       20.1Ki  14.5%
-   0.0%       0 [section .debug_str]     8.41Ki   6.1%
-   0.0%       0 [section .debug_line]    6.78Ki   4.9%
-  17.0%  5.18Ki [section .rodata]        5.18Ki   3.7%
-   0.0%       0 [ELF Headers]            2.38Ki   1.7%
-   0.0%       0 [Unmapped]               1.76Ki   1.3%
-   4.5%  1.38Ki [30 Others]              1.71Ki   1.2%
-   0.0%       0 [section .symtab]        1.62Ki   1.2%
-   1.9%     605 __libc_csu_init          1.17Ki   0.8%
-   2.5%     772 CountLines()                857   0.6%
-   2.2%     700 main                        729   0.5%
-   0.0%       0 [section .debug_abbrev]     693   0.5%
-   1.9%     595 [LOAD [RX]]                 595   0.4%
-   0.0%       0 [section .strtab]           577   0.4%
-   1.5%     480 [section .dynsym]           480   0.3%
-   1.5%     464 [section .dynamic]          464   0.3%
-   0.0%       0 [section .shstrtab]         357   0.3%
-   0.0%       0 [section .debug_ranges]     352   0.2%
-   1.0%     304 [section .plt]              304   0.2%
- 100.0%  30.5Ki TOTAL                     138Ki 100.0%
+   0.0%       0 [section .debug_loc]      769Ki  58.0%
+  76.8%   213Ki GrepFixedStrings()        213Ki  16.1%
+   0.0%       0 [section .debug_info]     130Ki   9.9%
+   0.0%       0 [section .debug_line]    83.4Ki   6.3%
+  21.3%  59.2Ki [section .rodata]        59.2Ki   4.5%
+   0.0%       0 [section .debug_str]     56.3Ki   4.2%
+   0.0%       0 [Unmapped]               2.68Ki   0.2%
+   0.0%       0 [ELF Headers]            2.38Ki   0.2%
+   0.5%  1.37Ki [30 Others]              1.71Ki   0.1%
+   0.0%       0 [section .symtab]        1.62Ki   0.1%
+   0.2%     605 __libc_csu_init          1.17Ki   0.1%
+   0.3%     772 CountLines()                857   0.1%
+   0.2%     700 main                        729   0.1%
+   0.0%       0 [section .debug_abbrev]     693   0.1%
+   0.2%     595 [LOAD [RX]]                 595   0.0%
+   0.0%       0 [section .strtab]           577   0.0%
+   0.2%     480 [section .dynsym]           480   0.0%
+   0.2%     464 [section .dynamic]          464   0.0%
+   0.0%       0 [section .shstrtab]         357   0.0%
+   0.0%       0 [section .debug_ranges]     352   0.0%
+   0.1%     304 [section .plt]              304   0.0%
+ 100.0%   277Ki TOTAL                    1.30Mi 100.0%

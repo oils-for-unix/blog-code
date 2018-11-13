@@ -351,6 +351,8 @@ download-ripgrep() {
 # n=5000       363 ms          2,638 ms           10,431 ms
 # n=6000       366 ms          2,659 ms           13,182 ms
 
+# re2c code size for n=6000 as measured by bloaty: 213 KiB.
+
 ripgrep-re2c() {
   local n=6000
   sample $n
