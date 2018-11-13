@@ -36,7 +36,7 @@ sample() {
   # Maybe it is building a DFA that is too big!
 
   #local n=14200
-  local n=400
+  local n=1000
 
   shuf -n $n $FILTERED > _tmp/sampled.txt
 

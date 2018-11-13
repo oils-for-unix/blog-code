@@ -213,20 +213,12 @@ grep-fixed-benchmark() {
 # because it is able to search LESS of the line.  A match is more likely to
 # appear earlier in the line, even though there are fewer matches overall?
 many-words-grep-benchmark() {
+  local pat="$(many-words-pipe-pat)"
+
+  rm -f _tmp/many-*
 
   # Always enable
   COUNT_RESULTS=1
-
-  local pat="$(many-words-pipe-pat)"
-
-  if test -n "$COUNT_RESULTS"; then
-    echo
-    echo 'EGREP number of results'
-    egrep "$pat" $TEN > _tmp/many-egrep.txt
-  fi
-
-  banner 'EGREP'
-  time egrep "$pat" $TEN >/dev/null
 
   if test -f $RG; then
 
@@ -239,6 +231,20 @@ many-words-grep-benchmark() {
     banner 'RIPGREP'
     time $RG "$pat" $TEN >/dev/null
   fi
+
+  wc -l _tmp/many-*
+  md5sum _tmp/many-*
+
+  banner 'NOTE: egrep blows up on large input!  May want to Ctrl-C.'
+
+  if test -n "$COUNT_RESULTS"; then
+    echo
+    echo 'EGREP number of results'
+    egrep "$pat" $TEN > _tmp/many-egrep.txt
+  fi
+
+  banner 'EGREP'
+  time egrep "$pat" $TEN >/dev/null
 
   wc -l _tmp/many-*
   md5sum _tmp/many-*
