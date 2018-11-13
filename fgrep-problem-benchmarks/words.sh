@@ -31,19 +31,17 @@ sample() {
   # But this is random because of 'shuf'
   #local n=14436
 
-  local n=14200
+  # egrep starts to have a lot of problems between 300 and 400.  It starts
+  # taking 8.7 seconds!
+  # Maybe it is building a DFA that is too big!
+
+  #local n=14200
+  local n=400
 
   shuf -n $n $FILTERED > _tmp/sampled.txt
 
   readarray SAMPLED < _tmp/sampled.txt
   echo "Sampled ${#SAMPLED[@]} items"
-
-  pat="$(words-pipe-pat "${SAMPLED[@]}")"
-  argv "$pat"
-}
-
-many-words-pipe-pat() {
-  readarray SAMPLED < _tmp/sampled.txt
 
   pat="$(words-pipe-pat "${SAMPLED[@]}")"
   argv "$pat"

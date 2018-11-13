@@ -22,3 +22,21 @@ sys.stdout.write("|".join(words))
 ' "$@"
 }
 
+many-words-pipe-pat() {
+  readarray SAMPLED < _tmp/sampled.txt
+
+  words-pipe-pat "${SAMPLED[@]}"
+}
+
+re2c-pat() {
+  python -c '
+import sys
+quoted = ["\"%s\"" % line.strip() for line in sys.argv[1:]]
+sys.stdout.write(" | ".join(quoted))
+' "$@"
+}
+
+many-words-re2c-pat() {
+  echo
+}
+
