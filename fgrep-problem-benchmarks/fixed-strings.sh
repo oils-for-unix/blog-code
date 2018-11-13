@@ -101,6 +101,11 @@ ripgrep-pat() {
   python -c 'import sys;sys.stdout.write("|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
 }
 
+# Same syntax!
+re2-pat() {
+  ripgrep-pat
+}
+
 re2c-pat() {
   python -c '
 import sys
@@ -225,10 +230,16 @@ re2c-fixed-benchmark() {
   time $bin mmap $TEN #>/dev/null
 }
 
+re2-fixed-benchmark() {
+  ./build.sh re2-grep
+  time _tmp/re2_grep "$(re2-pat)" $TEN >/dev/null
+}
+
 all-benchmarks() {
   io-benchmark
   grep-fixed-benchmark
   re2c-fixed-benchmark
+  re2-fixed-benchmark
   python-re-benchmark
 }
 

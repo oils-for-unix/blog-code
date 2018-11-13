@@ -39,7 +39,7 @@ re2-grep() {
     -L _deps/re2/obj -l re2 \
     -l pthread
 
-  _tmp/re2_grep
+  #_tmp/re2_grep
 }
 
 
