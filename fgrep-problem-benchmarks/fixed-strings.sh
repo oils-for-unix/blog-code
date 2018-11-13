@@ -11,11 +11,12 @@
 # Also useful:
 #   viz, vis-trie
 
+source common.sh
+source words.sh  # for many-words-pipe-pat
+
 set -o nounset
 set -o pipefail
 set -o errexit
-
-source common.sh
 
 readonly ONE=_tmp/all-1.txt
 readonly TWO=_tmp/all-2.txt
@@ -202,7 +203,6 @@ grep-fixed-benchmark() {
   banner 'GREP'
   time grep "$(grep-pat)" $TEN >/dev/null
 
-  # ripgrep fails on this file?  Unicode?
   if test -f $RG; then
 
     if test -n "$COUNT_RESULTS"; then
@@ -213,7 +213,35 @@ grep-fixed-benchmark() {
 
     banner 'RIPGREP'
     time $RG "$(ripgrep-pat)" $TEN >/dev/null
-    echo $?
+  fi
+}
+
+many-words-grep-benchmark() {
+
+  # Always enable
+  COUNT_RESULTS=1
+
+  local pat="$(many-words-pipe-pat)"
+
+  if test -n "$COUNT_RESULTS"; then
+    echo
+    echo 'EGREP number of results'
+    egrep "$pat" $TEN | wc -l
+  fi
+
+  banner 'EGREP'
+  time egrep "$pat" $TEN >/dev/null
+
+  if test -f $RG; then
+
+    if test -n "$COUNT_RESULTS"; then
+      echo
+      echo 'RIPGREP number of results'
+      $RG "$pat" $TEN | wc -l
+    fi
+
+    banner 'RIPGREP'
+    time $RG "$pat" $TEN >/dev/null
   fi
 }
 
