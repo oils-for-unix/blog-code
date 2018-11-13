@@ -216,6 +216,9 @@ grep-fixed-benchmark() {
   fi
 }
 
+# NOTE: egrep is faster with 14,300 strings than on 13 strings?  Probably
+# because it is able to search LESS of the line.  A match is more likely to
+# appear earlier in the line, even though there are fewer matches overall?
 many-words-grep-benchmark() {
 
   # Always enable
@@ -226,7 +229,7 @@ many-words-grep-benchmark() {
   if test -n "$COUNT_RESULTS"; then
     echo
     echo 'EGREP number of results'
-    egrep "$pat" $TEN | wc -l
+    egrep "$pat" $TEN > _tmp/many-egrep.txt
   fi
 
   banner 'EGREP'
@@ -237,12 +240,15 @@ many-words-grep-benchmark() {
     if test -n "$COUNT_RESULTS"; then
       echo
       echo 'RIPGREP number of results'
-      $RG "$pat" $TEN | wc -l
+      $RG "$pat" $TEN > _tmp/many-ripgrep.txt
     fi
 
     banner 'RIPGREP'
     time $RG "$pat" $TEN >/dev/null
   fi
+
+  wc -l _tmp/many-*
+  md5sum _tmp/many-*
 }
 
 # Does this make a difference?  I'm not seeing it.  Could be related to
