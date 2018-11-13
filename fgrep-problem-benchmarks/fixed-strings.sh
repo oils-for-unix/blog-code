@@ -15,6 +15,8 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+source common.sh
+
 readonly ONE=_tmp/all-1.txt
 readonly TWO=_tmp/all-2.txt
 readonly TEN=_tmp/all-10.txt
@@ -189,11 +191,6 @@ grep-fixed-benchmark() {
     echo $?
   fi
 }
-
-# symbols in OPT mode to see how bit it is
-readonly CXXFLAGS='-std=c++11 -Wall -Wextra -g'
-readonly DEBUG_FLAGS="$CXXFLAGS -fsanitize=address"
-readonly OPT_FLAGS="$CXXFLAGS -O3"
 
 # I'm getting opposite results?  mmap() is a win?
 # https://lemire.me/blog/2012/06/26/which-is-fastest-read-fread-ifstream-or-mmap/
