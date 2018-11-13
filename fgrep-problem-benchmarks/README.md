@@ -64,11 +64,16 @@ lion's share of the work, not say printing lines.
   byte.  It knows how to skip bytes in the fashion of Boyer-Moore.  See links
   below.
 - I think that Python is slower because it's a Perl-style **backtracking
-  engine** rather than an automata-based angine.
+  engine** rather than an automata-based angine.  However, `re.findall()` must
+  create a Python string object for every result (nearly 30 million of them),
+  which is slow.  So it might not be completely fair.
 
 ### Links
 
 - [Why GNU Grep is Fast](https://lists.freebsd.org/pipermail/freebsd-current/2010-August/019310.html) ([Discussions](https://news.ycombinator.com/item?id=12351140))
+- [ripgrep is faster than {grep, ag, git grep, ucg, pt, sift}](https://blog.burntsushi.net/ripgrep/)
+  - ripgrep uses many strategies, including NFA, DFA, Aho-Corasick, and Teddy
+    (SIMD)!
 - [aho-corasick](https://github.com/BurntSushi/aho-corasick) library in Rust.
 
 ### TODO
@@ -76,10 +81,13 @@ lion's share of the work, not say printing lines.
 - Measure running time of other regex implementations on the same problem.
   (Pull requests accepted.)
   - Are all backtracking engines slower than automata-based engines?
+  - Compare Perl 5 vs. Python.  Perl 5 is the "original" backtracking engine.
   - Does interpreting vs. compiling make a difference?  `grep` is an
     interpreter but it beats a compiler, probably due to the strings it does
     **not** try to match.
-  - RE2, Rust, Go?
+  - Others like Go regex, which is based on re2?
+  - redgrep?  Uses derivatives to construct automata.  (I tried to build it but
+    the dependencies seem out of date, and it doesn't have binaries.)
 - Plot running time vs. number of strings.  Right now we have a fixed set of 13
   strings.  It would be nice to do 2, 10, 20, 30, etc.
 
