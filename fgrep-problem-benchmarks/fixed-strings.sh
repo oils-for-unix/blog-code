@@ -97,14 +97,12 @@ grep-pat() {
   python -c 'import sys;sys.stdout.write("\\|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
 }
 
-pipe-pat() {
-  python -c 'import sys;sys.stdout.write("|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
-}
+# pipe-pat defined in common.sh
 
 # Same syntax!
-ripgrep-pat() { pipe-pat; }
-re2-pat() { pipe-pat; }
-egrep-pat() { pipe-pat; }
+ripgrep-pat() { pipe-pat "${KEYWORDS[@]}"; }
+re2-pat() { pipe-pat "${KEYWORDS[@]}"; }
+egrep-pat() { pipe-pat "${KEYWORDS[@]}"; }
 
 egrep-dash-e-argv() {
   # NOTE: only supports argv without spaces.  readarray could help
