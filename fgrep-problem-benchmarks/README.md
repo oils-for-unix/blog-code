@@ -43,6 +43,7 @@ Note that there are ~35 states `yy2` - `yy36`.
 | wc -l | 139 | 189 |
 | fgrep | 1,368  | 1,432 |
 | grep | 1,093 | 1,133 |
+| ripgrep | 949 | 962 |
 | read:count-lines (touch every byte in C++) | 49 | 186 |
 | read:fixed-strings (match with re2c) | 1,211 | 1,347 |
 | Python re | 5,781 | 5,946 |

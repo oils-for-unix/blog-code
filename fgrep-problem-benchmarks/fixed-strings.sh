@@ -95,6 +95,10 @@ grep-pat() {
   python -c 'import sys;sys.stdout.write("\\|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
 }
 
+ripgrep-pat() {
+  python -c 'import sys;sys.stdout.write("|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
+}
+
 re2c-pat() {
   python -c '
 import sys
@@ -179,10 +183,9 @@ grep-fixed-benchmark() {
   time grep "$(grep-pat)" $TEN >/dev/null
 
   # ripgrep fails on this file?  Unicode?
-  set +o errexit
   if test -f $RG; then
     banner 'RIPGREP'
-    time $RG "$(grep-pat)" $TEN >/dev/null
+    time $RG "$(ripgrep-pat)" $TEN >/dev/null
     echo $?
   fi
 }
