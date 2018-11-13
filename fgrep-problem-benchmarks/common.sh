@@ -10,34 +10,6 @@ readonly CXXFLAGS='-std=c++11 -Wall -Wextra -g'
 readonly DEBUG_FLAGS="$CXXFLAGS -fsanitize=address"
 readonly OPT_FLAGS="$CXXFLAGS -O3"
 
-pipe-pat() {
-  python -c 'import sys;sys.stdout.write("|".join(sys.argv[1:]))' "$@"
-}
-
-words-pipe-pat() {
-  python -c '
-import sys
-words = [ line.strip() for line in sys.argv[1:] ]
-sys.stdout.write("|".join(words))
-' "$@"
-}
-
-many-words-pipe-pat() {
-  readarray SAMPLED < _tmp/sampled.txt
-
-  words-pipe-pat "${SAMPLED[@]}"
-}
-
-re2c-pat() {
-  python -c '
-import sys
-quoted = ["\"%s\"" % line.strip() for line in sys.argv[1:]]
-sys.stdout.write(" | ".join(quoted))
-' "$@"
-}
-
-many-words-re2c-pat() {
-  readarray SAMPLED < _tmp/sampled.txt
-  re2c-pat "${SAMPLED[@]}"
-}
+# For smaller benchmark
+readonly KEYWORDS=(for while continue break if fi then else elif case esac do done)
 
