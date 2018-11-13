@@ -97,13 +97,23 @@ grep-pat() {
   python -c 'import sys;sys.stdout.write("\\|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
 }
 
-ripgrep-pat() {
+pipe-pat() {
   python -c 'import sys;sys.stdout.write("|".join(sys.argv[1:]))' "${KEYWORDS[@]}"
 }
 
 # Same syntax!
-re2-pat() {
-  ripgrep-pat
+ripgrep-pat() { pipe-pat; }
+re2-pat() { pipe-pat; }
+egrep-pat() { pipe-pat; }
+
+egrep-dash-e-argv() {
+  # NOTE: only supports argv without spaces.  readarray could help
+  python -c '
+import sys
+for arg in sys.argv[1:]:
+  print("-e")
+  print(arg)
+' "${KEYWORDS[@]}"
 }
 
 re2c-pat() {
@@ -206,6 +216,18 @@ grep-fixed-benchmark() {
     banner 'RIPGREP'
     time $RG "$(ripgrep-pat)" $TEN >/dev/null
     echo $?
+  fi
+}
+
+# Does this make a difference?  I'm not seeing it.  Could be related to
+# locale.
+egrep-syntax-comparison() {
+  if true; then
+    banner 'EGREP with | syntax'
+    time egrep "$(egrep-pat)" $TEN >/dev/null
+
+    banner 'EGREP with -e'
+    time egrep $(egrep-dash-e-argv) $TEN >/dev/null
   fi
 }
 
