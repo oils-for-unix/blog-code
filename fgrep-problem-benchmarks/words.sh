@@ -66,13 +66,24 @@ write-sample() {
   #local n=14200
   local n=${1:-2000}
 
-  shuf -n $n $FILTERED > _tmp/sampled.txt
+  local file=_tmp/sampled-$n.txt
+  shuf -n $n $FILTERED > $file
 
-  readarray SAMPLED < _tmp/sampled.txt
+  readarray SAMPLED < $file
   echo "Sampled ${#SAMPLED[@]} items"
 
-  pat="$(words-pipe-pat "${SAMPLED[@]}")"
-  argv "$pat"
+  # Check that it's not too big for an argument!
+  pat="$(./make_pat.py re2 < $file)"
+  argv "$pat" > /dev/null
+}
+
+readonly NUM_WORDS=(1000 2000 3000 4000 5000 6000)
+
+write-n() {
+  for n in "${NUM_WORDS[@]}"; do
+    write-sample $n
+  done 
+  wc -l _tmp/sampled-*.txt
 }
 
 write-keywords() {

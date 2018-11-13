@@ -278,7 +278,7 @@ re2c-fixed-benchmark() {
 }
 
 re2-fixed-benchmark() {
-  local words=_tmp/keywords.txt
+  local words=${1:-_tmp/keywords.txt}
 
   ./build.sh re2-grep
   time _tmp/re2_grep "$(re2-pat < $words)" $TEN >/dev/null
@@ -331,10 +331,13 @@ download-ripgrep() {
 
 ripgrep-re2c() {
   local n=1000
-  sample $n
+  write-sample $n
 
   update-re2c-keywords
   re2c-fixed-benchmark
+
+  re2-fixed-benchmark
+
   code-size
 
   many-words-grep-benchmark
