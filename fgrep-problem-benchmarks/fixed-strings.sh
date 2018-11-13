@@ -352,6 +352,16 @@ compare-many-words() {
   code-size
 }
 
+re2c-huge() {
+  local n=70000
+  write-sample $n
+  local words=_tmp/sampled-$n.txt
+
+  # Can't do this because the argument list is too long for sed!  Doh!
+  update-re2c-keywords $words
+  re2c-fixed-benchmark $words
+}
+
 max-re2c-state() {
   egrep -o 'yy[0-9]+' _gen/fixed-strings.cc | sort 
 }
