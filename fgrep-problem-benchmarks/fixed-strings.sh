@@ -326,15 +326,16 @@ download-ripgrep() {
 # All times are 'user' time, which is most of the 'real' time.
 #        re2c compile | re2c code size | re2c match time | ripgrep time | RE2
 # n=1000        66 ms          57 KiB           2,311 ms       1,803 ms   1,874 ms
-# n=2000       120 ms          93 KiB           2,499 ms       3,591 ms   DFA OOM!
-# n=3000       204 ms         125 KiB           2,574 ms       5,801 ms
-# n=4000       266 ms         159 KiB           2,563 ms       8,083 ms
-# n=5000       363 ms         186 KiB           2,638 ms      10,431 ms
-# n=6000       366 ms         213 KiB           2,659 ms      13,182 ms
+# n=2000       120 ms          93 KiB           2,499 ms       3,591 ms   2,681 ms
+# n=3000       204 ms         125 KiB           2,574 ms       5,801 ms   3,471 ms
+# n=4000       266 ms         159 KiB           2,563 ms       8,083 ms   4,323 ms
+# n=5000       363 ms         186 KiB           2,638 ms      10,431 ms   5,294 ms
+# n=6000       366 ms         213 KiB           2,659 ms      13,182 ms   6,397 ms
 #
 # NOTES:
 # - egrep blows up around 400 strings!
-# - RE2 is out of memory at 2000 strings!
+# - RE2 says "DFA out of memory" at 2000 strings, because it exhausts its 8 MB
+# budget.  We simply bump it up.
 
 compare-many-words() {
   local n=${1:-1000}
@@ -350,6 +351,13 @@ compare-many-words() {
   update-re2c-keywords $words
   re2c-fixed-benchmark $words
   code-size
+}
+
+re2-many() {
+  for n in 1000 2000 3000 4000 5000 6000; do
+    local words=_tmp/sampled-$n.txt
+    re2-fixed-benchmark $words
+  done
 }
 
 re2c-huge() {

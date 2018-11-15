@@ -31,9 +31,15 @@ int main(int argc, char **argv) {
 
   //fprintf(stderr, "pat = %s\n", pat);
 
-  re2::StringPiece input(buf, num_bytes);
-  re2::RE2 re(pat);
+  // RE2 uses a maximum of 8 MB for DFAs by default, but we can override it.
+  // https://github.com/google/re2/blob/master/re2/re2.h#L591
+
+  re2::RE2::Options options;
+  options.set_max_mem(1 << 30);  // 1 GB
+  re2::RE2 re(pat, options);
   assert(re.ok());
+
+  re2::StringPiece input(buf, num_bytes);
 
   // This loop modifies the input.
   // Have to read the header.
