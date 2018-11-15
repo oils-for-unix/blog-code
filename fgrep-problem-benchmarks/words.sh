@@ -77,7 +77,7 @@ write-sample() {
   argv "$pat" > /dev/null
 }
 
-readonly NUM_WORDS=(1000 2000 3000 4000 5000 6000)
+readonly NUM_WORDS=(10 100 1000 2000 3000 4000 5000 6000)
 
 write-n() {
   for n in "${NUM_WORDS[@]}"; do

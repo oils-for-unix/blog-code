@@ -325,6 +325,7 @@ download-ripgrep() {
 
 # All times are 'user' time, which is most of the 'real' time.
 #        re2c compile | re2c code size | re2c match time | ripgrep time | RE2
+# n= 100         7 ms          11 KiB           1,566 ms         687 ms   1,398 ms
 # n=1000        66 ms          57 KiB           2,311 ms       1,803 ms   1,874 ms
 # n=2000       120 ms          93 KiB           2,499 ms       3,591 ms   2,681 ms
 # n=3000       204 ms         125 KiB           2,574 ms       5,801 ms   3,471 ms
@@ -346,7 +347,7 @@ compare-many-words() {
   many-words-grep-benchmark $words
 
   # NOTE: blows up
-  #re2-fixed-benchmark $words
+  re2-fixed-benchmark $words
 
   update-re2c-keywords $words
   re2c-fixed-benchmark $words
