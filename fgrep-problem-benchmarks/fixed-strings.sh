@@ -257,7 +257,8 @@ re2c-fixed-benchmark() {
   banner 'Done'
 
   #g++ $DEBUG_FLAGS -o _tmp/fread _gen/fread.cc
-  g++ $OPT_FLAGS -o $bin $gen
+  banner 'Compiling with g++ (GCC)'
+  time g++ $OPT_FLAGS -o $bin $gen
 
   # 800 ms to read line-by-line.  disabled because it's slow.  
   if false; then
@@ -361,8 +362,10 @@ re2-many() {
   done
 }
 
+# NOTE: at 70,000, re2c crashes?  At 10,000, the C compiler starts to take a
+# long time!
 re2c-huge() {
-  local n=70000
+  local n=9000
   write-sample $n
   local words=_tmp/sampled-$n.txt
 

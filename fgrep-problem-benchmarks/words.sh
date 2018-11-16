@@ -41,7 +41,7 @@ update-re2c-keywords() {
   local pat="$(./make_pat.py re2c < $file)"
   local prog="s;.*__TO_REPLACE__.*;      $pat  // __TO_REPLACE__ ;g" 
   echo "$prog" > _tmp/replace.sed
-  sed -i --file=_tmp/replace.sed fixed-strings.re2c.cc
+  sed -i --file _tmp/replace.sed fixed-strings.re2c.cc
 }
 
 prune() {
@@ -74,7 +74,9 @@ write-sample() {
   readarray SAMPLED < $file
   echo "Sampled ${#SAMPLED[@]} items"
 
+  return
   # Check that it's not too big for an argument!
+  # Don't need this anymore since we're using sed --file.
   pat="$(./make_pat.py re2 < $file)"
   argv "$pat" > /dev/null
 }
