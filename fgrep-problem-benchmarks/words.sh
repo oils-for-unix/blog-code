@@ -39,7 +39,9 @@ for arg in sys.argv[1:]:
 update-re2c-keywords() {
   local file=$1
   local pat="$(./make_pat.py re2c < $file)"
-  sed -i "s;.*__TO_REPLACE__.*;      $pat  // __TO_REPLACE__ ;g" fixed-strings.re2c.cc
+  local prog="s;.*__TO_REPLACE__.*;      $pat  // __TO_REPLACE__ ;g" 
+  echo "$prog" > _tmp/replace.sed
+  sed -i --file=_tmp/replace.sed fixed-strings.re2c.cc
 }
 
 prune() {
