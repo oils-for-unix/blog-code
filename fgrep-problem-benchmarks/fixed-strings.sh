@@ -255,6 +255,7 @@ re2c-fixed-benchmark() {
   banner 'Compiling with re2c'
   time re2c -o $gen fixed-strings.re2c.cc
   banner 'Done'
+  return
 
   #g++ $DEBUG_FLAGS -o _tmp/fread _gen/fread.cc
   banner 'Compiling with g++ (GCC)'
@@ -333,11 +334,15 @@ download-ripgrep() {
 # n=4000       266 ms         159 KiB           2,563 ms       8,083 ms   4,323 ms
 # n=5000       363 ms         186 KiB           2,638 ms      10,431 ms   5,294 ms
 # n=6000       366 ms         213 KiB           2,659 ms      13,182 ms   6,397 ms
+# n=47,000   2,814 ms
 #
 # NOTES:
 # - egrep blows up around 400 strings!
 # - RE2 says "DFA out of memory" at 2000 strings, because it exhausts its 8 MB
 # budget.  We simply bump it up.
+# - at 48,000 words, re2c segfaults!
+# - At 10,000 words, GCC takes 36 seconds to compile re2c's output!  It's 74K
+# lines in 1.2 MB of source.
 
 compare-many-words() {
   local n=${1:-1000}
@@ -362,10 +367,8 @@ re2-many() {
   done
 }
 
-# NOTE: at 70,000, re2c crashes?  At 10,000, the C compiler starts to take a
-# long time!
 re2c-huge() {
-  local n=9000
+  local n=${1:-9000}
   write-sample $n
   local words=_tmp/sampled-$n.txt
 
