@@ -16,16 +16,16 @@ main = function(argv) {
   Log('Loaded data:')
   print(traffic)
 
-  by_url = aggregate(traffic$num_hits, by=list(url=traffic$url), FUN=sum)
-  Log('Aggregated over URL:')
-  print(by_url)
-
   total_hits = sum(traffic$num_hits)
-
   Log('Total traffic to /blog/ = %d', total_hits)
 
-  summary = data.frame(url = by_url$url, percentage = by_url$x / total_hits * 100.0)
-  Log('Percentage by URL:')
+  percentage = function(num_hits) {
+    sum(num_hits) / total_hits * 100.0
+  }
+
+  summary = aggregate(traffic$num_hits, by=list(url=traffic$url), FUN=percentage)
+
+  Log('Summary by URL:')
   print(summary)
 
   return()
