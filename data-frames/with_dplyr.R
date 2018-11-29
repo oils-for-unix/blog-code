@@ -1,6 +1,6 @@
 #!/usr/bin/Rscript
 #
-# example_dplyr.R
+# with_dplyr.R
 
 library(dplyr)
 
@@ -15,13 +15,19 @@ Log = function(fmt, ...) {
 main = function(argv) {
   Log('----')
 
-  traffic = read.csv('traffic.csv')
-
+  traffic = read.csv('traffic.csv', colClasses=c("Date", "character", "numeric")) 
   Log('Loaded data:')
   print(traffic)
 
   total_hits = sum(traffic$num_hits)
   Log('Total traffic to /blog/ = %d', total_hits)
+
+  traffic %>%
+    group_by(date) %>%
+    summarize(num_hits = sum(num_hits)) ->
+    daily
+  Log('Daily traffic:')
+  print(daily)
 
   traffic %>%
     group_by(url) %>%
@@ -31,13 +37,6 @@ main = function(argv) {
 
   Log('Popular Pages:')
   print(popular)
-
-  traffic %>%
-    group_by(date) %>%
-    summarize(num_hits = sum(num_hits)) ->
-    daily
-  Log('Daily traffic:')
-  print(daily)
 }
 
 main(commandArgs(TRUE))
