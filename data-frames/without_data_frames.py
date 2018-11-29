@@ -7,6 +7,13 @@ import collections
 import csv
 
 
+def log(msg, *args):
+  print()
+  if args:
+    msg = msg % args
+  print('  ' + msg)
+
+
 def main():
   # Load it
   with open('traffic.csv') as f:
@@ -19,14 +26,24 @@ def main():
     # Sum hits by URL, and calculate the total number of hits.
     total_hits = 0
     by_url = collections.defaultdict(int)
+    by_date = collections.defaultdict(int)
+
     for date, url, num_hits in reader:
       num_hits = int(num_hits)
+      by_date[date] += num_hits
       by_url[url] += num_hits
       total_hits += num_hits
 
-  # Print report.
+  log('Daily Traffic:')
+  print('%20s %s' % ('date', 'num_hits'))
+  daily = sorted(by_date.items())  # sort by date
+  for date, num_hits in daily:
+    print('%20s %d' % (date, num_hits))
+
+  log('Popular Pages:')
   print('%20s %s' % ('url', 'percentage'))
-  for url, num_hits in by_url.items():
+  popular = sorted(by_url.items(), key=lambda x: x[1], reverse=True)
+  for url, num_hits in popular:
     print('%20s %.2f' % (url, float(num_hits) / total_hits * 100.0))
 
   # TODO: Could sort these by percentage
