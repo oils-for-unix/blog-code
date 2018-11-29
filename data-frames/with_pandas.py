@@ -31,6 +31,7 @@ def main(argv):
       traffic.groupby('url')
       .apply(lambda x: sum(x.num_hits) / total_hits * 100.0)
       .reset_index(name='percentage')
+      .sort_values(by='percentage', ascending=False)
   )
 
   log('Popular Pages:')

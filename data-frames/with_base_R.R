@@ -27,6 +27,8 @@ main = function(argv) {
     sum(num_hits) / total_hits * 100.0
   }
   popular = aggregate(traffic$num_hits, by=list(url=traffic$url), FUN=percentage)
+  names(popular) = c('url', 'percentage')
+  popular = popular[order(popular$percentage, decreasing=TRUE), ]
   Log('Popular Pages:')
   print(popular)
 }
