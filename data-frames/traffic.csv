@@ -1,5 +1,8 @@
 date,url,num_hits
-2018-11-30,/releases.html,  45
-2018-11-30,/blog/,         100
-2018-12-01,/releases.html,  65
-2018-12-01,/blog/,         200
+2018-11-30,/site.html,         300
+2018-11-30,/blog/,            1000
+2018-12-01,/site.html,         320
+2018-12-01,/blog/,            1300
+2018-12-02,/site.html,         310
+2018-12-02,/blog/,            1800
+2018-12-02,/data-frames.html, 7500
