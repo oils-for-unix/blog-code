@@ -11,7 +11,7 @@ Log = function(fmt, ...) {
 }
 
 main = function(argv) {
-  traffic = read.csv('traffic.csv')
+  traffic = read.csv('traffic.csv', colClasses=c("Date", "character", "numeric")) 
 
   Log('Loaded data:')
   print(traffic)
@@ -21,7 +21,7 @@ main = function(argv) {
   print(daily)
 
   total_hits = sum(traffic$num_hits)
-  Log('Total traffic to /blog/ = %d', total_hits)
+  Log('Total hits = %d', total_hits)
 
   percentage = function(num_hits) {
     sum(num_hits) / total_hits * 100.0
