@@ -19,14 +19,20 @@ def main(argv):
   log('Loaded:')
   print(traffic)
 
-  total_hits = sum(traffic.num_hits)
-  log('Total hits = %d', total_hits)
-
-  daily = traffic.groupby('date').apply(lambda x: sum(x.num_hits))
+  daily = traffic.groupby('date').sum()
   log('Daily Traffic:')
   print(daily)
 
-  popular = traffic.groupby('url').apply(lambda x: sum(x.num_hits) / total_hits * 100.0)
+  total_hits = sum(traffic.num_hits)
+  log('Total hits = %d', total_hits)
+
+  # https://stackoverflow.com/questions/29802034/set-column-name-for-apply-result-over-groupby
+  popular = (
+      traffic.groupby('url')
+      .apply(lambda x: sum(x.num_hits) / total_hits * 100.0)
+      .reset_index(name='percentage')
+  )
+
   log('Popular Pages:')
   print(popular)
 
