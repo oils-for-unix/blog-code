@@ -15,7 +15,7 @@ def log(msg, *args):
 
 
 def main():
-  # Load it
+  # Load data and compute two "group by" dictionaries.
   with open('traffic.csv') as f:
     reader = csv.reader(f)
 
@@ -45,8 +45,6 @@ def main():
   popular = sorted(by_url.items(), key=lambda x: x[1], reverse=True)
   for url, num_hits in popular:
     print('%20s %.2f' % (url, float(num_hits) / total_hits * 100.0))
-
-  # TODO: Could sort these by percentage
 
 
 if __name__ == '__main__':

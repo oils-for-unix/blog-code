@@ -1,7 +1,11 @@
 #!/bin/bash
 #
+# Run the same analysis in 5 languages/libraries.
+#
 # Usage:
 #   ./run.sh <function name>
+#
+# See README.md for instructions.
 
 set -o nounset
 set -o pipefail
