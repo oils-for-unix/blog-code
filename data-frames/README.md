@@ -33,4 +33,4 @@ Look inside `run.sh` and adjust these functions for your OS, if necessary.
 
 - Julia?  Feel free to send me a patch to port this to DataFrames.jl.
 
-[blog-post]: TODO
+[blog-post]: http://www.oilshell.org/blog/2018/11/30.html
