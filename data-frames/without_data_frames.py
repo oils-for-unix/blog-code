@@ -15,7 +15,7 @@ def log(msg, *args):
 
 
 def main():
-  # Load data and compute two "group by" dictionaries.
+  # Load data
   with open('traffic.csv') as f:
     reader = csv.reader(f)
 
@@ -23,10 +23,10 @@ def main():
     date, url, num_hits = reader.__next__()
     assert date == 'date' and url == 'url' and num_hits == 'num_hits', 'Invalid header row'
 
-    # Sum hits by URL, and calculate the total number of hits.
-    total_hits = 0
+    # Compute two "group by" dictionaries, and the total number of hits.
     by_url = collections.defaultdict(int)
     by_date = collections.defaultdict(int)
+    total_hits = 0
 
     for date, url, num_hits in reader:
       num_hits = int(num_hits)
