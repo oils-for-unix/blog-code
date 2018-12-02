@@ -74,8 +74,10 @@ SELECT date, SUM(num_hits) FROM traffic GROUP BY date;
 
 SELECT '';
 SELECT 'Popular Pages:';
-SELECT url,
-       SUM(num_hits) * 100.0 / (SELECT SUM(num_hits) FROM traffic) AS percentage
+
+-- Use common table expression
+WITH total_hits (_) AS (SELECT SUM(num_hits) FROM traffic)
+SELECT url, SUM(num_hits) * 100.0 / (SELECT _ FROM total_hits) AS percentage
 FROM traffic
 GROUP BY url
 ORDER BY percentage DESC;
