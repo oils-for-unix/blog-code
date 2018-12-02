@@ -67,6 +67,8 @@ csv2sqlite() {
 EOF
 }
 
+# credit to jeb and terminus-est on lobste.rs
+# https://lobste.rs/s/hnfc6a/what_is_data_frame_python_r_sql
 with-sql() {
   sqlite3 $DB <<EOF
 SELECT 'Daily Traffic:';  -- silly way to print
@@ -76,9 +78,10 @@ SELECT '';
 SELECT 'Popular Pages:';
 
 -- Use common table expression
-WITH total_hits (_) AS (SELECT SUM(num_hits) FROM traffic)
-SELECT url, SUM(num_hits) * 100.0 / (SELECT _ FROM total_hits) AS percentage
-FROM traffic
+WITH     total (num_hits) AS (SELECT SUM(num_hits) FROM traffic)
+SELECT   url,
+         traffic.num_hits * 100.0 / total.num_hits AS percentage
+FROM     traffic, total
 GROUP BY url
 ORDER BY percentage DESC;
 EOF
