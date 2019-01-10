@@ -1,0 +1,27 @@
+--all	Equivalent to: -h -l -S -s -r -d -V -A -I
+--file-header	Display the ELF file header
+--program-headers	Display the program headers
+--program-headers	
+--section-headers	Display the sections' header
+--section-headers	
+--section-groups	Display the section groups
+--section-details	Display the section details
+--headers	Equivalent to: -h -l -S
+--syms	Display the symbol table
+--syms	
+--dyn-syms	Display the dynamic symbol table
+--notes	Display the core notes (if present)
+--relocs	Display the relocations (if present)
+--unwind	Display the unwind info (if present)
+--dynamic	Display the dynamic section (if present)
+--version-info	Display the version sections (if present)
+--arch-specific	Display architecture specific information (if any)
+--archive-index	Display the symbol/file index in an archive
+--use-dynamic	Use the dynamic section info when displaying symbols
+--decompress	Decompress section before dumping it
+--dwarf-depth=	Do not display DIEs at depth N or greater
+--dwarf-start=	Display DIEs starting with N, at the same depth
+--histogram	Display histogram of bucket list lengths
+--wide	Allow output width to exceed 80 characters
+--help	Display this information
+--version	Display the version number of readelf

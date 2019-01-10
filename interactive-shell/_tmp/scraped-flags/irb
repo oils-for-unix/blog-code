@@ -1,0 +1,18 @@
+--context-mode	n  Set n[0-3] to method to create Binding Object,
+--echo	Show result(default)
+--noecho	Don't show result
+--inspect	Use `inspect' for output (default except for bc mode)
+--noinspect	Don't use inspect for output
+--readline	Use Readline extension module
+--noreadline	Don't use Readline extension module
+--prompt-mode	prompt-mode
+--inf-ruby-mode	Use prompt appropriate for inf-ruby-mode on emacs.
+--simple-prompt	
+--noprompt	No prompt mode
+--single-irb	Share self with sub-irb.
+--tracer	Display trace for each execution of commands.
+--back-trace-limit	n
+--verbose	Show details
+--noverbose	Don't show details
+--version	Print the version of irb
+--help	Print help

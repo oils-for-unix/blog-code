@@ -1,0 +1,5 @@
+--mode=	set file mode (as in chmod), not a=rwx - umask
+--parents	no error if existing, make parent directories as needed
+--verbose	print a message for each created directory
+--help	display this help and exit
+--version	output version information and exit

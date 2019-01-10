@@ -1,0 +1,9 @@
+--suffix-format=	use sprintf FORMAT instead of %02d
+--prefix=	use PREFIX instead of 'xx'
+--keep-files	do not remove output files on errors
+--suppress-matched	suppress the lines matching PATTERN
+--digits=	use specified number of digits instead of 2
+--silent	do not print counts of output file sizes
+--elide-empty-files	remove empty output files
+--help	display this help and exit
+--version	output version information and exit

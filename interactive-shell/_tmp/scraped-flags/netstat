@@ -1,0 +1,21 @@
+--route	display routing table
+--interfaces	display interface table
+--groups	display multicast group memberships
+--statistics	display networking statistics (like SNMP)
+--masquerade	display masqueraded connections
+--verbose	be verbose
+--wide	don't truncate IP addresses
+--numeric	don't resolve names
+--numeric-hosts	don't resolve host names
+--numeric-ports	don't resolve port names
+--numeric-users	don't resolve user names
+--symbolic	resolve hardware names
+--extend	display other/more information
+--programs	display PID/Program name for sockets
+--continuous	continuous listing
+--listening	display listening server sockets
+--listening	display all sockets (default: connected)
+--timers	display timers
+--fib	display Forwarding Information Base (default)
+--cache	display routing cache instead of FIB
+--netrom	

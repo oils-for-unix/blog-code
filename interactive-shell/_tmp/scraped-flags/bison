@@ -1,0 +1,17 @@
+--help	display this help and exit
+--version	output version information and exit
+--print-localedir	output directory containing locale-dependent data
+--print-datadir	output directory containing skeletons and XSLT
+--yacc	emulate POSIX Yacc
+--language=	specify the output programming language
+--skeleton=	specify the skeleton to use
+--debug	instrument the parser for tracing
+--locations	enable location support
+--name-prefix=	prepend PREFIX to the external symbols
+--no-lines	don't generate '#line' directives
+--token-table	include a table of token names
+--report=	also produce details on the automaton
+--report-file=	write report to FILE
+--verbose	same as '--report=state'
+--file-prefix=	specify a PREFIX for output files
+--output=	leave output to FILE

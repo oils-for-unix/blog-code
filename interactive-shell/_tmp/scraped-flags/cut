@@ -1,0 +1,10 @@
+--bytes=	select only these bytes
+--characters=	select only these characters
+--delimiter=	use DELIM instead of TAB for field delimiter
+--fields=	select only these fields;  also print any line
+--complement	complement the set of selected bytes, characters
+--only-delimited	do not print lines not containing delimiters
+--output-delimiter=	use STRING as the output delimiter
+--zero-terminated	line delimiter is NUL, not newline
+--help	display this help and exit
+--version	output version information and exit

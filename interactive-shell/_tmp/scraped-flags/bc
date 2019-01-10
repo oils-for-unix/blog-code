@@ -1,0 +1,7 @@
+--help	print this usage and exit
+--interactive	force interactive mode
+--mathlib	use the predefined math routines
+--quiet	don't print initial banner
+--standard	non-standard bc constructs are errors
+--warn	warn about non-standard bc constructs
+--version	print version information and exit

@@ -1,0 +1,5 @@
+--ignore-fail-on-non-empty	
+--parents	remove DIRECTORY and its ancestors; e.g., 'rmdir -p a/b/c' is
+--verbose	output a diagnostic for every directory processed
+--help	display this help and exit
+--version	output version information and exit

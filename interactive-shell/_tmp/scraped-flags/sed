@@ -1,0 +1,11 @@
+--silent	
+--expression=	
+--follow-symlinks	
+--line-length=	
+--posix	
+--regexp-extended	
+--separate	
+--unbuffered	
+--null-data	
+--help	display this help and exit
+--version	output version information and exit

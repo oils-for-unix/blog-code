@@ -1,0 +1,46 @@
+--normal	output a normal diff (the default)
+--brief	report only when files differ
+--report-identical-files	report when two files are the same
+--ed	output an ed script
+--rcs	output an RCS format diff
+--side-by-side	output in two columns
+--width=	output at most NUM (default 130) print columns
+--left-column	output only the left column of common lines
+--suppress-common-lines	do not output common lines
+--show-c-function	show which C function each change is in
+--show-function-line=	show the most recent line matching RE
+--label	LABEL             use LABEL instead of file name
+--expand-tabs	expand tabs to spaces in output
+--initial-tab	make tabs line up by prepending a tab
+--tabsize=	tab stops every NUM (default 8) print columns
+--suppress-blank-empty	suppress space or tab before empty output lines
+--paginate	pass output through 'pr' to paginate it
+--recursive	recursively compare any subdirectories found
+--no-dereference	don't follow symbolic links
+--new-file	treat absent files as empty
+--unidirectional-new-file	treat absent first files as empty
+--ignore-file-name-case	ignore case when comparing file names
+--no-ignore-file-name-case	consider case when comparing file names
+--exclude=	exclude files that match PAT
+--exclude-from=	exclude files that match any pattern in FILE
+--starting-file=	start with FILE when comparing directories
+--from-file=	compare FILE1 to all operands;
+--to-file=	compare all operands to FILE2;
+--ignore-case	ignore case differences in file contents
+--ignore-tab-expansion	ignore changes due to tab expansion
+--ignore-trailing-space	ignore white space at line end
+--ignore-space-change	ignore changes in the amount of white space
+--ignore-all-space	ignore all white space
+--ignore-blank-lines	ignore changes where lines are all blank
+--ignore-matching-lines=	ignore changes where all lines match RE
+--text	treat all files as text
+--strip-trailing-cr	strip trailing carriage return on input
+--ifdef=	output merged file with '#ifdef NAME' diffs
+--GTYPE-group-format=	format GTYPE input groups with GFMT
+--line-format=	format all input lines with LFMT
+--LTYPE-line-format=	format LTYPE input lines with LFMT
+--minimal	try hard to find a smaller set of changes
+--horizon-lines=	keep NUM lines of the common prefix and suffix
+--speed-large-files	assume large files and many scattered small changes
+--help	display this help and exit
+--version	output version information and exit

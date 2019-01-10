@@ -1,0 +1,6 @@
+--help	print this help and exit
+--version	print version information and exit
+--data-relocs	process data relocations
+--function-relocs	process data and function relocations
+--unused	print unused direct dependencies
+--verbose	print all information

@@ -1,0 +1,9 @@
+--show-all	equivalent to -vET
+--number-nonblank	number nonempty output lines, overrides -n
+--show-ends	display $ at end of each line
+--number	number all output lines
+--squeeze-blank	suppress repeated empty output lines
+--show-tabs	display TAB characters as ^I
+--show-nonprinting	use ^ and M- notation, except for LFD and TAB
+--help	display this help and exit
+--version	output version information and exit

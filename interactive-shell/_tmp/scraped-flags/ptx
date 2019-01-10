@@ -1,0 +1,19 @@
+--auto-reference	output automatically generated references
+--traditional	behave more like System V 'ptx'
+--flag-truncation=	use STRING for flagging line truncations.
+--macro-name=	macro name to use instead of 'xx'
+--format=	generate output as roff directives
+--right-side-refs	put references at right, not counted in -w
+--sentence-regexp=	for end of lines or end of sentences
+--format=	generate output as TeX directives
+--word-regexp=	use REGEXP to match each keyword
+--break-file=	word break characters in this FILE
+--ignore-case	fold lower case to upper case for sorting
+--gap-size=	gap size in columns between output fields
+--ignore-file=	read ignore word list from FILE
+--only-file=	read only word list from this FILE
+--references	first field of each line is a reference
+--typeset-mode	- not implemented -
+--width=	output width in columns, reference excluded
+--help	display this help and exit
+--version	output version information and exit

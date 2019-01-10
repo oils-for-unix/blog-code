@@ -1,0 +1,10 @@
+--count	prefix lines by the number of occurrences
+--repeated	only print duplicate lines, one for each group
+--skip-fields=	avoid comparing the first N fields
+--ignore-case	ignore differences in case when comparing
+--skip-chars=	avoid comparing the first N characters
+--unique	only print unique lines
+--zero-terminated	line delimiter is NUL, not newline
+--check-chars=	compare no more than N characters in lines
+--help	display this help and exit
+--version	output version information and exit

@@ -1,0 +1,20 @@
+--columns=	
+--across	print columns across rather than down, used together
+--show-control-chars	
+--double-space	
+--date-format=	
+--form-feed	
+--header=	
+--join-lines	merge full lines, turns off -W line truncation, no column
+--length=	
+--merge	print all files in parallel, one in each column,
+--first-line-number=	
+--indent=	
+--no-file-warnings	
+--omit-header	omit page headers and trailers;
+--omit-pagination	
+--show-nonprinting	
+--width=	
+--page-width=	
+--help	display this help and exit
+--version	output version information and exit

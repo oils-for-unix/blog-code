@@ -1,0 +1,7 @@
+--no-create	do not create any files
+--date=	parse STRING and use it instead of current time
+--no-dereference	affect each symbolic link instead of any referenced
+--reference=	use this file's times instead of current time
+--time=	change the specified time:
+--help	display this help and exit
+--version	output version information and exit

@@ -1,0 +1,9 @@
+--traditional	[OPTION]... [FILE] [[+]OFFSET[.][b] [+][LABEL][.][b]]
+--address-radix=	output format for file offsets; RADIX is one
+--skip-bytes=	skip BYTES input bytes first
+--read-bytes=	limit dump to BYTES input bytes
+--format=	select output format or formats
+--output-duplicates	do not use * to mark line suppression
+--traditional	accept arguments in third form above
+--help	display this help and exit
+--version	output version information and exit

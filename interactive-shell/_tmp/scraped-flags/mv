@@ -1,0 +1,14 @@
+--backup	but does not accept an argument
+--force	do not prompt before overwriting
+--interactive	prompt before overwrite
+--no-clobber	do not overwrite an existing file
+--strip-trailing-slashes	remove any trailing slashes from each SOURCE
+--suffix=	override the usual backup suffix
+--target-directory=	move all SOURCE arguments into DIRECTORY
+--no-target-directory	treat DEST as a normal file
+--update	move only when the SOURCE file is newer
+--verbose	explain what is being done
+--context	set SELinux security context of destination
+--help	display this help and exit
+--version	output version information and exit
+--backup	is given)

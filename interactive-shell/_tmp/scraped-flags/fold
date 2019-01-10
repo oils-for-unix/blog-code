@@ -1,0 +1,5 @@
+--bytes	count bytes rather than columns
+--spaces	break at spaces
+--width=	use WIDTH columns instead of 80
+--help	display this help and exit
+--version	output version information and exit

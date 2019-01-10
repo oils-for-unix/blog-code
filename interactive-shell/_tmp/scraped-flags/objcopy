@@ -1,0 +1,77 @@
+--input-target	<bfdname>      Assume input file is in format <bfdname>
+--output-target	<bfdname>     Create an output file in format <bfdname>
+--binary-architecture	<arch>  Set output arch, when input is arch-less
+--target	<bfdname>            Set both input and output format to <bfdname>
+--debugging	Convert debugging information, if possible
+--preserve-dates	Copy modified/access timestamps to the output
+--enable-deterministic-archives	
+--disable-deterministic-archives	
+--only-section	<name>         Only copy section <name> into the output
+--remove-section	<name>       Remove section <name> from the output
+--strip-all	Remove all symbol and relocation information
+--strip-debug	Remove all debugging symbols & sections
+--strip-dwo	Remove all DWO sections
+--strip-unneeded	Remove all symbols not needed by relocations
+--strip-symbol	<name>         Do not copy symbol <name>
+--strip-unneeded-symbol	<name>
+--only-keep-debug	Strip everything but the debug information
+--extract-dwo	Copy only DWO sections
+--extract-symbol	Remove section contents but keep symbols
+--keep-symbol	<name>          Do not strip symbol <name>
+--keep-file-symbols	Do not strip file symbol(s)
+--localize-hidden	Turn all ELF hidden symbols into locals
+--localize-symbol	<name>      Force symbol <name> to be marked as a local
+--globalize-symbol	<name>     Force symbol <name> to be marked as a global
+--keep-global-symbol	<name>   Localize all symbols except <name>
+--weaken-symbol	<name>        Force symbol <name> to be marked as a weak
+--weaken	Force all global symbols to be marked as weak
+--wildcard	Permit wildcard in symbol comparison
+--discard-all	Remove all non-global symbols
+--discard-locals	Remove any compiler-generated symbols
+--interleave	
+--byte	<num>                  Select byte <num> in every interleaved block
+--gap-fill	<val>              Fill gaps between sections with <val>
+--pad-to	<addr>               Pad the last section up to address <addr>
+--set-start	<addr>            Set the start address to <addr>
+--change-section-lma	<name>{=|+|-}<val>
+--change-section-vma	<name>{=|+|-}<val>
+--set-section-flags	<name>=<flags>
+--add-section	<name>=<file>   Add section <name> found in <file> to output
+--update-section	<name>=<file>
+--dump-section	<name>=<file>  Dump the contents of section <name> into <file>
+--rename-section	<old>=<new>[,<flags>] Rename section <old> to <new>
+--long-section-names	{enable|disable|keep}
+--change-leading-char	Force output format's leading character style
+--remove-leading-char	Remove leading character from global symbols
+--redefine-sym	<old>=<new>    Redefine symbol name <old> to <new>
+--redefine-sym	for all symbol pairs 
+--srec-len	<number>           Restrict the length of generated Srecords
+--srec-forceS3	Restrict the type of generated Srecords to S3
+--strip-symbols	<file>        -N for all symbols listed in <file>
+--strip-unneeded-symbols	<file>
+--strip-unneeded-symbol	for all symbols listed
+--keep-symbols	<file>         -K for all symbols listed in <file>
+--localize-symbols	<file>     -L for all symbols listed in <file>
+--globalize-symbol	for all in <file>
+--keep-global-symbols	<file>  -G for all symbols listed in <file>
+--weaken-symbols	<file>       -W for all symbols listed in <file>
+--add-symbol	<name>=[<section>:]<value>[,<flags>]  Add a symbol
+--alt-machine-code	<index>    Use the target's <index>'th alternative machine
+--writable-text	Mark the output text as writable
+--readonly-text	Make the output text write protected
+--pure	Mark the output file as demand paged
+--impure	Mark the output file as impure
+--prefix-symbols	<prefix>     Add <prefix> to start of every symbol name
+--prefix-sections	<prefix>    Add <prefix> to start of every section name
+--prefix-alloc-sections	<prefix>
+--file-alignment	<num>        Set PE file alignment to <num>
+--heap	<reserve>[,<commit>]   Set PE reserve/commit heap to <reserve>/
+--image-base	<address>        Set PE image base to <address>
+--section-alignment	<num>     Set PE section alignment to <num>
+--stack	<reserve>[,<commit>]  Set PE reserve/commit stack to <reserve>/
+--subsystem	<name>[:<version>]
+--decompress-debug-sections	Decompress DWARF debug sections using zlib
+--verbose	List all object files modified
+--version	Display this program's version number
+--help	Display this output
+--info	List object formats & architectures supported

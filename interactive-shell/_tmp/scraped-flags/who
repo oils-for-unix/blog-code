@@ -1,0 +1,18 @@
+--login	-p -r -t -T -u
+--boot	time of last system boot
+--dead	print dead processes
+--heading	print line of column headings
+--ips	print ips instead of hostnames. with --lookup,
+--login	print system login processes
+--lookup	attempt to canonicalize hostnames via DNS
+--process	print active processes spawned by init
+--count	all login names and number of users logged on
+--runlevel	print current runlevel
+--short	print only name, line, and time (default)
+--time	print last system clock change
+--mesg	add user's message status as +, - or ?
+--users	list users logged in
+--message	same as -T
+--writable	same as -T
+--help	display this help and exit
+--version	output version information and exit

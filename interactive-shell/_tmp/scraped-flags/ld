@@ -1,0 +1,215 @@
+--architecture	ARCH
+--format	TARGET  Specify target for following input files
+--mri-script	FILE  Read MRI format linker script
+--entry	ADDRESS Set start address
+--export-dynamic	Export all dynamic symbols
+--export-dynamic	
+--auxiliary	SHLIB Auxiliary filter for shared object symbol table
+--filter	SHLIB    Filter for shared object symbol table
+--gpsize	SIZE      Small data size (if no size, same as --shared)
+--dynamic-linker	PROGRAM
+--no-dynamic-linker	Produce an executable with no program interpreter header
+--library	LIBNAME
+--library-path	DIRECTORY
+--print-map	Print map file on standard output
+--nmagic	Do not page align data
+--omagic	Do not page align data, do not make text readonly
+--no-omagic	Page align data, make text readonly
+--output	FILE      Set output file name
+--map-whole-files	Ignored for gold option compatibility
+--no-map-whole-files	Ignored for gold option compatibility
+--emit-relocs	Generate relocations in final output
+--relocatable	Generate relocatable output
+--just-symbols	FILE
+--strip-all	Strip all symbols
+--strip-debug	Strip debugging symbols
+--strip-discarded	Strip symbols in discarded sections
+--no-strip-discarded	Do not strip symbols in discarded sections
+--trace	Trace file opens
+--script	FILE      Read linker script
+--default-script	FILE, -dT  Read default linker script
+--undefined	SYMBOL
+--require-defined	SYMBOL    Require SYMBOL be defined in the final output
+--unique	[=SECTION]         Don't merge input [SECTION | orphan] sections
+--version	Print version information
+--discard-all	Discard all local symbols
+--discard-locals	Discard temporary local symbols (default)
+--discard-none	Don't discard any local symbols
+--trace-symbol	SYMBOL
+--start-group	Start a group
+--end-group	End a group
+--accept-unknown-input-arch	Accept input files whose architecture cannot be determined
+--no-accept-unknown-input-arch	
+--as-needed	Only set DT_NEEDED for following dynamic libs if used
+--no-as-needed	Always set DT_NEEDED for dynamic libraries mentioned on
+--check-sections	Check section addresses for overlaps (default)
+--no-check-sections	Do not check section addresses for overlaps
+--copy-dt-needed-entries	Copy DT_NEEDED links mentioned inside DSOs that follow
+--no-copy-dt-needed-entries	Do not copy DT_NEEDED links mentioned inside DSOs that follow
+--cref	Output cross reference table
+--defsym	SYMBOL=EXPRESSION  Define a symbol
+--demangle	[=STYLE]         Demangle symbol names [using STYLE]
+--embedded-relocs	Generate embedded relocs
+--fatal-warnings	Treat warnings as errors
+--no-fatal-warnings	Do not treat warnings as errors (default)
+--force-exe-suffix	Force generation of file with .exe suffix
+--gc-sections	Remove unused sections (on some targets)
+--no-gc-sections	Don't remove unused sections (default)
+--print-gc-sections	List removed unused sections on stderr
+--no-print-gc-sections	Do not list removed unused sections
+--help	Print option help
+--no-define-common	Do not define Common storage
+--no-demangle	Do not demangle symbol names
+--no-keep-memory	Use less memory and more disk I/O
+--no-undefined	Do not allow unresolved references in object files
+--allow-shlib-undefined	Allow unresolved references in shared libraries
+--no-allow-shlib-undefined	Do not allow unresolved references in shared libs
+--allow-multiple-definition	Allow multiple definitions
+--no-undefined-version	Disallow undefined version
+--default-symver	Create default symbol version
+--default-imported-symver	Create default symbol version for imported symbols
+--no-warn-mismatch	Don't warn about mismatched input files
+--no-warn-search-mismatch	Don't warn on finding an incompatible library
+--whole-archive	
+--noinhibit-exec	Create an output file even if errors occur
+--oformat	TARGET            Specify target of output file
+--print-output-format	Print default output format
+--print-sysroot	Print current sysroot
+--reduce-memory-overheads	Reduce memory overheads, possibly taking much longer
+--relax	Reduce code size by using target specific optimizations
+--no-relax	Do not use relaxation techniques to reduce code size
+--retain-symbols-file	FILE  Keep only symbols listed in FILE
+--pic-executable	Create a position independent executable
+--sort-common	[=ascending|descending]
+--sort-section	name|alignment
+--spare-dynamic-tags	COUNT  How many tags to reserve in .dynamic section
+--split-by-file	[=SIZE]     Split output sections every SIZE octets
+--split-by-reloc	[=COUNT]   Split output sections every COUNT relocs
+--stats	Print memory usage statistics
+--target-help	Display target specific options
+--task-link	SYMBOL          Do task level linking
+--traditional-format	Use same format as native linker
+--section-start	SECTION=ADDRESS
+--verbose	[=NUMBER]         Output lots of information during link
+--version-script	FILE       Read version information script
+--version-exports-section	SYMBOL
+--dynamic-list-data	Add data symbols to dynamic list
+--dynamic-list-cpp-new	Use C++ operator new/delete dynamic list
+--dynamic-list-cpp-typeinfo	Use C++ typeinfo dynamic list
+--dynamic-list	FILE         Read dynamic list
+--warn-common	Warn about duplicate common symbols
+--warn-constructors	Warn if global constructors/destructors are seen
+--warn-multiple-gp	Warn if the multiple GP values are used
+--warn-once	Warn only once per undefined symbol
+--warn-section-align	Warn if start of section changes due to alignment
+--warn-shared-textrel	Warn if shared object has DT_TEXTREL
+--warn-alternate-em	Warn if an object has alternate ELF machine code
+--warn-unresolved-symbols	Report unresolved symbols as warnings
+--error-unresolved-symbols	Report unresolved symbols as errors
+--whole-archive	Include all objects from following archives
+--wrap	SYMBOL               Use wrapper functions for SYMBOL
+--ignore-unresolved-symbol	SYMBOL
+--push-state	Push state of flags governing input file handling
+--pop-state	Pop state of flags governing input file handling
+--print-memory-usage	Report target memory usage
+--orphan-handling	=MODE     Control how orphan sections are handled.
+--ld-generated-unwind-info	Generate exception handling info for PLT
+--no-ld-generated-unwind-info	
+--audit=	Specify a library to use for auditing
+--disable-new-dtags	Disable new dynamic tags
+--enable-new-dtags	Enable new dynamic tags
+--eh-frame-hdr	Create .eh_frame_hdr section
+--exclude-libs=	Make all symbols in LIBS hidden
+--hash-style=	Set hash style to sysv, gnu or both
+--depaudit=	
+--dll	Set image base to the default for DLLs
+--file-alignment	<size>            Set file alignment
+--heap	<size>                      Set initial size of the heap
+--image-base	<address>             Set start address of the executable
+--major-image-version	<number>     Set version number of the executable
+--major-os-version	<number>        Set minimum required OS version
+--major-subsystem-version	<number> Set minimum required OS subsystem version
+--minor-image-version	<number>     Set revision number of the executable
+--minor-os-version	<number>        Set minimum required OS revision
+--minor-subsystem-version	<number> Set minimum required OS subsystem revision
+--section-alignment	<size>         Set section alignment
+--stack	<size>                     Set size of the initial stack
+--subsystem	<name>[:<version>]     Set required OS subsystem [& version]
+--support-old-code	Support interworking with old code
+--add-stdcall-alias	Export symbols with and without @nn
+--disable-stdcall-fixup	Don't link _sym to _sym@nn
+--enable-stdcall-fixup	Link _sym to _sym@nn without warnings
+--exclude-symbols	sym,sym,...      Exclude symbols from automatic export
+--exclude-all-symbols	Exclude all symbols from automatic export
+--exclude-libs	lib,lib,...         Exclude libraries from automatic export
+--exclude-modules-for-implib	mod,mod,...
+--export-all-symbols	Automatically export all globals to DLL
+--kill-at	Remove @nn from exported symbols
+--out-implib	<file>                Generate import library
+--output-def	<file>                Generate a .DEF file for the built DLL
+--warn-duplicate-exports	Warn about duplicate exports.
+--compat-implib	Create backward compatible import libs;
+--enable-auto-image-base	Automatically choose image base for DLLs
+--disable-auto-image-base	Do not auto-choose image base. (default)
+--enable-auto-import	Do sophisticated linking of _sym to
+--disable-auto-import	Do not auto-import DATA items from DLLs
+--enable-runtime-pseudo-reloc	Work around auto-import limitations by
+--disable-runtime-pseudo-reloc	Do not add runtime pseudo-relocations for
+--enable-extra-pep-debug	Enable verbose debug output when building
+--enable-long-section-names	Use long COFF section names even in
+--disable-long-section-names	Never use long COFF section names, even
+--high-entropy-va	Image is compatible with 64-bit address space
+--dynamicbase	Image base address may be relocated using
+--forceinteg	Code integrity checks are enforced
+--nxcompat	Image is compatible with data execution prevention
+--no-isolation	Image understands isolation but do not isolate the image
+--no-seh	Image does not use SEH. No SE handler may
+--no-bind	Do not bind this image
+--wdmdriver	Driver uses the WDM model
+--tsaware	Image is Terminal Server aware
+--dll	Set image base to the default for DLLs
+--file-alignment	<size>            Set file alignment
+--heap	<size>                      Set initial size of the heap
+--image-base	<address>             Set start address of the executable
+--major-image-version	<number>     Set version number of the executable
+--major-os-version	<number>        Set minimum required OS version
+--major-subsystem-version	<number> Set minimum required OS subsystem version
+--minor-image-version	<number>     Set revision number of the executable
+--minor-os-version	<number>        Set minimum required OS revision
+--minor-subsystem-version	<number> Set minimum required OS subsystem revision
+--section-alignment	<size>         Set section alignment
+--stack	<size>                     Set size of the initial stack
+--subsystem	<name>[:<version>]     Set required OS subsystem [& version]
+--support-old-code	Support interworking with old code
+--add-stdcall-alias	Export symbols with and without @nn
+--disable-stdcall-fixup	Don't link _sym to _sym@nn
+--enable-stdcall-fixup	Link _sym to _sym@nn without warnings
+--exclude-symbols	sym,sym,...      Exclude symbols from automatic export
+--exclude-all-symbols	Exclude all symbols from automatic export
+--exclude-libs	lib,lib,...         Exclude libraries from automatic export
+--exclude-modules-for-implib	mod,mod,...
+--export-all-symbols	Automatically export all globals to DLL
+--kill-at	Remove @nn from exported symbols
+--out-implib	<file>                Generate import library
+--output-def	<file>                Generate a .DEF file for the built DLL
+--warn-duplicate-exports	Warn about duplicate exports
+--compat-implib	Create backward compatible import libs;
+--image-base	
+--disable-auto-image-base	Do not auto-choose image base. (default)
+--enable-auto-import	Do sophisticated linking of _sym to
+--disable-auto-import	Do not auto-import DATA items from DLLs
+--enable-runtime-pseudo-reloc	Work around auto-import limitations by
+--disable-runtime-pseudo-reloc	Do not add runtime pseudo-relocations for
+--enable-extra-pe-debug	Enable verbose debug output when building
+--large-address-aware	Executable supports virtual addresses
+--disable-large-address-aware	Executable does not support virtual
+--enable-long-section-names	Use long COFF section names even in
+--disable-long-section-names	Never use long COFF section names, even
+--dynamicbase	Image base address may be relocated using
+--forceinteg	Code integrity checks are enforced
+--nxcompat	Image is compatible with data execution prevention
+--no-isolation	Image understands isolation but do not isolate the image
+--no-seh	Image does not use SEH. No SE handler may
+--no-bind	Do not bind this image
+--wdmdriver	Driver uses the WDM model
+--tsaware	Image is Terminal Server aware

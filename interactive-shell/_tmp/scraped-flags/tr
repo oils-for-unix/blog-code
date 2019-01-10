@@ -1,0 +1,6 @@
+--complement	use the complement of SET1
+--delete	delete characters in SET1, do not translate
+--squeeze-repeats	replace each sequence of a repeated character
+--truncate-set1	first truncate SET1 to length of SET2
+--help	display this help and exit
+--version	output version information and exit

@@ -1,0 +1,3 @@
+--sysv	use System V sum algorithm, use 512 bytes blocks
+--help	display this help and exit
+--version	output version information and exit

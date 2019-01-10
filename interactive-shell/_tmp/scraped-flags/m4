@@ -1,0 +1,17 @@
+--help	display this help and exit
+--version	output version information and exit
+--fatal-warnings	once: warnings become errors, twice: stop
+--interactive	unbuffer output, ignore interrupts
+--prefix-builtins	force a `m4_' prefix to all builtins
+--silent	suppress some warnings for builtins
+--include=	append DIRECTORY to include path
+--synclines	generate `#line NUM "FILE"' lines
+--undefine=	undefine NAME
+--gnu	override -G to re-enable GNU extensions
+--traditional	suppress all GNU extensions
+--hashsize=	set symbol lookup hash table size [509]
+--nesting-limit=	change nesting limit, 0 for unlimited [0]
+--freeze-state=	produce a frozen state on FILE at end
+--reload-state=	reload a frozen state from FILE at start
+--arglength=	restrict macro tracing size
+--trace=	trace NAME when it is defined

@@ -1,0 +1,44 @@
+--extended-regexp	PATTERN is an extended regular expression (ERE)
+--fixed-strings	PATTERN is a set of newline-separated strings
+--basic-regexp	PATTERN is a basic regular expression (BRE)
+--perl-regexp	PATTERN is a Perl regular expression
+--regexp=	use PATTERN for matching
+--file=	obtain PATTERN from FILE
+--ignore-case	ignore case distinctions
+--word-regexp	force PATTERN to match only whole words
+--line-regexp	force PATTERN to match only whole lines
+--null-data	a data line ends in 0 byte, not newline
+--no-messages	suppress error messages
+--invert-match	select non-matching lines
+--version	display version information and exit
+--help	display this help text and exit
+--max-count=	stop after NUM matches
+--byte-offset	print the byte offset with output lines
+--line-number	print line number with output lines
+--line-buffered	flush output on every line
+--with-filename	print the file name for each match
+--no-filename	suppress the file name prefix on output
+--label=	use LABEL as the standard input file name prefix
+--only-matching	show only the part of a line matching PATTERN
+--silent	suppress all normal output
+--binary-files=	assume that binary files are TYPE;
+--binary-files=	
+--directories=	how to handle directories;
+--devices=	how to handle devices, FIFOs and sockets;
+--directories=	
+--dereference-recursive	likewise, but follow all symlinks
+--include=	search only files that match FILE_PATTERN
+--exclude=	skip files and directories matching FILE_PATTERN
+--exclude-from=	skip files matching any file pattern from FILE
+--exclude-dir=	directories that match PATTERN will be skipped.
+--files-without-match	print only names of FILEs containing no match
+--files-with-matches	print only names of FILEs containing matches
+--count	print only a count of matching lines per FILE
+--initial-tab	make tabs line up (if needed)
+--null	print 0 byte after FILE name
+--before-context=	print NUM lines of leading context
+--after-context=	print NUM lines of trailing context
+--context=	print NUM lines of output context
+--context=	
+--binary	do not strip CR characters at EOL (MSDOS/Windows)
+--unix-byte-offsets	report offsets as if CRs were not there

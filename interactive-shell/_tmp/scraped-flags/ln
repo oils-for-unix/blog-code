@@ -1,0 +1,16 @@
+--backup	but does not accept an argument
+--directory	allow the superuser to attempt to hard link
+--force	remove existing destination files
+--interactive	prompt whether to remove destinations
+--logical	dereference TARGETs that are symbolic links
+--no-dereference	treat LINK_NAME as a normal file if
+--physical	make hard links directly to symbolic links
+--relative	create symbolic links relative to link location
+--symbolic	make symbolic links instead of hard links
+--suffix=	override the usual backup suffix
+--target-directory=	specify the DIRECTORY in which to create
+--no-target-directory	treat LINK_NAME as a normal file always
+--verbose	print name of each linked file
+--help	display this help and exit
+--version	output version information and exit
+--backup	is given)

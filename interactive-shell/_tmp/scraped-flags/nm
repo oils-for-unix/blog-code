@@ -1,0 +1,24 @@
+--debug-syms	Display debugger-only symbols
+--print-file-name	Print name of the input file before every symbol
+--format=	
+--no-demangle	Do not demangle low-level symbol names
+--dynamic	Display dynamic symbols instead of normal symbols
+--defined-only	Display only defined symbols
+--format=	Use the output format FORMAT.  FORMAT can be `bsd',
+--extern-only	Display only external symbols
+--line-numbers	Use debugging information to find a filename and
+--numeric-sort	Sort symbols numerically by address
+--no-sort	Do not sort the symbols
+--format=	
+--reverse-sort	Reverse the sense of the sort
+--plugin	NAME      Load the specified plugin
+--print-size	Print size of defined symbols
+--print-armap	Include index for symbols from archive members
+--size-sort	Sort symbols by size
+--special-syms	Include special symbols in the output
+--synthetic	Display synthetic symbols as well
+--radix=	Use RADIX for printing symbol values
+--target=	Specify the target object format as BFDNAME
+--undefined-only	Display only undefined symbols
+--help	Display this information
+--version	Display this program's version number

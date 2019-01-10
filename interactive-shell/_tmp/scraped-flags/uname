@@ -1,0 +1,11 @@
+--all	print all information, in the following order,
+--kernel-name	print the kernel name
+--nodename	print the network node hostname
+--kernel-release	print the kernel release
+--kernel-version	print the kernel version
+--machine	print the machine hardware name
+--processor	print the processor type (non-portable)
+--hardware-platform	print the hardware platform (non-portable)
+--operating-system	print the operating system
+--help	display this help and exit
+--version	output version information and exit

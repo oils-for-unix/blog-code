@@ -1,0 +1,5 @@
+--format=	use printf style floating-point FORMAT
+--separator=	use STRING to separate numbers (default: \n)
+--equal-width	equalize width by padding with leading zeroes
+--help	display this help and exit
+--version	output version information and exit

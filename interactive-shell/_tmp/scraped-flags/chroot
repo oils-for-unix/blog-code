@@ -1,0 +1,4 @@
+--groups=	specify supplementary groups as g1,g2,..,gN
+--skip-chdir	do not change working directory to '/'
+--help	display this help and exit
+--version	output version information and exit

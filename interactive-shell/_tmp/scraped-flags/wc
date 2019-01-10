@@ -1,0 +1,9 @@
+--files0-from=	
+--bytes	print the byte counts
+--chars	print the character counts
+--lines	print the newline counts
+--files0-from=	read input from the files specified by
+--max-line-length	print the maximum display width
+--words	print the word counts
+--help	display this help and exit
+--version	output version information and exit

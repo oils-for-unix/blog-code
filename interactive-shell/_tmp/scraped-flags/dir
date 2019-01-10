@@ -1,0 +1,46 @@
+--all	do not ignore entries starting with .
+--almost-all	do not list implied . and ..
+--author	with -l, print the author of each file
+--escape	print C-style escapes for nongraphic characters
+--block-size=	scale sizes by SIZE before printing them; e.g.,
+--ignore-backups	do not list implied entries ending with ~
+--directory	list directories themselves, not their contents
+--dired	generate output designed for Emacs' dired mode
+--color	
+--classify	append indicator (one of */=>@|) to entries
+--file-type	likewise, except do not append '*'
+--format=	across -x, commas -m, horizontal -x, long -l,
+--full-time	like -l --time-style=full-iso
+--group-directories-first	
+--sort	option, but any
+--sort=	(-U) disables grouping
+--no-group	in a long listing, don't print group names
+--human-readable	with -l and/or -s, print human readable sizes
+--si	likewise, but use powers of 1000 not 1024
+--dereference-command-line	
+--dereference-command-line-symlink-to-dir	
+--hide=	do not list implied entries matching shell PATTERN
+--indicator-style=	append indicator with style WORD to entry names:
+--inode	print the index number of each file
+--ignore=	do not list implied entries matching shell PATTERN
+--kibibytes	default to 1024-byte blocks for disk usage
+--dereference	when showing file information for a symbolic
+--numeric-uid-gid	like -l, but list numeric user and group IDs
+--literal	print raw entry names (don't treat e.g. control
+--indicator-style=	
+--hide-control-chars	print ? instead of nongraphic characters
+--show-control-chars	show nongraphic characters as-is (the default,
+--quote-name	enclose entry names in double quotes
+--quoting-style=	use quoting style WORD for entry names:
+--reverse	reverse order while sorting
+--recursive	list subdirectories recursively
+--size	print the allocated size of each file, in blocks
+--sort=	sort by WORD instead of name: none (-U), size (-S),
+--time=	with -l, show time as WORD instead of default
+--sort=	(newest first)
+--time-style=	with -l, show times using style STYLE:
+--tabsize=	assume tab stops at each COLS instead of 8
+--width=	set output width to COLS.  0 means no limit
+--context	print any security context of each file
+--help	display this help and exit
+--version	output version information and exit

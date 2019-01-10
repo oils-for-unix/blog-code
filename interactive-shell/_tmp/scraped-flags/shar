@@ -1,0 +1,33 @@
+--intermix-type	specify compression for input files
+--compactor=	specify compaction (compression) program PROG
+--level-of-compression=	
+--mixed-uuencode	decide uuencoding for each file
+--uuencode	treat all files as binary
+--text-files	treat all files as text
+--output-prefix=	print output to file PREFIX.nn
+--whole-size-limit=	
+--split-size-limit=	
+--input-file-list=	read file list from FILE
+--archive-name=	use NAME to document the archive
+--submitter=	override the submitter name with NAME
+--net-headers	output Submitted-by: & Archive-name: headers
+--cut-mark	start the shar with a cut line
+--translate	translate messages in the script
+--no-character-count	do not use `wc -c' to check size
+--no-md5-digest	do not use md5sum digest to verify
+--force-prefix	apply the prefix character on every line
+--here-delimiter=	use DELIM to delimit the files
+--vanilla-operation	produce very simple shars
+--no-piping	use temporary files between programs
+--no-check-existing	blindly overwrite existing files
+--query-user	ask user before overwriting files
+--no-timestamp	do not restore modification times
+--quiet-unshar	avoid verbose messages at unshar time
+--basename	restore in one directory, despite hierarchy
+--no-i18n	do not internationalize
+--print-text-domain-dir	print directory with shar messages
+--quiet	do not output verbose messages
+--silent	an alias for the 'quiet' option
+--help	display extended usage information and exit
+--more-help	extended usage information passed thru pager
+--load-opts=	load options from the config file FILE

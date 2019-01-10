@@ -1,0 +1,5 @@
+--decode	decode data
+--ignore-garbage	when decoding, ignore non-alphabet characters
+--wrap=	wrap encoded lines after COLS character (default 76).
+--help	display this help and exit
+--version	output version information and exit

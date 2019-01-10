@@ -1,0 +1,16 @@
+--preserve-dates	Copy modified/access timestamps to the output
+--enable-deterministic-archives	
+--disable-deterministic-archives	
+--strip-all	Remove all symbol and relocation information
+--strip-debug	Remove all debugging symbols & sections
+--strip-dwo	Remove all DWO sections
+--strip-unneeded	Remove all symbols not needed by relocations
+--only-keep-debug	Strip everything but the debug information
+--keep-file-symbols	Do not strip file symbol(s)
+--wildcard	Permit wildcard in symbol comparison
+--discard-all	Remove all non-global symbols
+--discard-locals	Remove any compiler-generated symbols
+--verbose	List all object files modified
+--version	Display this program's version number
+--help	Display this output
+--info	List object formats & architectures supported

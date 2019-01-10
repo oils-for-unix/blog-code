@@ -1,0 +1,5 @@
+--ignore-environment	start with an empty environment
+--null	end each output line with NUL, not newline
+--unset=	remove variable from the environment
+--help	display this help and exit
+--version	output version information and exit

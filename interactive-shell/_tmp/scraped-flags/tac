@@ -1,0 +1,5 @@
+--before	attach the separator before instead of after
+--regex	interpret the separator as a regular expression
+--separator=	use STRING as the separator instead of newline
+--help	display this help and exit
+--version	output version information and exit

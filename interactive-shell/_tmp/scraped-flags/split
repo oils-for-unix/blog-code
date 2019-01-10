@@ -1,0 +1,13 @@
+--suffix-length=	generate suffixes of length N (default 2)
+--additional-suffix=	append an additional SUFFIX to file names
+--bytes=	put SIZE bytes per output file
+--line-bytes=	put at most SIZE bytes of records per output file
+--elide-empty-files	do not generate empty output files with '-n'
+--filter=	write to shell COMMAND; file name is $FILE
+--lines=	put NUMBER lines/records per output file
+--number=	generate CHUNKS output files; see explanation below
+--separator=	use SEP instead of newline as the record separator;
+--unbuffered	immediately copy input to output with '-n r/...'
+--verbose	print a diagnostic just before each
+--help	display this help and exit
+--version	output version information and exit

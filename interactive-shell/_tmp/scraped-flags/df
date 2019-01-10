@@ -1,0 +1,16 @@
+--all	include pseudo, duplicate, inaccessible file systems
+--block-size=	scale sizes by SIZE before printing them; e.g.,
+--human-readable	print sizes in powers of 1024 (e.g., 1023M)
+--si	print sizes in powers of 1000 (e.g., 1.1G)
+--inodes	list inode information instead of block usage
+--block-size=	
+--local	limit listing to local file systems
+--no-sync	do not invoke sync before getting usage info (default)
+--portability	use the POSIX output format
+--sync	invoke sync before getting usage info
+--total	elide all entries insignificant to available space,
+--type=	limit listing to file systems of type TYPE
+--print-type	print file system type
+--exclude-type=	limit listing to file systems not of type TYPE
+--help	display this help and exit
+--version	output version information and exit

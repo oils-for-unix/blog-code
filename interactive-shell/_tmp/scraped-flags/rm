@@ -1,0 +1,9 @@
+--force	ignore nonexistent files and arguments, never prompt
+--one-file-system	when removing a hierarchy recursively, skip any
+--no-preserve-root	do not treat '/' specially
+--preserve-root	do not remove '/' (default)
+--recursive	remove directories and their contents recursively
+--dir	remove empty directories
+--verbose	explain what is being done
+--help	display this help and exit
+--version	output version information and exit

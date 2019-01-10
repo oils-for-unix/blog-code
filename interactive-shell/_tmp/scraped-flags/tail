@@ -1,0 +1,10 @@
+--retry	
+--max-unchanged-stats=	
+--pid=	with -f, terminate after process ID, PID dies
+--silent	never output headers giving file names
+--retry	keep trying to open a file if it is inaccessible
+--sleep-interval=	with -f, sleep for approximately N seconds
+--verbose	always output headers giving file names
+--zero-terminated	line delimiter is NUL, not newline
+--help	display this help and exit
+--version	output version information and exit

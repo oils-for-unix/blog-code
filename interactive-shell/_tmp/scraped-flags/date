@@ -1,0 +1,9 @@
+--date=	display time described by STRING, not 'now'
+--file=	like --date; once for each line of DATEFILE
+--rfc-2822	output date and time in RFC 2822 format.
+--rfc-3339=	output date/time in RFC 3339 format.
+--reference=	display the last modification time of FILE
+--set=	set time described by STRING
+--universal	print or set Coordinated Universal Time (UTC)
+--help	display this help and exit
+--version	output version information and exit

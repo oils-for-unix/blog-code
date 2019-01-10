@@ -7,6 +7,8 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+readonly FLAG_DIR=_tmp/scraped-flags
+
 scrape-flags() {
   ./scrape_flags.py "$@"
 }
@@ -21,7 +23,15 @@ readonly LONGOPT=( awk base64 bash bc bison cat chroot cp \
     touch tr uname unexpand uniq units vdir wc who
 )
 
-readonly FLAG_DIR=_tmp/scraped-flags
+remove-empty() {
+  for file in $FLAG_DIR/*; do
+    #echo $file
+    if ! test -s $file; then
+      echo $file is empty
+      rm -v $file
+      fi
+  done
+}
 
 scrape-all-flags() {
   local out=$FLAG_DIR
@@ -32,6 +42,8 @@ scrape-all-flags() {
     echo $cmd
     { $cmd --help 2>&1 || true; } | scrape-flags > $out/$cmd
   done
+
+  remove-empty
 
   wc -l $out/*
 }

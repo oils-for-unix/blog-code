@@ -1,0 +1,13 @@
+--body-numbering=	use STYLE for numbering body lines
+--section-delimiter=	use CC for separating logical pages
+--footer-numbering=	use STYLE for numbering footer lines
+--header-numbering=	use STYLE for numbering header lines
+--line-increment=	line number increment at each line
+--join-blank-lines=	group of NUMBER empty lines counted as one
+--number-format=	insert line numbers according to FORMAT
+--no-renumber	do not reset line numbers at logical pages
+--number-separator=	add STRING after (possible) line number
+--starting-line-number=	first line number on each logical page
+--number-width=	use NUMBER columns for line numbers
+--help	display this help and exit
+--version	output version information and exit
