@@ -927,7 +927,7 @@ def main(argv):
 
   display = Display(comp_state, bold_line=True)
 
-  osh = False
+  osh = True
   if osh:
     prompt = PromptEvaluator(_OSH, display)
     reader = InteractiveLineReader(_PS1, '> ', prompt, display)

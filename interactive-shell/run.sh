@@ -73,4 +73,8 @@ demoish() {
   ./demoish.py $FLAG_DIR
 }
 
+record() {
+  ~/.local/bin/asciinema rec
+}
+
 "$@"
