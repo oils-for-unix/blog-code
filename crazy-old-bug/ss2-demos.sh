@@ -53,6 +53,7 @@ contexts() {
   x='myarray[$(echo 1 | tee out/01-arith2)]'
   echo $(( x + 42 ))
 
+  # At least 4 constructs with variable names
   local varname
 
   varname='myarray[$(echo 2 | tee out/02-printf-v)]'
@@ -63,6 +64,13 @@ contexts() {
 
   varname='myarray[$(echo 4 | tee out/04-indirect)]'
   echo "${!varname}"  # error, but still writes the file
+
+  varname='myarray[$(echo 15 | tee out/15-read)]'
+  read "$varname" < /dev/null && true
+
+  # getopts doesn't seem to be vulnerable
+  #varname='myarray[0]'
+  #getopts '' "$varname" && true
 
   local x
 
