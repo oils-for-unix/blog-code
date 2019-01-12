@@ -104,10 +104,16 @@ contexts() {
   x='myarray[$(echo 13 | tee out/13-assoc)]'
   myassoc=([x]=foo)
 
-  # -f 
-  x='1+1'
-  [[ -f $x ]] && echo 'YES' || echo 'NO'
+  # This one is different because it doesn't accept arbitrary code.
+  # The arbitrary code has to be unquoted and not have spaces, etc.
+  #
+  # bash '-v' is a misfeature.  Do other shells have it?
+  #
+  # From Stephane Chazelas.
+  # https://unix.stackexchange.com/questions/172103/security-implications-of-using-unsanitized-data-in-shell-arithmetic-evaluation/172109#172109
 
+  x='/ -o -v myarray[0$(uname>out/14-unquoted-test-arg)]'
+  [ -f $x ] && true
 
   head out/*
   ls -l out/
