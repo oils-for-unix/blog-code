@@ -1,0 +1,25 @@
+Bugs
+----
+
+
+TODO
+----
+
+- Add more unit tests
+  - output should be "clamped" with self.f instead of sys.stdout?
+
+Fixed
+-----
+
+- FIXED make sure it works in non-fancy mode, without color, for libedit and for
+  impoverished displays
+
+- prompt should move properly with Oil style
+  - it has an issue because there are two lines
+
+- FIXED Hitting tab on the SECOND word of the SECOND line.  Cursor goes to the
+  wrong place.
+  - had to take PS2 length into account
+
+- Needs shell-escaping for quoting filenames
+  - add that to demoish or do it in OSH?

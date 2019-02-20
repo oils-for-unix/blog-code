@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-pyreadline.py
+demoish.py
 
 Let's think of the interactive shell prompt roughly as a state machine.
 
@@ -55,72 +55,26 @@ Variable: int rl_sort_completion_matches
 """
 from __future__ import print_function
 
+import optparse
 import os
 import readline
 import signal
 import sys
 import time
-import traceback
-
-# Only for GetTerminalSize().  OSH should implement that function in C to avoid
-# dependencies.
-import fcntl
-import struct
-import termios
 
 # Only for prompt rendering.
 import getpass
 import pwd
 import socket
 
+import ui
 
-_RESET = '\033[0;0m'
-_BOLD = '\033[1m'
-_UNDERLINE = '\033[4m'
-_REVERSE = '\033[7m'  # reverse video
+log = ui.log
 
-_YELLOW = '\033[33m'
-_BLUE = '\033[34m'
-#_MAGENTA = '\033[35m'
-_CYAN = '\033[36m'
 
 # Prompt style
 _RIGHT = '_RIGHT'
 _OSH = '_OSH'
-
-
-# ANSI escape codes affect the prompt!
-# https://superuser.com/questions/301353/escape-non-printing-characters-in-a-function-for-a-bash-prompt
-#
-# Readline understands \x01 and \x02, while bash understands \[ and \].
-
-_PROMPT_BOLD = '\x01%s\x02' % _BOLD
-_PROMPT_RESET = '\x01%s\x02' % _RESET
-_PROMPT_UNDERLINE = '\x01%s\x02' % _UNDERLINE
-_PROMPT_REVERSE = '\x01%s\x02' % _REVERSE
-
-
-if 0:
-  DEBUG_F = open('_tmp/demo-debug', 'w')
-else:
-  DEBUG_F = open('/dev/null', 'w')
-
-
-def log(msg, *args, **kwargs):
-  if args:
-    msg = msg % args
-  f = kwargs.get('file', sys.stderr)
-  print(msg, file=f)
-  f.flush()
-
-
-def GetTerminalSize():
-  # fd 0 = stdin.  The arg has to be 4 bytes for some reason.
-  b = fcntl.ioctl(0, termios.TIOCGWINSZ, '1234')
-  #log('%r', b)
-  cr = struct.unpack('hh', b)  # 2 short integers
-  #log('%s', cr)
-  return cr
 
 
 def GetHomeDir():
@@ -258,6 +212,12 @@ def JoinLinesOfCommand(pending_lines):
 def MakeCompletionRequest(lines):
   """Returns a 4-tuple or an error code.
 
+  Returns:
+    first: The first word, or None if we're completing the first word itself
+    to_complete: word to complete
+    prefix: string
+    prefix_pos: integer
+
   Cases we CAN complete:
 
     echo foo \
@@ -323,6 +283,18 @@ def MakeCompletionRequest(lines):
   return first, to_complete, prefix, prefix_pos
 
 
+def ShellQuote(s):
+  # TODO: Use regex replace.
+  # & ; ( also need replacing.  And { in case you have a file
+  # {foo,bar}
+  # And ! for history.
+
+  return s.replace(
+      ' ', '\\ ').replace(
+      '$', '\\$').replace(
+      '|', '\\|')
+
+
 class RootCompleter(object):
   """Dispatch to multiple completers."""
 
@@ -385,6 +357,7 @@ class RootCompleter(object):
           rl_match = flag + ' '
         self.comp_state['DESC'][rl_match] = desc  # save it for later
       else:
+        match = ShellQuote(match)
         if match.endswith('/'):  # Hack for directories
           rl_match = match
         else:
@@ -438,297 +411,6 @@ class CompletionCallback(object):
       raise
 
 
-def PrintPacked(matches, max_match_len, term_width, max_lines):
-  # With of each candidate.  2 spaces between each.
-  w = max_match_len + 2
-
-  # Number of candidates per line.  Don't print in first or last column.
-  num_per_line = max(1, (term_width-2) // w)
-
-  fmt = '%-' + str(w) + 's'
-  num_lines = 0
-
-  too_many = False
-  remainder = num_per_line - 1
-  i = 0  # num matches
-  for m in matches:
-    if i % num_per_line == 0:
-      sys.stdout.write(' ')  # 1 space left gutter
-
-    sys.stdout.write(fmt % m)
-
-    if i % num_per_line == remainder:
-      sys.stdout.write('\n')  # newline (leaving 1 space right gutter)
-      num_lines += 1
-
-      # Check if we've printed enough lines
-      if num_lines == max_lines:
-        too_many = True
-        i += 1  # count this one
-        break
-    i += 1
-
-  # Write last line break, unless it came out exactly.
-  if i % num_per_line != 0:
-    #log('i = %d, num_per_line = %d, i %% num_per_line = %d',
-    #    i, num_per_line, i % num_per_line)
-
-    sys.stdout.write('\n')
-    num_lines += 1
-
-  if too_many:
-    # TODO: Save this in the Display class
-    fmt2 = _BOLD + _BLUE + '%' + str(term_width-2) + 's' + _RESET
-    num_left = len(matches) - i
-    if num_left:
-      sys.stdout.write(fmt2 % '... and %d more\n' % num_left)
-      num_lines += 1
-
-  return num_lines
-
-
-def PrintLong(matches, max_match_len, term_width, max_lines, descriptions):
-  """Print flags with descriptions, one per line.
-
-  Args:
-    descriptions: dict of { prefix-stripped match -> description }
-
-  Returns:
-    The number of lines printed.
-  """
-  #log('desc = %s', descriptions)
-
-  # Why subtract 3?  1 char for left and right margin, and then 1 for the space
-  # in between.
-  max_desc = max(0, term_width - max_match_len - 3)
-  fmt = ' %-' + str(max_match_len) + 's ' + _YELLOW + '%s' + _RESET
-
-  num_lines = 0
-
-  # rl_match is a raw string, which may or may not have a trailing space
-  for rl_match in matches:
-    desc = descriptions.get(rl_match) or ''
-    if max_desc == 0:  # the window is not wide enough for some flag
-      print(' %s' % rl_match)
-    else:
-      if len(desc) > max_desc:
-        desc = desc[:max_desc-5] + ' ... '
-      print(fmt % (rl_match, desc))
-
-    num_lines += 1
-
-    if num_lines == max_lines:
-      # right justify
-      fmt2 = _BOLD + _BLUE + '%' + str(term_width-1) + 's' + _RESET
-      num_left = len(matches) - num_lines
-      if num_left:
-        sys.stdout.write(fmt2 % '... and %d more\n' % num_left)
-        num_lines += 1
-      break
-
-  return num_lines
-
-
-class Display(object):
-  """Methods to display completion candidates and other messages.
-
-  This object has to remember how many lines we last drew, in order to erase
-  them before drawing something new.
-
-  It's also useful for:
-  - Stripping off the common prefix according to OUR rules, not readline's.
-  - displaying descriptions of flags and builtins
-  """
-  def __init__(self, comp_state, bold_line=False):
-    """
-    Args:
-      bold_line: Should the command line be made bold?
-    """
-    self.comp_state = comp_state
-    self.bold_line = bold_line
-
-    self.last_prompt_len = -1  # invalid
-
-    self.width_is_dirty = True
-    self.term_width = -1  # invalid
-
-    self.num_lines_last_displayed = 0
-
-    self.c_count = 0
-    self.m_count = 0
-
-    # hash of matches -> count.  Has exactly ONE entry at a time.
-    self.dupes = {}
-
-  def Reset(self):
-    """Call this in between commands."""
-    self.num_lines_last_displayed = 0
-
-  def SetPromptLength(self, i):
-    self.last_prompt_len = i
-
-  def _ReturnToPrompt(self, num_lines):
-    # NOTE: We can't use ANSI terminal codes to save and restore the prompt,
-    # because the screen may have scrolled.  Instead we have to keep track of
-    # how many lines we printed and the original column of the cursor.
-
-    orig_len = len(self.comp_state['ORIG'])
-
-    sys.stdout.write('\x1b[%dA' % num_lines)  # UP
-    assert self.last_prompt_len != -1
-    n = orig_len + self.last_prompt_len
-    sys.stdout.write('\x1b[%dC' % n)  # RIGHT
-
-    if self.bold_line:
-      sys.stdout.write(_BOLD)  # Experiment
-
-    sys.stdout.flush()
-
-  def _PrintCandidates(self, subst, matches, unused_max_match_len):
-    term_width = self._GetTerminalWidth()
-
-    # Variables set by the completion generator.  They should always exist,
-    # because we can't get "matches" without calling that function.
-    prefix_pos = self.comp_state['prefix_pos']
-
-    sys.stdout.write('\n')
-
-    self.EraseLines()  # Delete previous completions!
-    log('_PrintCandidates %r', subst, file=DEBUG_F)
-
-    # Figure out if the user hit TAB multiple times to show more matches.
-    # It's not correct to hash the line itself, because two different lines can
-    # have the same completions:
-    #
-    # ls <TAB>
-    # ls --<TAB>
-    #
-    # This is because there is a common prefix.
-    # So instead use the hash of all matches as the identity.
-
-    # This could be more accurate but I think it's good enough.
-    comp_id = hash(''.join(matches))
-    if comp_id in self.dupes:
-      self.dupes[comp_id] += 1
-    else:
-      self.dupes.clear()  # delete the old ones
-      self.dupes[comp_id] = 1
-
-    max_lines = 10 * self.dupes[comp_id]
-
-    # TODO: should we quote these or not?
-    if prefix_pos:
-      to_display = [m[prefix_pos:] for m in matches]
-    else:
-      to_display = matches
-
-    # Calculate max length after stripping prefix.
-    max_match_len = max(len(m) for m in to_display)
-
-    # Print and go back up.  But we have to ERASE these before hitting enter!
-    if self.comp_state.get('DESC'):  # exists and is NON EMPTY
-      num_lines = PrintLong(to_display, max_match_len, term_width,
-                            max_lines, self.comp_state['DESC'])
-    else:
-      num_lines = PrintPacked(to_display, max_match_len, term_width,
-                              max_lines)
-
-    self._ReturnToPrompt(num_lines+1)
-    self.num_lines_last_displayed = num_lines
-
-    self.c_count += 1
-
-  def PrintCandidates(self, *args):
-    try:
-      self._PrintCandidates(*args)
-    except Exception as e:
-      traceback.print_exc()
-
-  def PrintMessage(self, msg, *args):
-    """
-    Print a message below the prompt, and then return to the location on the
-    prompt line.
-    """
-    if args:
-      msg = msg % args
-
-    # This will mess up formatting
-    assert not msg.endswith('\n'), msg
-
-    sys.stdout.write('\n')
-
-    self.EraseLines()
-    log('_PrintMessage %r', msg, file=DEBUG_F)
-
-    # Truncate to terminal width
-    max_len = self._GetTerminalWidth() - 2
-    if len(msg) > max_len:
-      msg = msg[:max_len-5] + ' ... '
-
-    # NOTE: \n at end is REQUIRED.  Otherwise we get drawing problems when on
-    # the last line.
-    fmt = _BOLD + _BLUE + '%' + str(max_len) + 's' + _RESET + '\n'
-    sys.stdout.write(fmt % msg)
-
-    self._ReturnToPrompt(2)
-
-    self.num_lines_last_displayed = 1
-    self.m_count += 1
-
-  def ShowPromptOnRight(self, rendered):
-    n = self._GetTerminalWidth() - 2 - len(rendered)
-    spaces = ' ' * n
-
-    # We avoid drawing problems if we print it on its own line:
-    # - inserting text doesn't push it to the right
-    # - you can't overwrite it
-    sys.stdout.write(spaces + _REVERSE + ' ' + rendered + ' ' + _RESET + '\r\n')
-
-  def EraseLines(self):
-    """Clear N lines one-by-one.
-
-    Assume the cursor is right below thep rompt:
-
-    ish$ echo hi
-    _ <-- HERE
-
-    That's the first line to erase out of N.  After erasing them, return it
-    there.
-    """
-    if self.bold_line:
-      sys.stdout.write(_RESET)  # if command is bold
-      sys.stdout.flush()
-
-    n = self.num_lines_last_displayed
-
-    log('EraseLines %d (c = %d, m = %d)', n, self.c_count, self.m_count,
-        file=DEBUG_F)
-
-    if n == 0:
-      return
-
-    for i in xrange(n):
-      # 2K would clear the ENTIRE line, but isn't strictly necessary.
-      sys.stdout.write('\x1b[0K')
-      sys.stdout.write('\x1b[%dB' % 1)  # go down one line
-
-    # Now go back up
-    sys.stdout.write('\x1b[%dA' % n)
-    sys.stdout.flush()  # Without this, output will look messed up
-
-  def _GetTerminalWidth(self):
-    if self.width_is_dirty:
-      _, self.term_width = GetTerminalSize()
-      self.width_is_dirty = False
-    return self.term_width
-
-  def OnWindowChange(self):
-    # Only do it for the NEXT completion.  The signal handler can be run in
-    # between arbitrary bytecodes, and we don't want a single completion
-    # display to be shown with different widths.
-    self.width_is_dirty = True
-
-
 def DoNothing(unused1, unused2):
   pass
 
@@ -755,20 +437,23 @@ class PromptEvaluator(object):
     if self.style == _RIGHT:
       self.display.ShowPromptOnRight(p)
 
-      p2 = _PROMPT_BOLD + ': ' + _PROMPT_RESET
+      p2 = ui.PROMPT_BOLD + ': ' + ui.PROMPT_RESET
       prompt_len = 2
 
-    elif self.style == _BOLD:  # Make it bold and add '$ '
-      p2 = _PROMPT_BOLD + p + '$ ' + _PROMPT_RESET
+    elif 0:
+    #elif self.style == _BOLD:  # Make it bold and add '$ '
+      p2 = ui.PROMPT_BOLD + p + '$ ' + ui.PROMPT_RESET
       prompt_len += 2
 
-    elif self.style == _UNDERLINE:
+    elif 0:
+    #elif self.style == _UNDERLINE:
       # Don't underline the space
-      p2 = _PROMPT_UNDERLINE + p + _PROMPT_RESET + ' '
+      p2 = ui.PROMPT_UNDERLINE + p + ui.PROMPT_RESET + ' '
       prompt_len += 1
 
-    elif self.style == _REVERSE:
-      p2 = _PROMPT_REVERSE + ' ' + p + ' ' + _PROMPT_RESET + ' '
+    elif 0:
+    #elif self.style == _REVERSE:
+      p2 = ui.PROMPT_REVERSE + ' ' + p + ' ' + ui.PROMPT_RESET + ' '
       prompt_len += 3
 
     elif self.style == _OSH:
@@ -786,12 +471,14 @@ class InteractiveLineReader(object):
 
   Holds PS1 / PS2 state.
   """
-  def __init__(self, ps1, ps2, prompt_eval, display, bold_line=False):
+  def __init__(self, ps1, ps2, prompt_eval, display, bold_line=False,
+               erase_empty=0):
     self.ps1 = ps1
     self.ps2 = ps2
     self.prompt_eval = prompt_eval
     self.display = display
     self.bold_line = bold_line
+    self.erase_empty = erase_empty
 
     self.prompt_str = ''
     self.pending_lines = []  # for completion to use
@@ -806,8 +493,8 @@ class InteractiveLineReader(object):
     signal.signal(signal.SIGINT, self.orig_handler)  # raise KeyboardInterrupt
 
     p = self.prompt_str
-    if self.display.bold_line:
-      p += _PROMPT_BOLD
+    if self.bold_line:
+      p += ui.PROMPT_BOLD
 
     try:
       line = raw_input(p) + '\n'  # newline required
@@ -825,18 +512,33 @@ class InteractiveLineReader(object):
       signal.signal(signal.SIGINT, DoNothing)
 
     # Nice trick to remove repeated prompts.
-    if line == '\n':  # empty
-      # Go up one line and erase the whole line
-      sys.stdout.write('\x1b[1A\x1b[2K\n')
-      sys.stdout.flush()
+    if line == '\n':
+      if self.erase_empty == 0:
+        pass
+      elif self.erase_empty == 1:
+        # Go up one line and erase the whole line
+        sys.stdout.write('\x1b[1A\x1b[2K\n')
+        sys.stdout.flush()
+      elif self.erase_empty == 2:
+        sys.stdout.write('\x1b[1A\x1b[2K')
+        sys.stdout.write('\x1b[1A\x1b[2K')
+        sys.stdout.write('\n')  # go down one line
+        sys.stdout.flush()
+      else:
+        raise AssertionError(self.erase_empty)
 
     self.prompt_str = self.ps2
+    self.display.SetPromptLength(len(self.ps2))
     return line
 
   def Reset(self):
     self.prompt_str, prompt_len = self.prompt_eval.Eval(self.ps1)
     self.display.SetPromptLength(prompt_len)
     del self.pending_lines[:]
+
+  def CurrentRenderedPrompt(self):
+    """For BasicDisplay to reprint the prompt."""
+    return self.prompt_str
 
 
 def MainLoop(reader, display):
@@ -910,32 +612,53 @@ def LoadFlags(path):
   return flags
 
 
-_PS1 = '\u@\h \w'
+_PS1 = '[demoish] \u@\h \w'
 
 
 def main(argv):
-  _, term_width = GetTerminalSize()
+  p = optparse.OptionParser(__doc__, version='snip 0.1')
+  p.add_option(
+      '--flag-dir', dest='flag_dir', default=None,
+      help='Directory with flags definitions')
+  p.add_option(
+      '--style', dest='style', default='osh',
+      help='Style of prompt')
+
+  opts, _ = p.parse_args(argv[1:])
+
+  _, term_width = ui.GetTerminalSize()
   fmt = '%' + str(term_width) + 's'
 
   #msg = "[Oil 0.6.pre11] Type 'help' or visit https://oilshell.org/help/ "
-  msg = "For help, type 'help' or visit https://oilshell.org "
+  msg = "Type 'help' or visit https://oilshell.org/ for help"
   print(fmt % msg)
   print('')
 
   # Used to store the original line, flag descriptions, etc.
   comp_state = {}
 
-  display = Display(comp_state, bold_line=True)
-
-  osh = True
-  if osh:
+  if opts.style == 'bare':
+    display = ui.BasicDisplay(comp_state)
     prompt = PromptEvaluator(_OSH, display)
-    reader = InteractiveLineReader(_PS1, '> ', prompt, display)
-  else:
+    reader = InteractiveLineReader(_PS1, '> ', prompt, display,
+                                   bold_line=False)
+    display.SetReader(reader)  # needed to re-print prompt
+
+  elif opts.style == 'osh':
+    display = ui.NiceDisplay(comp_state, bold_line=True)
+    prompt = PromptEvaluator(_OSH, display)
+    reader = InteractiveLineReader(_PS1, '> ', prompt, display,
+                                   bold_line=True, erase_empty=1)
+  elif opts.style == 'oil':
+    display = ui.NiceDisplay(comp_state, bold_line=True)
     # Oil has reverse video on the right.  It's also bold, and may be syntax
     # highlighted later.
     prompt = PromptEvaluator(_RIGHT, display)
-    reader = InteractiveLineReader(_PS1, '| ', prompt, display)
+    reader = InteractiveLineReader(_PS1, '| ', prompt, display,
+                                   bold_line=True, erase_empty=2)
+
+  else:
+    raise RuntimeError('Invalid style %r' % opts.style)
 
   # Register a callback to receive terminal width changes.
   signal.signal(signal.SIGWINCH, lambda x, y: display.OnWindowChange())
@@ -948,13 +671,9 @@ def main(argv):
   }
 
   commands = []
-  try:
-    flag_dir = argv[1]
-  except IndexError:
-    pass
-  else:
-    for cmd in os.listdir(flag_dir):
-      path = os.path.join(flag_dir, cmd)
+  if opts.flag_dir:
+    for cmd in os.listdir(opts.flag_dir):
+      path = os.path.join(opts.flag_dir, cmd)
       flags = LoadFlags(path)
       fl = FlagsHelpAction(flags)
       comp_lookup[cmd] = FlagsAndFileSystemAction(fl, _FS_ACTION)
@@ -971,11 +690,15 @@ def main(argv):
   readline.set_completer_delims('')
 
   # Register a callback to display completions.
+  # NOTE: If we don't register a hook, readline will print the ENTIRE command
+  # line completed, not just the word.
+
   # NOTE: Is this style hard to compile?  Maybe have to expand the args
   # literally.
   readline.set_completion_display_matches_hook(
       lambda *args: display.PrintCandidates(*args)
   )
+
   readline.parse_and_bind('tab: complete')
 
   MainLoop(reader, display)

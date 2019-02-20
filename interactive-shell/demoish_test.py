@@ -6,36 +6,18 @@ from __future__ import print_function
 
 import unittest
 
+import ui
 import demoish  # module under test
 
 
-# TODO: Unit tests should test some properties of the output!
-# How many lines are there, and did it overflow?
-
-class PyReadlineTest(unittest.TestCase):
-
-  def testPrintPacked(self):
-    matches = ['foo', 'bar', 'spam', 'eggs', 'python', 'perl']
-    longest_match_len = max(len(m) for m in matches)
-    for width in (10, 20, 30, 40, 50):
-      n = demoish.PrintPacked(matches, longest_match_len, width, 10)
-      print('Wrote %d lines' % n)
-      print('')
-
-  def testTooMany(self):
-    matches = ['--flag%d' % i for i in xrange(100)]
-    longest_match_len = max(len(m) for m in matches)
-    for width in (10, 20, 30, 40, 50, 60):
-      n = demoish.PrintPacked(matches, longest_match_len, width, 10)
-      print('Wrote %d lines' % n)
-      print('')
+class DemoishTest(unittest.TestCase):
 
   def testRootCompleter(self):
     comp_state = {}
     comp_lookup = {
         'echo': demoish.WordsAction(['foo', 'bar']),
     }
-    display = demoish.Display(comp_state, bold_line=True)
+    display = ui.NiceDisplay(comp_state, bold_line=True)
     prompt = demoish.PromptEvaluator(demoish._RIGHT, display)
     reader = demoish.InteractiveLineReader('$ ', '> ', prompt, display)
     reader.pending_lines.extend([
@@ -74,6 +56,17 @@ class PyReadlineTest(unittest.TestCase):
     # CAN complete with line break in the middle
     self.assertEqual(('echo', 'b', 'oo ', 3), f(['echo f\\\n', 'oo b']))
 
+  def testCompletionCallback(self):
+    pass
 
+  # The display manages the details of drawing:
+  # - the terminal width
+  # - the prompt length
+
+  # So we could have a NiceDisplay and a BasicDisplay?
+  # The BareDisplay is like readline's default.
+
+
+    
 if __name__ == '__main__':
   unittest.main()

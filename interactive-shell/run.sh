@@ -70,11 +70,26 @@ scrape-all-banners() {
 }
 
 demoish() {
-  ./demoish.py $FLAG_DIR
+  ./demoish.py --flag-dir $FLAG_DIR "$@"
 }
+
+bare-style() {
+  demoish --style bare
+}
+
+oil-style() {
+  demoish --style oil
+}
+
 
 record() {
   ~/.local/bin/asciinema rec
+}
+
+unit() {
+  for t in *_test.py; do
+    ./$t
+  done
 }
 
 "$@"
