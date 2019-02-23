@@ -280,7 +280,19 @@ def MakeCompletionRequest(lines):
   #log('X partial_cmd %r', partial_cmd, file=DEBUG_F)
   #log('X to_complete %r', to_complete, file=DEBUG_F)
 
-  return first, to_complete, prefix, prefix_pos
+  unquoted = ShellUnquote(to_complete)
+  return first, unquoted, prefix, prefix_pos
+
+
+def ShellUnquote(s):
+  # This is an approximation.  In OSH we'll use the
+  # CompletionWordEvaluator.
+
+  result = []
+  for ch in s:
+    if ch != '\\':
+      result.append(ch)
+  return ''.join(result)
 
 
 def ShellQuote(s):
@@ -292,6 +304,7 @@ def ShellQuote(s):
   return s.replace(
       ' ', '\\ ').replace(
       '$', '\\$').replace(
+      ';', '\\;').replace(
       '|', '\\|')
 
 
@@ -320,10 +333,10 @@ class RootCompleter(object):
 
     result = MakeCompletionRequest(lines)
     if result == -1:
-      self.display.PrintMessage("(can't complete first word spanning lines)")
+      self.display.PrintOptional("(can't complete first word spanning lines)")
       return
     if result == -2:
-      self.display.PrintMessage("(can't complete last word spanning lines)")
+      self.display.PrintOptional("(can't complete last word spanning lines)")
       return
 
     # We have to add on prefix before sending it completer.  And then
@@ -374,12 +387,12 @@ class RootCompleter(object):
       i += 1
       if elapsed_ms > 200:
         plural = '' if i == 1 else 'es'
-        self.display.PrintMessage(
+        self.display.PrintOptional(
             '... %d match%s for %r in %d ms (Ctrl-C to cancel)', i,
             plural, line, elapsed_ms)
 
     if i == 0:
-      self.display.PrintMessage('(no matches for %r)', line)
+      self.display.PrintRequired('(no matches for %r)', line)
 
 
 class CompletionCallback(object):
@@ -418,13 +431,12 @@ def DoNothing(unused1, unused2):
 class PromptEvaluator(object):
   """Evaluate the prompt and give it a certain style."""
 
-  def __init__(self, style, display):
+  def __init__(self, style):
     """
     Args:
       style: _RIGHT, _BOLD, _UNDERLINE, _REVERSE or _OSH
     """
     self.style = style
-    self.display = display
 
   def Eval(self, template):
     p = template
@@ -434,9 +446,10 @@ class PromptEvaluator(object):
     p = p.replace('\w', cwd)
     prompt_len = len(p)
 
-    if self.style == _RIGHT:
-      self.display.ShowPromptOnRight(p)
+    right_prompt_str = None
 
+    if self.style == _RIGHT:
+      right_prompt_str = p
       p2 = ui.PROMPT_BOLD + ': ' + ui.PROMPT_RESET
       prompt_len = 2
 
@@ -463,7 +476,7 @@ class PromptEvaluator(object):
     else:
       raise AssertionError
 
-    return p2, prompt_len
+    return p2, prompt_len, right_prompt_str
 
 
 class InteractiveLineReader(object):
@@ -481,6 +494,8 @@ class InteractiveLineReader(object):
     self.erase_empty = erase_empty
 
     self.prompt_str = ''
+    self.right_prompt = ''
+
     self.pending_lines = []  # for completion to use
     self.Reset()  # initialize self.prompt_str
 
@@ -495,6 +510,9 @@ class InteractiveLineReader(object):
     p = self.prompt_str
     if self.bold_line:
       p += ui.PROMPT_BOLD
+
+    if self.right_prompt_str:  # only for PS1
+      self.display.ShowPromptOnRight(self.right_prompt_str)
 
     try:
       line = raw_input(p) + '\n'  # newline required
@@ -528,11 +546,14 @@ class InteractiveLineReader(object):
         raise AssertionError(self.erase_empty)
 
     self.prompt_str = self.ps2
+    self.right_prompt_str = None
+
     self.display.SetPromptLength(len(self.ps2))
     return line
 
   def Reset(self):
-    self.prompt_str, prompt_len = self.prompt_eval.Eval(self.ps1)
+    self.prompt_str, prompt_len, self.right_prompt_str = (
+        self.prompt_eval.Eval(self.ps1))
     self.display.SetPromptLength(prompt_len)
     del self.pending_lines[:]
 
@@ -543,6 +564,7 @@ class InteractiveLineReader(object):
 
 def MainLoop(reader, display):
   while True:
+    # TODO: Catch KeyboardInterrupt and EOFError here.
     line = reader.GetLine()
 
     # Erase lines before execution, displaying PS2, or exit!
@@ -639,21 +661,21 @@ def main(argv):
 
   if opts.style == 'bare':
     display = ui.BasicDisplay(comp_state)
-    prompt = PromptEvaluator(_OSH, display)
+    prompt = PromptEvaluator(_OSH)
     reader = InteractiveLineReader(_PS1, '> ', prompt, display,
                                    bold_line=False)
     display.SetReader(reader)  # needed to re-print prompt
 
   elif opts.style == 'osh':
     display = ui.NiceDisplay(comp_state, bold_line=True)
-    prompt = PromptEvaluator(_OSH, display)
+    prompt = PromptEvaluator(_OSH)
     reader = InteractiveLineReader(_PS1, '> ', prompt, display,
                                    bold_line=True, erase_empty=1)
   elif opts.style == 'oil':
     display = ui.NiceDisplay(comp_state, bold_line=True)
     # Oil has reverse video on the right.  It's also bold, and may be syntax
     # highlighted later.
-    prompt = PromptEvaluator(_RIGHT, display)
+    prompt = PromptEvaluator(_RIGHT)
     reader = InteractiveLineReader(_PS1, '| ', prompt, display,
                                    bold_line=True, erase_empty=2)
 

@@ -1,12 +1,55 @@
-Bugs
-----
-
-
 TODO
 ----
 
-- Add more unit tests
-  - output should be "clamped" with self.f instead of sys.stdout?
+- start integrating:
+  - core/display.py instead of ui.py?  Just to copy it right over
+  - flag for --style oil|osh|basic ?
+    - yeah I kind of want the oil style prompt.  But isn't that totally
+      independent from completion?
+
+- comp_state has ORIG, prefix_pos, and DESC
+  - need to hook this up i Oil
+- termios deps and so forth -- move to libc? 
+
+
+- clamp super long filenames to like 30 characters?
+  - bash and zsh do NOT do this, but I think it's reasonable for the
+    NiceDisplay?
+  - params:
+    - max lines (num_lines_cap)
+    - max width per candidate
+
+
+- TODO: test what zsh does when there is a super long candidate
+  - hm zsh seems to do better
+  - it knows where it is on the line
+  - maybe punt this until later.
+
+Integration Issues
+------------------
+
+- Ctrl_C  Ctrl_D  Empty  Node(command c) -- 
+  - yes the line reader should return these!
+  - so the main loop can handle them
+  - no the command parser would have to handle them.  Exceptions are better.
+  - I think you have use Python for now, but write C++ code later to figure out
+    how they can be handled
+
+
+- RootCompleter also gets DESCRIPTIONS!
+  - there is a 2-tuple.  Have to figure that interface.
+
+- are you generating too much garbage here?  rebuilding a new dictionary every
+  time?
+  - also: how are you going to get descriptions into OSH?
+    - you could dynamically run awk I guess 
+    - or you could make up a better file format
+  - this is an interesting case for arena allocation
+    - you don't want to COPY strings
+    - but the dictionary is ephemeral, and you don't want ephemeral copies for
+      every completion candidate?
+
+- are you going to hook up both OSH and Oil style?
 
 Fixed
 -----
@@ -23,3 +66,25 @@ Fixed
 
 - Needs shell-escaping for quoting filenames
   - add that to demoish or do it in OSH?
+
+
+- DONE PrintRequired vs. PrintOptioanl
+  - for BasicDisplay
+    - but then it has to redisplay the prompt?
+    - I think that is OK.  It will help people learn how to use it?
+
+
+
+- Add more unit tests
+  - output should be "clamped" with self.f instead of sys.stdout?
+
+- Test what happens when you exceed terminal width
+  - maybe have a debug-print of terminal width state!
+  - you can't avoid it when the user is typing
+    - it gets screwed up
+    - I'm not sure if we can avoid this
+  - could you DETECT when prompt_len + orig_len is greater than max_width
+    - and then fallback on BASIC display?
+    - that means it's kind of dynamic?
+  - max_match_len could be greater than term_width!
+    - test what in PrintPacked

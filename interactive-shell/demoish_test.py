@@ -18,7 +18,7 @@ class DemoishTest(unittest.TestCase):
         'echo': demoish.WordsAction(['foo', 'bar']),
     }
     display = ui.NiceDisplay(comp_state, bold_line=True)
-    prompt = demoish.PromptEvaluator(demoish._RIGHT, display)
+    prompt = demoish.PromptEvaluator(demoish._RIGHT)
     reader = demoish.InteractiveLineReader('$ ', '> ', prompt, display)
     reader.pending_lines.extend([
         'echo \\\n',  # first line

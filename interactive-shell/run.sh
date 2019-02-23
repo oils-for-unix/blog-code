@@ -77,10 +77,13 @@ bare-style() {
   demoish --style bare
 }
 
+osh-style() {
+  demoish --style osh
+}
+
 oil-style() {
   demoish --style oil
 }
-
 
 record() {
   ~/.local/bin/asciinema rec

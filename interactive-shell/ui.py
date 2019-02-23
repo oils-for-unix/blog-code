@@ -60,7 +60,102 @@ def GetTerminalSize():
   return cr
 
 
-def PrintPacked(matches, max_match_len, term_width, max_lines, f=sys.stdout):
+class _IDisplay(object):
+  """Interface for completion displays."""
+
+  def __init__(self, comp_state, num_lines_cap, f):
+    self.comp_state = comp_state
+    self.num_lines_cap = num_lines_cap
+    self.f = f
+
+  def PrintCandidates(self, *args):
+    try:
+      self._PrintCandidates(*args)
+    except Exception as e:
+      traceback.print_exc()
+
+  def SetPromptLength(self, i):
+    # NiceDisplay needs this to return to original location.
+    pass
+
+  def Reset(self):
+    """Call this in between commands."""
+    pass
+
+  def ShowPromptOnRight(self):
+    # Doesn't apply to BasicDisplay
+    pass
+
+  def EraseLines(self):
+    # Doesn't apply to BasicDisplay
+    pass
+
+  def PrintRequired(self, msg, *args):
+    # This gets called with "nothing to display"
+    pass
+
+  def PrintOptional(self, msg, *args):
+    pass
+
+  def OnWindowChange(self):
+    # BasicDisplay doesn't care about terminal width.
+    pass
+
+
+class BasicDisplay(_IDisplay):
+  """Doesn't output color or depend on the terminal width.
+
+  This could be useful if we ever have a browser build!  We can see completion
+  without testing it.
+  """
+  def __init__(self, comp_state, num_lines_cap=10, f=sys.stdout):
+    _IDisplay.__init__(self, comp_state, num_lines_cap, f)
+
+    self.reader = None
+
+  def SetReader(self, r):
+    """Dependency injection."""
+    self.reader = r
+
+  def _RedrawPrompt(self):
+    # NOTE: This has to reprint the prompt and the command line!
+    # Like bash, we SAVE the prompt and print it, rather than re-evaluating it.
+    self.f.write(self.reader.CurrentRenderedPrompt())
+    self.f.write(self.comp_state['ORIG'])
+
+  def _PrintCandidates(self, unused_subst, matches, unused_match_len):
+    #log('_PrintCandidates %s', matches)
+    self.f.write('\n')  # need this
+    prefix_pos = self.comp_state['prefix_pos']
+
+    too_many = False
+    i = 0
+    for m in matches:
+      self.f.write(' %s\n' % m[prefix_pos:])
+
+      if i == self.num_lines_cap:
+        too_many = True
+        i += 1  # Count this one
+        break
+
+      i += 1
+
+    if too_many:
+      num_left = len(matches) - i
+      if num_left:
+        self.f.write(' ... and %d more\n' % num_left)
+
+    self._RedrawPrompt()
+
+  def PrintRequired(self, msg, *args):
+    self.f.write('\n')
+    if args:
+      msg = msg % args
+    self.f.write(' %s\n' % msg)  # need a newline
+    self._RedrawPrompt()
+
+
+def _PrintPacked(matches, max_match_len, term_width, max_lines, f):
   # With of each candidate.  2 spaces between each.
   w = max_match_len + 2
 
@@ -109,8 +204,7 @@ def PrintPacked(matches, max_match_len, term_width, max_lines, f=sys.stdout):
   return num_lines
 
 
-def PrintLong(matches, max_match_len, term_width, max_lines, descriptions,
-              f=sys.stdout):
+def _PrintLong(matches, max_match_len, term_width, max_lines, descriptions, f):
   """Print flags with descriptions, one per line.
 
   Args:
@@ -121,8 +215,8 @@ def PrintLong(matches, max_match_len, term_width, max_lines, descriptions,
   """
   #log('desc = %s', descriptions)
 
-  # Why subtract 3?  1 char for left and right margin, and then 1 for the space
-  # in between.
+  # Subtract 3 chars: 1 for left and right margin, and then 1 for the space in
+  # between.
   max_desc = max(0, term_width - max_match_len - 3)
   fmt = ' %-' + str(max_match_len) + 's ' + _YELLOW + '%s' + _RESET + '\n'
 
@@ -152,88 +246,7 @@ def PrintLong(matches, max_match_len, term_width, max_lines, descriptions,
   return num_lines
 
 
-class _Display(object):
-
-  def __init__(self, comp_state, num_lines_cap, f):
-    self.comp_state = comp_state
-    self.num_lines_cap = num_lines_cap
-    self.f = f
-
-  def PrintCandidates(self, *args):
-    try:
-      self._PrintCandidates(*args)
-    except Exception as e:
-      traceback.print_exc()
-
-  def SetPromptLength(self, i):
-    # We don't need this because we don't return to the print
-    pass
-
-  def Reset(self):
-    """Call this in between commands."""
-    pass
-
-  def ShowPromptOnRight(self):
-    # Don't show prompt at all?
-    pass
-
-  def EraseLines(self):
-    pass
-
-  def PrintMessage(self, msg, *args):
-    # This gets called with "nothing to display"
-    # in bare mode we don't display any of this stuff?
-    pass
-
-  def OnWindowChange(self):
-    # We don't care about terminal width by default."""
-    pass
-
-
-class BasicDisplay(_Display):
-  """Doesn't output color or depend on the terminal width.
-
-  This could be useful if we ever have a browser build!  We can see completion
-  without testing it.
-  """
-  def __init__(self, comp_state, num_lines_cap=10, f=sys.stdout):
-    _Display.__init__(self, comp_state, num_lines_cap, f)
-
-    self.reader = None
-
-  def SetReader(self, r):
-    """Dependency injection."""
-    self.reader = r
-
-  def _PrintCandidates(self, unused_subst, matches, unused_match_len):
-    #log('_PrintCandidates %s', matches)
-    self.f.write('\n')  # need this
-    prefix_pos = self.comp_state['prefix_pos']
-
-    too_many = False
-    i = 0
-    for m in matches:
-      self.f.write(' %s\n' % m[prefix_pos:])
-
-      if i == self.num_lines_cap:
-        too_many = True
-        i += 1  # Count this one
-        break
-
-      i += 1
-
-    if too_many:
-      num_left = len(matches) - i
-      if num_left:
-        self.f.write(' ... and %d more\n' % num_left)
-
-    # NOTE: This has to reprint the prompt and the command line!
-    # Like bash, we SAVE the prompt and print it, rather than re-evaluating it.
-    self.f.write(self.reader.CurrentRenderedPrompt())
-    self.f.write(self.comp_state['ORIG'])
-
-
-class NiceDisplay(_Display):
+class NiceDisplay(_IDisplay):
   """Methods to display completion candidates and other messages.
 
   This object has to remember how many lines we last drew, in order to erase
@@ -249,7 +262,7 @@ class NiceDisplay(_Display):
     Args:
       bold_line: Should user's entry be bold?
     """
-    _Display.__init__(self, comp_state, num_lines_cap, f)
+    _IDisplay.__init__(self, comp_state, num_lines_cap, f)
 
     self.bold_line = bold_line
 
@@ -323,7 +336,6 @@ class NiceDisplay(_Display):
 
     max_lines = self.num_lines_cap * self.dupes[comp_id]
 
-    # TODO: should we quote these or not?
     if prefix_pos:
       to_display = [m[prefix_pos:] for m in matches]
     else:
@@ -332,20 +344,23 @@ class NiceDisplay(_Display):
     # Calculate max length after stripping prefix.
     max_match_len = max(len(m) for m in to_display)
 
+    # TODO: NiceDisplay should truncate when max_match_len > term_width?
+    # Also truncate when a single candidate is super long?
+
     # Print and go back up.  But we have to ERASE these before hitting enter!
     if self.comp_state.get('DESC'):  # exists and is NON EMPTY
-      num_lines = PrintLong(to_display, max_match_len, term_width,
-                            max_lines, self.comp_state['DESC'])
+      num_lines = _PrintLong(to_display, max_match_len, term_width,
+                             max_lines, self.comp_state['DESC'], self.f)
     else:
-      num_lines = PrintPacked(to_display, max_match_len, term_width,
-                              max_lines)
+      num_lines = _PrintPacked(to_display, max_match_len, term_width,
+                               max_lines, self.f)
 
     self._ReturnToPrompt(num_lines+1)
     self.num_lines_last_displayed = num_lines
 
     self.c_count += 1
 
-  def PrintMessage(self, msg, *args):
+  def PrintRequired(self, msg, *args):
     """
     Print a message below the prompt, and then return to the location on the
     prompt line.
@@ -359,7 +374,7 @@ class NiceDisplay(_Display):
     self.f.write('\n')
 
     self.EraseLines()
-    log('_PrintMessage %r', msg, file=DEBUG_F)
+    log('PrintOptional %r', msg, file=DEBUG_F)
 
     # Truncate to terminal width
     max_len = self._GetTerminalWidth() - 2
@@ -375,6 +390,9 @@ class NiceDisplay(_Display):
 
     self.num_lines_last_displayed = 1
     self.m_count += 1
+
+  def PrintOptional(self, msg, *args):
+    self.PrintRequired(msg, *args)
 
   def ShowPromptOnRight(self, rendered):
     n = self._GetTerminalWidth() - 2 - len(rendered)
@@ -428,3 +446,4 @@ class NiceDisplay(_Display):
     # between arbitrary bytecodes, and we don't want a single completion
     # display to be shown with different widths.
     self.width_is_dirty = True
+

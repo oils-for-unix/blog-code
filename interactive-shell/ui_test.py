@@ -4,6 +4,8 @@ ui_test.py: Tests for ui.py
 """
 from __future__ import print_function
 
+import cStringIO
+import sys
 import unittest
 
 import ui  # module under test
@@ -17,18 +19,96 @@ class VisualTest(unittest.TestCase):
   def testPrintPacked(self):
     matches = ['foo', 'bar', 'spam', 'eggs', 'python', 'perl']
     longest_match_len = max(len(m) for m in matches)
-    for width in (10, 20, 30, 40, 50):
-      n = ui.PrintPacked(matches, longest_match_len, width, 10)
-      print('Wrote %d lines' % n)
+    max_lines = 10
+
+    for width in (1, 10, 20, 30, 40, 50):
+      f = cStringIO.StringIO()
+      n = ui._PrintPacked(matches, longest_match_len, width, max_lines, f)
+
+      out = f.getvalue()
+      lines = out.splitlines()
+      max_len = max(len(line) for line in lines)
+
+      print('WIDTH = %d' % width)
+      print('reported lines = %d' % n)
+      print('measured lines = %d' % len(lines))
+      print('max_len = %d' % max_len)
+
+      # Make sure it fits in the width!
+
+      # NOTE: This is too conservative because of non-printable characters
+      # like \n and ANSI escapes
+      if width != 1:
+        self.assertLess(max_len, width)
+
+      print('')
+
+  def testLongStringAndSkinnyTerminal(self):
+    matches = ['foo' * 10, 'bar' * 10, 'spams' * 10, 'zzz']
+    longest_match_len = max(len(m) for m in matches)
+
+    for width in (1, 10, 20, 30, 40, 50):
+      f = cStringIO.StringIO()
+      n = ui._PrintPacked(matches, longest_match_len, width, 10, f)
+
+      out = f.getvalue()
+      lines = out.splitlines()
+      max_len = max(len(line) for line in lines)
+
+      print('WIDTH = %d' % width)
+      print('reported lines = %d' % n)
+      print('measured lines = %d' % len(lines))
+      print('max_len = %d' % max_len)
       print('')
 
   def testTooMany(self):
     matches = ['--flag%d' % i for i in xrange(100)]
     longest_match_len = max(len(m) for m in matches)
-    for width in (10, 20, 30, 40, 50, 60):
-      n = ui.PrintPacked(matches, longest_match_len, width, 10)
-      print('Wrote %d lines' % n)
+
+    for width in (1, 10, 20, 30, 40, 50, 60):
+      f = cStringIO.StringIO()
+      n = ui._PrintPacked(matches, longest_match_len, width, 10, f)
+
+      out = f.getvalue()
+      lines = out.splitlines()
+      max_len = max(len(line) for line in lines)
+
+      print('WIDTH = %d' % width)
+      print('reported lines = %d' % n)
+      # Count newlines since last one doesn't have a newline
+      print('measured lines = %d' % out.count('\n'))
+      print('max_len = %d' % max_len)
       print('')
+
+      #print(out)
+
+  def testPrintLong(self):
+    matches = ['--all', '--almost-all', '--verbose']
+    longest_match_len = max(len(m) for m in matches)
+    descriptions = {
+        '--all': 'show all ' * 10,  # truncate
+        '--almost-all': 'foo',
+        '--verbose': 'bar'
+    }
+
+    max_lines = 10
+    for width in (1, 10, 20, 30, 40, 50, 60):
+      f = cStringIO.StringIO()
+      n = ui._PrintLong(matches, longest_match_len, width, max_lines,
+                        descriptions, f)
+
+      out = f.getvalue()
+      lines = out.splitlines()
+      max_len = max(len(line) for line in lines)
+
+      print('WIDTH = %d' % width)
+      print('reported lines = %d' % n)
+      # Count newlines since last one doesn't have a newline
+      print('measured lines = %d' % out.count('\n'))
+      print('max_len = %d' % max_len)
+      print('')
+
+      #print(out)
 
 
 class UiTest(unittest.TestCase):
@@ -46,7 +126,8 @@ class UiTest(unittest.TestCase):
     comp_state['ORIG'] = 'echo '  # for returning to the prompt
     comp_state['prefix_pos'] = 5  # Strip this off every candidate
 
-    display.PrintMessage('hello')
+    display.PrintRequired('hello')
+    display.PrintOptional('hello')
 
     matches = ['echo one', 'echo two']
     display.PrintCandidates(None, matches, None)
