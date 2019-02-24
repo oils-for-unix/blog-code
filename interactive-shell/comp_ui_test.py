@@ -8,7 +8,7 @@ import cStringIO
 import sys
 import unittest
 
-import display  # module under test
+import comp_ui  # module under test
 
 
 # TODO: Unit tests should test some properties of the output!
@@ -23,7 +23,7 @@ class VisualTest(unittest.TestCase):
 
     for width in (1, 10, 20, 30, 40, 50):
       f = cStringIO.StringIO()
-      n = display._PrintPacked(matches, longest_match_len, width, max_lines, f)
+      n = comp_ui._PrintPacked(matches, longest_match_len, width, max_lines, f)
 
       out = f.getvalue()
       lines = out.splitlines()
@@ -49,7 +49,7 @@ class VisualTest(unittest.TestCase):
 
     for width in (1, 10, 20, 30, 40, 50):
       f = cStringIO.StringIO()
-      n = display._PrintPacked(matches, longest_match_len, width, 10, f)
+      n = comp_ui._PrintPacked(matches, longest_match_len, width, 10, f)
 
       out = f.getvalue()
       lines = out.splitlines()
@@ -67,7 +67,7 @@ class VisualTest(unittest.TestCase):
 
     for width in (1, 10, 20, 30, 40, 50, 60):
       f = cStringIO.StringIO()
-      n = display._PrintPacked(matches, longest_match_len, width, 10, f)
+      n = comp_ui._PrintPacked(matches, longest_match_len, width, 10, f)
 
       out = f.getvalue()
       lines = out.splitlines()
@@ -94,7 +94,7 @@ class VisualTest(unittest.TestCase):
     max_lines = 10
     for width in (1, 10, 20, 30, 40, 50, 60):
       f = cStringIO.StringIO()
-      n = display._PrintLong(matches, longest_match_len, width, max_lines,
+      n = comp_ui._PrintLong(matches, longest_match_len, width, max_lines,
                         descriptions, f)
 
       out = f.getvalue()
@@ -116,7 +116,7 @@ class UiTest(unittest.TestCase):
   def testNiceDisplay(self):
     comp_state = {}
 
-    disp = display.NiceDisplay(comp_state, bold_line=False)
+    disp = comp_ui.NiceDisplay(comp_state, bold_line=False)
     # This one is important
     disp.EraseLines()
     disp.Reset()

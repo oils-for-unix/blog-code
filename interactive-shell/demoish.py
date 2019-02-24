@@ -67,9 +67,9 @@ import getpass
 import pwd
 import socket
 
-import display
+import comp_ui
 
-log = display.log
+log = comp_ui.log
 
 
 # Prompt style
@@ -450,23 +450,23 @@ class PromptEvaluator(object):
 
     if self.style == _RIGHT:
       right_prompt_str = p
-      p2 = display.PROMPT_BOLD + ': ' + display.PROMPT_RESET
+      p2 = comp_ui.PROMPT_BOLD + ': ' + comp_ui.PROMPT_RESET
       prompt_len = 2
 
     elif 0:
     #elif self.style == _BOLD:  # Make it bold and add '$ '
-      p2 = display.PROMPT_BOLD + p + '$ ' + display.PROMPT_RESET
+      p2 = comp_ui.PROMPT_BOLD + p + '$ ' + comp_ui.PROMPT_RESET
       prompt_len += 2
 
     elif 0:
     #elif self.style == _UNDERLINE:
       # Don't underline the space
-      p2 = display.PROMPT_UNDERLINE + p + display.PROMPT_RESET + ' '
+      p2 = comp_ui.PROMPT_UNDERLINE + p + comp_ui.PROMPT_RESET + ' '
       prompt_len += 1
 
     elif 0:
     #elif self.style == _REVERSE:
-      p2 = display.PROMPT_REVERSE + ' ' + p + ' ' + display.PROMPT_RESET + ' '
+      p2 = comp_ui.PROMPT_REVERSE + ' ' + p + ' ' + comp_ui.PROMPT_RESET + ' '
       prompt_len += 3
 
     elif self.style == _OSH:
@@ -509,7 +509,7 @@ class InteractiveLineReader(object):
 
     p = self.prompt_str
     if self.bold_line:
-      p += display.PROMPT_BOLD
+      p += comp_ui.PROMPT_BOLD
 
     if self.right_prompt_str:  # only for PS1
       self.display.ShowPromptOnRight(self.right_prompt_str)
@@ -648,7 +648,7 @@ def main(argv):
 
   opts, _ = p.parse_args(argv[1:])
 
-  _, term_width = display.GetTerminalSize()
+  _, term_width = comp_ui.GetTerminalSize()
   fmt = '%' + str(term_width) + 's'
 
   #msg = "[Oil 0.6.pre11] Type 'help' or visit https://oilshell.org/help/ "
@@ -660,30 +660,30 @@ def main(argv):
   comp_state = {}
 
   if opts.style == 'bare':
-    disp = display.BasicDisplay(comp_state)
+    display = comp_ui.BasicDisplay(comp_state)
     prompt = PromptEvaluator(_OSH)
-    reader = InteractiveLineReader(_PS1, '> ', prompt, disp,
+    reader = InteractiveLineReader(_PS1, '> ', prompt, display,
                                    bold_line=False)
-    disp.SetReader(reader)  # needed to re-print prompt
+    display.SetReader(reader)  # needed to re-print prompt
 
   elif opts.style == 'osh':
-    disp = display.NiceDisplay(comp_state, bold_line=True)
+    display = comp_ui.NiceDisplay(comp_state, bold_line=True)
     prompt = PromptEvaluator(_OSH)
-    reader = InteractiveLineReader(_PS1, '> ', prompt, disp,
+    reader = InteractiveLineReader(_PS1, '> ', prompt, display,
                                    bold_line=True, erase_empty=1)
   elif opts.style == 'oil':
-    disp = display.NiceDisplay(comp_state, bold_line=True)
+    display = comp_ui.NiceDisplay(comp_state, bold_line=True)
     # Oil has reverse video on the right.  It's also bold, and may be syntax
     # highlighted later.
     prompt = PromptEvaluator(_RIGHT)
-    reader = InteractiveLineReader(_PS1, '| ', prompt, disp,
+    reader = InteractiveLineReader(_PS1, '| ', prompt, display,
                                    bold_line=True, erase_empty=2)
 
   else:
     raise RuntimeError('Invalid style %r' % opts.style)
 
   # Register a callback to receive terminal width changes.
-  signal.signal(signal.SIGWINCH, lambda x, y: disp.OnWindowChange())
+  signal.signal(signal.SIGWINCH, lambda x, y: display.OnWindowChange())
 
   comp_lookup = {
       'echo': WordsAction(ECHO_WORDS),
@@ -704,7 +704,7 @@ def main(argv):
   comp_lookup['__first'] = WordsAction(commands + _MORE_COMMANDS)
 
   # Register a callback to generate completion candidates.
-  root_comp = RootCompleter(reader, disp, comp_lookup, comp_state)
+  root_comp = RootCompleter(reader, display, comp_lookup, comp_state)
   readline.set_completer(CompletionCallback(root_comp))
 
   # We want to parse the line ourselves, rather than use readline's naive
@@ -718,12 +718,12 @@ def main(argv):
   # NOTE: Is this style hard to compile?  Maybe have to expand the args
   # literally.
   readline.set_completion_display_matches_hook(
-      lambda *args: disp.PrintCandidates(*args)
+      lambda *args: display.PrintCandidates(*args)
   )
 
   readline.parse_and_bind('tab: complete')
 
-  MainLoop(reader, disp)
+  MainLoop(reader, display)
 
 
 if __name__ == '__main__':
