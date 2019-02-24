@@ -1,6 +1,6 @@
 #!/usr/bin/python -S
 """
-ui_test.py: Tests for ui.py
+display_test.py: Tests for display.py
 """
 from __future__ import print_function
 
@@ -8,7 +8,7 @@ import cStringIO
 import sys
 import unittest
 
-import ui  # module under test
+import display  # module under test
 
 
 # TODO: Unit tests should test some properties of the output!
@@ -23,7 +23,7 @@ class VisualTest(unittest.TestCase):
 
     for width in (1, 10, 20, 30, 40, 50):
       f = cStringIO.StringIO()
-      n = ui._PrintPacked(matches, longest_match_len, width, max_lines, f)
+      n = display._PrintPacked(matches, longest_match_len, width, max_lines, f)
 
       out = f.getvalue()
       lines = out.splitlines()
@@ -49,7 +49,7 @@ class VisualTest(unittest.TestCase):
 
     for width in (1, 10, 20, 30, 40, 50):
       f = cStringIO.StringIO()
-      n = ui._PrintPacked(matches, longest_match_len, width, 10, f)
+      n = display._PrintPacked(matches, longest_match_len, width, 10, f)
 
       out = f.getvalue()
       lines = out.splitlines()
@@ -67,7 +67,7 @@ class VisualTest(unittest.TestCase):
 
     for width in (1, 10, 20, 30, 40, 50, 60):
       f = cStringIO.StringIO()
-      n = ui._PrintPacked(matches, longest_match_len, width, 10, f)
+      n = display._PrintPacked(matches, longest_match_len, width, 10, f)
 
       out = f.getvalue()
       lines = out.splitlines()
@@ -94,7 +94,7 @@ class VisualTest(unittest.TestCase):
     max_lines = 10
     for width in (1, 10, 20, 30, 40, 50, 60):
       f = cStringIO.StringIO()
-      n = ui._PrintLong(matches, longest_match_len, width, max_lines,
+      n = display._PrintLong(matches, longest_match_len, width, max_lines,
                         descriptions, f)
 
       out = f.getvalue()
@@ -116,29 +116,29 @@ class UiTest(unittest.TestCase):
   def testNiceDisplay(self):
     comp_state = {}
 
-    display = ui.NiceDisplay(comp_state, bold_line=False)
+    disp = display.NiceDisplay(comp_state, bold_line=False)
     # This one is important
-    display.EraseLines()
-    display.Reset()
-    display.SetPromptLength(10)
+    disp.EraseLines()
+    disp.Reset()
+    disp.SetPromptLength(10)
 
     # These are related but we can just set them separately.
     comp_state['ORIG'] = 'echo '  # for returning to the prompt
     comp_state['prefix_pos'] = 5  # Strip this off every candidate
 
-    display.PrintRequired('hello')
-    display.PrintOptional('hello')
+    disp.PrintRequired('hello')
+    disp.PrintOptional('hello')
 
     matches = ['echo one', 'echo two']
-    display.PrintCandidates(None, matches, None)
+    disp.PrintCandidates(None, matches, None)
 
-    display.OnWindowChange()
+    disp.OnWindowChange()
 
     # This needs to be aware of the terminal width.
     # It's a bit odd since it's called as a side effect of the PromptEvaluator.
     # That class knows about styles and so forth.
 
-    display.ShowPromptOnRight('RIGHT')
+    disp.ShowPromptOnRight('RIGHT')
 
 
 if __name__ == '__main__':

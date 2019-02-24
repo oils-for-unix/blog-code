@@ -6,7 +6,7 @@ from __future__ import print_function
 
 import unittest
 
-import ui
+import display
 import demoish  # module under test
 
 
@@ -17,14 +17,14 @@ class DemoishTest(unittest.TestCase):
     comp_lookup = {
         'echo': demoish.WordsAction(['foo', 'bar']),
     }
-    display = ui.NiceDisplay(comp_state, bold_line=True)
+    disp = display.NiceDisplay(comp_state, bold_line=True)
     prompt = demoish.PromptEvaluator(demoish._RIGHT)
-    reader = demoish.InteractiveLineReader('$ ', '> ', prompt, display)
+    reader = demoish.InteractiveLineReader('$ ', '> ', prompt, disp)
     reader.pending_lines.extend([
         'echo \\\n',  # first line
     ])
 
-    r = demoish.RootCompleter(reader, display, comp_lookup, comp_state)
+    r = demoish.RootCompleter(reader, disp, comp_lookup, comp_state)
     # second line
     matches = list(r.Matches({'line': 'x f'}))
     print(matches)
