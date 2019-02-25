@@ -51,6 +51,10 @@ def log(msg, *args, **kwargs):
   f.flush()
 
 
+def debug_log(msg, *args):
+  log(msg, *args, file=DEBUG_F)
+
+
 def GetTerminalSize():
   # fd 0 = stdin.  The arg has to be 4 bytes for some reason.
   b = fcntl.ioctl(0, termios.TIOCGWINSZ, '1234')

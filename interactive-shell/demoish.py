@@ -70,6 +70,7 @@ import socket
 import comp_ui
 
 log = comp_ui.log
+debug_log = comp_ui.debug_log
 
 
 # Prompt style
@@ -406,7 +407,14 @@ class CompletionCallback(object):
     """Generate completions."""
     if state == 0:  # initial completion
       orig_line = readline.get_line_buffer()
-      comp = {'line': orig_line}
+      #begin = readline.get_begidx()
+      end = readline.get_endidx()
+
+      comp = {'line': orig_line[:end]}
+      #debug_log('line %r', orig_line)
+      #debug_log('begidx %d', begin)
+      #debug_log('endidx %d', end)
+
       self.iter = self.root_comp.Matches(comp)
 
     try:
