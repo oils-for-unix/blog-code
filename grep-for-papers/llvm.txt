@@ -1,0 +1,395 @@
+Comments From the LLVM Source Code Regarding Algorithms
+-------------------------------------------------------
+
+I obtained these excepts by following the links I generated here:
+
+http://www.oilshell.org/grep-for-papers/llvm-7.0.1.src.wwz/
+
+
+GenericDomTreeConstruction.h
+
+   11 /// Generic dominator tree construction - This file provides routines to
+   12 /// construct immediate dominator information for a flow-graph based on the
+   13 /// Semi-NCA algorithm described in this dissertation:
+   14 ///
+   15 ///   Linear-Time Algorithms for Dominators and Related Problems
+   16 ///   Loukas Georgiadis, Princeton University, November 2005, pp. 21-23:
+   17 ///   ftp://ftp.cs.princeton.edu/reports/2005/737.pdf
+   18 ///
+   19 /// This implements the O(n*log(n)) versions of EVAL and LINK, because it turns
+   20 /// out that the theoretically slower O(n*log(n)) implementation is actually
+   21 /// faster than the almost-linear O(n*alpha(n)) version, even for large CFGs.
+   22 ///
+   23 /// The file uses the Depth Based Search algorithm to perform incremental
+   24 /// updates (insertion and deletions). The implemented algorithm is based on
+   25 /// this publication:
+   26 ///
+   27 ///   An Experimental Study of Dynamic Dominators
+   28 ///   Loukas Georgiadis, et al., April 12 2016, pp. 5-7, 9-10:
+   29 ///   https://arxiv.org/pdf/1604.02711.pdf
+
+ 1526   // A very simple and direct explanation of these properties can be found in
+ 1527   // "An Experimental Study of Dynamic Dominators", found at
+ 1528   // https://arxiv.org/abs/1604.02711
+
+
+PassManager.h
+
+   28 /// Note that the implementations of the pass managers use concept-based
+   29 /// polymorphism as outlined in the "Value Semantics and Concept-based
+   30 /// Polymorphism" talk (or its abbreviated sibling "Inheritance Is The Base
+   31 /// Class of Evil") by Sean Parent:
+   32 /// * http://github.com/sean-parent/sean-parent.github.com/wiki/Papers-and-Presentations
+   33 /// * http://www.youtube.com/watch?v=_BpMYeUFXv8
+   34 /// * http://channel9.msdn.com/Events/GoingNative/2013/Inheritance-Is-The-Base-Class-of-Evil
+
+
+RegionInfo.h
+
+   10 // Calculate a program structure tree built out of single entry single exit
+   11 // regions.
+   12 // The basic ideas are taken from "The Program Structure Tree - Richard Johnson,
+   13 // David Pearson, Keshav Pingali - 1994", however enriched with ideas from "The
+   14 // Refined Process Structure Tree - Jussi Vanhatalo, Hagen Voelyer, Jana
+   15 // Koehler - 2009".
+   16 // The algorithm to calculate these data structures however is completely
+   17 // different, as it takes advantage of existing information already available
+   18 // in (Post)dominace tree and dominance frontier passes. This leads to a simpler
+   19 // and in practice hopefully better performing algorithm. The runtime of the
+   20 // algorithms described in the papers above are both linear in graph size,
+   21 // O(V+E), whereas this algorithm is not, as the dominance frontier information
+   22 // itself is not, but in practice runtime seems to be in the order of magnitude
+   23 // of dominance tree calculation.
+   24 //
+   25 // WARNING: LLVM is generally very concerned about compile time such that
+   26 //          the use of additional analysis passes in the default
+   27 //          optimization sequence is avoided as much as possible.
+   28 //          Specifically, if you do not need the RegionInfo, but dominance
+   29 //          information could be sufficient please base your work only on
+   30 //          the dominator tree. Most passes maintain it, such that using
+   31 //          it has often near zero cost. In contrast RegionInfo is by
+   32 //          default not available, is not maintained by existing
+   33 //          transformations and there is no intention to do so.
+
+
+llvm/Analysis/DependenceAnalysis.h
+
+   10 // DependenceAnalysis is an LLVM pass that analyses dependences between memory
+   11 // accesses. Currently, it is an implementation of the approach described in
+   12 //
+   13 //            Practical Dependence Testing
+   14 //            Goff, Kennedy, Tseng
+   15 //            PLDI 1991
+
+
+DependenceAnalysis.cpp
+
+ 1385 // Kirch's algorithm, from
+ 1386 //
+ 1387 //        Optimizing Supercompilers for Supercomputers
+ 1388 //        Michael Wolfe
+ 1389 //        MIT Press, 1989
+ 1390 //
+ 1391 // Program 2.1, page 29.
+ 1392 // Computes the GCD of AM and BM.
+
+
+llvm/CodeGen/TargetLowering.h
+
+ 1641   /// On some platforms, an AtomicRMW that never actually modifies the value
+ 1642   /// (such as fetch_add of 0) can be turned into a fence followed by an
+ 1643   /// atomic load. This may sound useless, but it makes it possible for the
+ 1644   /// processor to keep the cacheline shared, dramatically improving
+ 1645   /// performance. And such idempotent RMWs are useful for implementing some
+ 1646   /// kinds of locks, see for example (justification + benchmarks):
+ 1647   /// http://www.hpl.hp.com/techreports/2012/HPL-2012-68.pdf
+
+Can Seqlocks Get Along With Programming Language Memory Models?  Hans-J. Boehm
+
+
+SSAUpdaterImpl.h
+
+  231   /// FindDominators - Calculate the dominator tree for the subset of the CFG
+  232   /// corresponding to the basic blocks on the BlockList.  This uses the
+  233   /// algorithm from: "A Simple, Fast Dominance Algorithm" by Cooper, Harvey
+  234   /// and Kennedy, published in Software--Practice and Experience, 2001,
+  235   /// 4:1-10.  Because the CFG subset does not include any edges leading into
+  236   /// blocks that define the value, the results are not the usual dominator
+  237   /// tree.  The CFG subset has a single pseudo-entry node with edges to a set
+  238   /// of root nodes for blocks that define the value.  The dominators for this
+  239   /// subset CFG are not the standard dominators but they are adequate for
+  240   /// placing PHIs within the subset CFG.
+
+
+llvm/ADT/SparseSet.h -
+
+   10 // This file defines the SparseSet class derived from the version described in
+   11 // Briggs, Torczon, "An efficient representation for sparse sets", ACM Letters
+   12 // on Programming Languages and Systems, Volume 2 Issue 1-4, March-Dec.  1993.
+   13 //
+   14 // A sparse set holds a small number of objects identified by integer keys from
+   15 // a moderately sized universe. The sparse set uses more memory than other
+   16 // containers in order to provide faster operations.
+
+
+JamCRC.cpp
+
+   14 // The implementation technique is the one mentioned in:
+   15 // D. V. Sarwate. 1988. Computation of cyclic redundancy checks via table
+   16 // look-up. Commun. ACM 31, 8 (August 1988)
+
+
+APFloat.cpp
+
+ 3908 // Implement addition, subtraction, multiplication and division based on:
+ 3909 // "Software for Doubled-Precision Floating-Point Computations",
+ 3910 // by Seppo Linnainmaa, ACM TOMS vol 7 no 3, September 1981, pages 272-283.
+
+
+X86SpeculativeLoadHardening.cpp
+
+   11 /// Provide a pass which mitigates speculative execution attacks which operate
+   12 /// by speculating incorrectly past some predicate (a type check, bounds check,
+   13 /// or other condition) to reach a load with invalid inputs and leak the data
+   14 /// accessed by that load using a side channel out of the speculative domain.
+   15 ///
+   16 /// For details on the attacks, see the first variant in both the Project Zero
+   17 /// writeup and the Spectre paper:
+   18 /// https://googleprojectzero.blogspot.com/2018/01/reading-privileged-memory-with-side.html
+   19 /// https://spectreattack.com/spectre.pdf
+
+
+RDFLiveness.cpp
+
+   10 // Computation of the liveness information from the data-flow graph.
+   11 //
+   12 // The main functionality of this code is to compute block live-in
+   13 // information. With the live-in information in place, the placement
+   14 // of kill flags can also be recalculated.
+   15 //
+   16 // The block live-in calculation is based on the ideas from the following
+   17 // publication:
+   18 //
+   19 // Dibyendu Das, Ramakrishna Upadrasta, Benoit Dupont de Dinechin.
+   20 // "Efficient Liveness Computation Using Merge Sets and DJ-Graphs."
+   21 // ACM Transactions on Architecture and Code Optimization, Association for
+   22 // Computing Machinery, 2012, ACM TACO Special Issue on "High-Performance
+   23 // and Embedded Architectures and Compilers", 8 (4),
+   24 // <10.1145/2086696.2086706>. <hal-00647369>
+
+MemoryDependenceAnalysis.cpp
+
+  456   // If it is simple, we know based on the results of
+  457   // "Compiler testing via a theory of sound optimisations in the C11/C++11
+  458   //   memory model" in PLDI 2013, that a non-atomic location can only be
+  459   //   clobbered between a pair of a release and an acquire action, with no
+  460   //   access to the location in between.
+
+
+MachineOutliner.cpp
+
+   11 /// Replaces repeated sequences of instructions with function calls.
+   12 ///
+   13 /// This works by placing every instruction from every basic block in a
+   14 /// suffix tree, and repeatedly querying that tree for repeated sequences of
+   15 /// instructions. If a sequence of instructions appears often, then it ought
+   16 /// to be beneficial to pull out into a function.
+
+
+   34 /// This was originally presented at the 2016 LLVM Developers' Meeting in the
+   35 /// talk "Reducing Code Size Using Outlining". For a high-level overview of
+   36 /// how this pass works, the talk is available on YouTube at
+   37 ///
+   38 /// https://www.youtube.com/watch?v=yorld-WSOeU
+   39 ///
+   40 /// The slides for the talk are available at
+   41 ///
+   42 /// http://www.llvm.org/devmtg/2016-11/Slides/Paquette-Outliner.pdf
+
+
+LegalizeDAG.cpp
+
+ 2721     // This is the "best" algorithm from
+ 2722     // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+ 2723 
+
+
+AddressSanitizer.cpp
+
+   10 // This file is a part of AddressSanitizer, an address sanity checker.
+   11 // Details of the algorithm:
+   12 //  https://github.com/google/sanitizers/wiki/AddressSanitizerAlgorithm
+
+
+Clustering.cpp
+
+
+   26 // We've used DBSCAN here because it's simple to implement. This is a pretty
+   27 // straightforward and inefficient implementation of the pseudocode in [2].
+   28 //
+   29 // [1] https://en.wikipedia.org/wiki/DBSCAN
+   30 // [2] https://en.wikipedia.org/wiki/OPTICS_algorithm
+
+
+MachinePipeliner.cpp
+
+   10 // An implementation of the Swing Modulo Scheduling (SMS) software pipeliner.
+   11 //
+   12 // Software pipelining (SWP) is an instruction scheduling technique for loops
+   13 // that overlap loop iterations and exploits ILP via a compiler transformation.
+   14 //
+   15 // Swing Modulo Scheduling is an implementation of software pipelining
+   16 // that generates schedules that are near optimal in terms of initiation
+   17 // interval, register requirements, and stage count. See the papers:
+   18 //
+   19 // "Swing Modulo Scheduling: A Lifetime-Sensitive Approach", by J. Llosa,
+   20 // A. Gonzalez, E. Ayguade, and M. Valero. In PACT '96 Proceedings of the 1996
+   21 // Conference on Parallel Architectures and Compilation Techiniques.
+   22 //
+   23 // "Lifetime-Sensitive Modulo Scheduling in a Production Environment", by J.
+   24 // Llosa, E. Ayguade, A. Gonzalez, M. Valero, and J. Eckhardt. In IEEE
+   25 // Transactions on Computers, Vol. 50, No. 3, 2001.
+   26 //
+   27 // "An Implementation of Swing Modulo Scheduling With Extensions for
+   28 // Superblocks", by T. Lattner, Master's Thesis, University of Illinois at
+   29 // Urbana-Chambpain, 2005.
+
+ShadowStackGCLowering.cpp
+
+   10 // This file contains the custom lowering code required by the shadow-stack GC
+   11 // strategy.
+   12 //
+   13 // This pass implements the code transformation described in this paper:
+   14 //   "Accurate Garbage Collection in an Uncooperative Environment"
+   15 //   Fergus Henderson, ISMM, 2002
+
+
+RegAllocPBQP.cpp
+
+   10 // This file contains a Partitioned Boolean Quadratic Programming (PBQP) based
+   11 // register allocator for LLVM. This allocator works by constructing a PBQP
+   12 // problem representing the register allocation problem under consideration,
+   13 // solving this using a PBQP solver, and mapping the solution back to a
+   14 // register assignment. If any variables are selected for spilling then spill
+   15 // code is inserted and the process repeated.
+   16 //
+   17 // The PBQP solver (pbqp.c) provided for this allocator uses a heuristic tuned
+   18 // for register allocation. For more information on PBQP for register
+   19 // allocation, see the following papers:
+   20 //
+   21 //   (1) Hames, L. and Scholz, B. 2006. Nearly optimal register allocation with
+   22 //   PBQP. In Proceedings of the 7th Joint Modular Languages Conference
+   23 //   (JMLC'06). LNCS, vol. 4228. Springer, New York, NY, USA. 346-361.
+   24 //
+   25 //   (2) Scholz, B., Eckstein, E. 2002. Register allocation for irregular
+   26 //   architectures. In Proceedings of the Joint Conference on Languages,
+   27 //   Compilers and Tools for Embedded Systems (LCTES'02), ACM Press, New York,
+   28 //   NY, USA, 139-148.
+
+
+SelectionDAGBuilder.cpp
+
+ 9479   // Split Clusters into minimum number of dense partitions. The algorithm uses
+ 9480   // the same idea as Kannan & Proebsting "Correction to 'Producing Good Code
+ 9481   // for the Case Statement'" (1994), but builds the MinPartitions array in
+ 9482   // reverse order to make it easier to reconstruct the partitions in ascending
+ 9483   // order. In the choice between two optimal partitionings, it picks the one
+ 9484   // which yields more jump tables.
+
+10010   // Balance the tree based on branch probabilities to create a near-optimal (in
+10011   // terms of search time given key frequency) binary search tree. See e.g. Kurt
+10012   // Mehlhorn "Nearly Optimal Binary Search Trees" (1975).
+
+
+PGOInstrumentation.cpp
+
+   10 // This file implements PGO instrumentation using a minimum spanning tree based
+   11 // on the following paper:
+   12 //   [1] Donald E. Knuth, Francis R. Stevenson. Optimal measurement of points
+   13 //   for program frequency counts. BIT Numerical Mathematics 1973, Volume 13,
+   14 //   Issue 3, pp 313-322
+
+
+InferAddressSpace.cpp
+
+   44 // Address space inference works in two steps. First, it uses a data-flow
+   45 // analysis to infer as many generic pointers as possible to point to only one
+   46 // specific address space. In the above example, it can prove that %1 only
+   47 // points to addrspace(3). This algorithm was published in
+   48 //   CUDA: Compiling and optimizing for a GPU platform
+   49 //   Chakrabarti, Grover, Aarts, Kong, Kudlur, Lin, Marathe, Murphy, Wang
+   50 //   ICCS 2012
+
+
+InstCombineCasts.cpp
+
+ 1527         // Specifically, if OpWidth >= 2*DstWdith+1 and DstWidth is sufficient
+ 1528         // to represent both sources, we can guarantee that the double
+ 1529         // rounding is innocuous (See p50 of Figueroa's 2000 PhD thesis,
+ 1530         // "A Rigorous Framework for Fully Supporting the IEEE Standard ..."
+ 1531         // for proof of this fact).
+
+
+SimplifyLibCalls.cpp
+
+ 1749   // This heuristic was suggested in:
+ 1750   // Improving Static Branch Prediction in a Compiler
+ 1751   // Brian L. Deitrich, Ben-Chung Cheng, Wen-mei W. Hwu
+ 1752   // Proceedings of PACT'98, Oct. 1998, IEEE
+
+
+llvm/ADT/edit_distance.h
+
+   46   // The algorithm implemented below is the "classic"
+   47   // dynamic-programming algorithm for computing the Levenshtein
+   48   // distance, which is described here:
+   49   //
+   50   //   http://en.wikipedia.org/wiki/Levenshtein_distance
+   51   //
+
+
+APInt.cpp
+
+ 1056   // Okay, all the short cuts are exhausted. We must compute it. The following
+ 1057   // is a classical Babylonian method for computing the square root. This code
+ 1058   // was adapted to APInt from a wikipedia article on such computations.
+ 1059   // See http://www.wikipedia.org/ and go to the page named
+ 1060   // Calculate_an_integer_square_root.
+
+
+ 1108   // Using the properties listed at the following web page (accessed 06/21/08):
+ 1109   //   http://www.numbertheory.org/php/euclid.html
+ 1110   // (especially the properties numbered 3, 4 and 9) it can be proved that
+ 1111   // BitWidth bits suffice for all the computations in the algorithm implemented
+ 1112   // below. More precisely, this number of bits suffice if the multiplicative
+ 1113   // inverse exists, but may not suffice for the general extended Euclidean
+ 1114   // algorithm.
+
+
+X86ISelLowering.cpp
+
+24503   // Implement a lookup table in register by using an algorithm based on:
+24504   // http://wm.ite.pl/articles/sse-popcount.html
+24505   //
+24506   // The general idea is that every lower byte nibble in the input vector is an
+24507   // index into a in-register pre-computed pop count table.
+
+24564   // This is the vectorized version of the "best" algorithm from
+24565   // http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
+24566   // with a minor tweak to use a series of adds + shifts instead of vector
+24567   // multiplications
+
+34932   // http://graphics.stanford.edu/~seander/bithacks.html#ConditionalNegate
+34933   // We know that, if fNegate is 0 or 1:
+34934   //   (fNegate ? -v : v) == ((v ^ -fNegate) + fNegate)
+
+
+PassBuilder.cpp
+
+  581   // In SamplePGO ThinLTO backend, we need instcombine before profile annotation
+  582   // to convert bitcast to direct calls so that they can be inlined during the
+  583   // profile annotation prepration step.
+  584   // More details about SamplePGO design can be found in:
+  585   // https://research.google.com/pubs/pub45290.html
+
+
