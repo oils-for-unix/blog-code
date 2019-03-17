@@ -7,7 +7,7 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
-readonly LLVM_DIR=~/src/languages/llvm-3.8.0.src
+readonly LLVM_DIR=~/src/languages/llvm-7.0.1.src
 readonly CLANG_DIR=~/src/languages/cfe-3.8.0.src
 readonly PYTHON_DIR=~/src/languages/Python-3.6.7
 
@@ -133,7 +133,7 @@ html-pubs() {
   # avoid xargs because it can mess up the total
   wc -l --files0-from $manifest > $out_dir/wc.txt
 
-  local num_results=$(wc -l < RESULTS.txt)
+  local num_results=$(wc -l < $results)
   # last line is the total, I think
   local num_lines=$(tail -n 1 $out_dir/wc.txt | awk '{print $1}')
   local num_files=$(cat $manifest | xargs -0 -n 1 -- echo | wc -l)
