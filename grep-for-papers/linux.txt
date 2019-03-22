@@ -424,3 +424,301 @@ drivers/misc/echo/echo.h
    60 FAP, etc. Some perform significantly better than NLMS.  However, factors such
    61 as computational complexity and patents favour the use of NLMS.
 
+
+kernel/bpf/verifier.c
+
+ 1266 				/* detected reuse of integer stack slot with a pointer
+ 1267 				 * which means either llvm is reusing stack slot or
+ 1268 				 * an attacker is trying to exploit CVE-2018-3639
+ 1269 				 * (speculative store bypass)
+ 1270 				 * Have to sanitize that slot with preemptive
+ 1271 				 * store of zero.
+ 1272 				 */
+
+arch/x86/kernel/cpu/amd.c
+
+   72  *	B step AMD K6 before B 9730xxxx have hardware bugs that can cause
+   73  *	misexecution of code under Linux. Owners of such processors should
+   74  *	contact AMD for precise details and a CPU swap.
+   75  *
+   76  *	See	http://www.multimania.com/poulot/k6bug.html
+   77  *	and	section 2.6.2 of "AMD-K6 Processor Revision Guide - Model 6"
+   78  *		(Publication # 21266  Issue Date: August 1998)
+
+
+include/linux/crc8.h
+
+   95  * "A Painless Guide to CRC Error Detection Algorithms", ver 3, Aug 1993
+   96  * Williams, Ross N., ross<at>ross.net
+   97  * (see URL http://www.ross.net/crc/download/crc_v3.txt).
+
+
+net/ipv4/fib_trie.c
+
+   15  * This work is based on the LPC-trie which is originally described in:
+   16  *
+   17  * An experimental study of compression methods for dynamic tries
+   18  * Stefan Nilsson and Matti Tikkanen. Algorithmica, 33(1):19-33, 2002.
+   19  * http://www.csc.kth.se/~snilsson/software/dyntrie2/
+
+   22  * IP-address lookup using LC-tries. Stefan Nilsson and Gunnar Karlsson
+   23  * IEEE Journal on Selected Areas in Communications, 17(6):1083-1092, June 1999
+
+
+arch/microblaze/include/asm/hash.h
+
+    6  * Fortunately, most people who want to run Linux on Microblaze enable
+    7  * both multiplier and barrel shifter, but omitting them is technically
+    8  * a supported configuration.
+    9  *
+   10  * With just a barrel shifter, we can implement an efficient constant
+   11  * multiply using shifts and adds.  GCC can find a 9-step solution, but
+   12  * this 6-step solution was found by Yevgen Voronenko's implementation
+   13  * of the Hcub algorithm at http://spiral.ece.cmu.edu/mcm/gen.html.
+   14  *
+   15  * That software is really not designed for a single multiplier this large,
+   16  * but if you run it enough times with different seeds, it'll find several
+   17  * 6-shift, 6-add sequences for computing x * 0x61C88647.  They are all
+   18  *	c = (x << 19) + x;
+   19  *	a = (x <<  9) + c;
+   20  *	b = (x << 23) + a;
+   21  *	return (a<<11) + (b<<6) + (c<<3) - b;
+   22  * with variations on the order of the final add.
+   23  *
+   24  * Without even a shifter, it's hopless; any hash function will suck.
+
+
+arch/parisc/include/asm/hash.h
+
+   19  * This is a multiply by GOLDEN_RATIO_32 = 0x61C88647 optimized for the
+   20  * PA7100 pairing rules.  This is an in-order 2-way superscalar processor.
+   21  * Only one instruction in a pair may be a shift (by more than 3 bits),
+   22  * but other than that, simple ALU ops (including shift-and-add by up
+   23  * to 3 bits) may be paired arbitrarily.
+   24  *
+   25  * PA8xxx processors also dual-issue ALU instructions, although with
+   26  * fewer constraints, so this schedule is good for them, too.
+   27  *
+   28  * This 6-step sequence was found by Yevgen Voronenko's implementation
+   29  * of the Hcub algorithm at http://spiral.ece.cmu.edu/mcm/gen.html.
+
+
+
+net/ipv4/syncookies.c
+
+    2  *  Syncookies implementation for the Linux kernel
+
+  143  * MSS Values are chosen based on the 2011 paper
+  144  * 'An Analysis of TCP Maximum Segement Sizes' by S. Alcock and R. Nelson.
+  145  * Values ..
+  146  *  .. lower than 536 are rare (< 0.2%)
+  147  *  .. between 537 and 1299 account for less than < 1.5% of observed values
+  148  *  .. in the 1300-1349 range account for about 15 to 20% of observed mss values
+  149  *  .. exceeding 1460 are very rare (< 0.04%)
+
+
+drivers/net/wireless/intersil/prism54/isl_oid.h
+
+  152 /* Prism "Nitro" / Frameburst / "Packet Frame Grouping"
+  153  * Value is in microseconds. Represents the # microseconds
+  154  * the firmware will take to group frames before sending out then out
+  155  * together with a CSMA contention. Without this all frames are
+  156  * sent with a CSMA contention.
+  157  * Bibliography:
+  158  * http://www.hpl.hp.com/personal/Jean_Tourrilhes/Papers/Packet.Frame.Grouping.html
+
+
+drivers/net/can/m_can/m_can.c
+
+ 1001 		/* TDC is only needed for bitrates beyond 2.5 MBit/s.
+ 1002 		 * This is mentioned in the "Bit Time Requirements for CAN FD"
+ 1003 		 * paper presented at the International CAN Conference 2013
+ 1004 		 */
+
+
+drivers/isdn/i4l/isdn_audio.c
+
+  441  * Goertzel algorithm.
+  442  * See http://ptolemy.eecs.berkeley.edu/papers/96/dtmf_ict/
+  443  * for more info.
+  444  * Result is stored into an sk_buff and queued up for later
+  445  * evaluation.
+  446  */
+  447 static void
+  448 isdn_audio_goertzel(int *sample, modem_info *info)
+
+
+drivers/iommu/iova.c
+
+  768  * Magazine caches for IOVA ranges.  For an introduction to magazines,
+  769  * see the USENIX 2001 paper "Magazines and Vmem: Extending the Slab
+  770  * Allocator to Many CPUs and Arbitrary Resources" by Bonwick and Adams.
+  771  * For simplicity, we use a static magazine size and don't implement the
+  772  * dynamic size tuning described in the paper.
+
+
+kernel/rcu/update.c
+
+    2  * Read-Copy Update mechanism for mutual exclusion
+
+   23  * Based on the original work by Paul McKenney <paulmck@us.ibm.com>
+   24  * and inputs from Rusty Russell, Andrea Arcangeli and Andi Kleen.
+   25  * Papers:
+   26  * http://www.rdrop.com/users/paulmck/paper/rclockpdcsproof.pdf
+   27  * http://lse.sourceforge.net/locking/rclock_OLS.2001.05.01c.sc.pdf (OLS2001)
+   28  *
+   29  * For detailed explanation of Read-Copy Update mechanism see -
+   30  *		http://lse.sourceforge.net/locking/rcupdate.html
+
+
+arch/ia64/include/asm/numa.h
+
+   54  * ACPI 2.0 SLIT (System Locality Information Table)
+   55  * http://devresource.hp.com/devresource/Docs/TechPapers/IA64/slit.pdf
+   56  *
+   57  * This is a matrix with "distances" between nodes, they should be
+   58  * proportional to the memory access latency ratios.
+
+
+lib/random32.c
+
+    3  * This is a maximally equidistributed combined Tausworthe generator
+    4  * based on code from GNU Scientific Library 1.5 (30 Jun 2004)
+    5  *
+    6  * lfsr113 version:
+    7  *
+    8  * x_n = (s1_n ^ s2_n ^ s3_n ^ s4_n)
+    9  *
+   10  * s1_{n+1} = (((s1_n & 4294967294) << 18) ^ (((s1_n <<  6) ^ s1_n) >> 13))
+   11  * s2_{n+1} = (((s2_n & 4294967288) <<  2) ^ (((s2_n <<  2) ^ s2_n) >> 27))
+   12  * s3_{n+1} = (((s3_n & 4294967280) <<  7) ^ (((s3_n << 13) ^ s3_n) >> 21))
+   13  * s4_{n+1} = (((s4_n & 4294967168) << 13) ^ (((s4_n <<  3) ^ s4_n) >> 12))
+   14  *
+   15  * The period of this generator is about 2^113 (see erratum paper).
+   16  *
+   17  * From: P. L'Ecuyer, "Maximally Equidistributed Combined Tausworthe
+   18  * Generators", Mathematics of Computation, 65, 213 (1996), 203--213:
+   19  * http://www.iro.umontreal.ca/~lecuyer/myftp/papers/tausme.ps
+   20  * ftp://ftp.iro.umontreal.ca/pub/simulation/lecuyer/papers/tausme.ps
+   21  *
+   22  * There is an erratum in the paper "Tables of Maximally Equidistributed
+   23  * Combined LFSR Generators", Mathematics of Computation, 68, 225 (1999),
+   24  * 261--269: http://www.iro.umontreal.ca/~lecuyer/myftp/papers/tausme2.ps
+
+
+
+net/netfilter/ipvs/ip_vs_mh.c
+
+    8 /* The mh algorithm is to assign a preference list of all the lookup
+    9  * table positions to each destination and populate the table with
+   10  * the most-preferred position of destinations. Then it is to select
+   11  * destination with the hash key of source IP address through looking
+   12  * up a the lookup table.
+   13  *
+   14  * The algorithm is detailed in:
+   15  * [3.4 Consistent Hasing]
+   16 https://www.usenix.org/system/files/conference/nsdi16/nsdi16-paper-eisenbud.pdf
+
+
+lib/zlib_deflate/deftree.c
+
+    2 /* trees.c -- output deflated data using Huffman coding
+
+    8  *  ALGORITHM
+    9  *
+   10  *      The "deflation" process uses several Huffman trees. The more
+   11  *      common source values are represented by shorter bit sequences.
+   12  *
+   13  *      Each code tree is stored in a compressed form which is itself
+   14  * a Huffman encoding of the lengths of all the code strings (in
+   15  * ascending order by source values).  The actual code strings are
+   16  * reconstructed from the lengths in the inflate process, as described
+   17  * in the deflate specification.
+   18  *
+   19  *  REFERENCES
+   20  *
+   21  *      Deutsch, L.P.,"'Deflate' Compressed Data Format Specification".
+   22  *      Available in ftp.uu.net:/pub/archiving/zip/doc/deflate-1.1.doc
+   23  *
+   24  *      Storer, James A.
+   25  *          Data Compression:  Methods and Theory, pp. 49-50.
+   26  *          Computer Science Press, 1988.  ISBN 0-7167-8156-5.
+   27  *
+   28  *      Sedgewick, R.
+   29  *          Algorithms, p290.
+   30  *          Addison-Wesley, 1983. ISBN 0-201-06672-6.
+
+lib/zlib_deflate/deflate.c
+
+    2 /* deflate.c -- compress data using the deflation algorithm
+
+   10  *      The "deflation" process depends on being able to identify portions
+   11  *      of the input text which are identical to earlier input (within a
+   12  *      sliding window trailing behind the input currently being processed).
+   13  *
+   14  *      The most straightforward technique turns out to be the fastest for
+   15  *      most input files: try all possible matches and select the longest.
+   16  *      The key feature of this algorithm is that insertions into the string
+   17  *      dictionary are very simple and thus fast, and deletions are avoided
+   18  *      completely. Insertions are performed at each input character, whereas
+   19  *      string matches are performed only when the previous match ends. So it
+   20  *      is preferable to spend more time in matches to allow very fast string
+   21  *      insertions and avoid deletions. The matching algorithm for small
+   22  *      strings is inspired from that of Rabin & Karp. A brute force approach
+   23  *      is used to find longer strings when a small match has been found.
+   24  *      A similar algorithm is used in comic (by Jan-Mark Wams) and freeze
+   25  *      (by Leonid Broukhis).
+   26  *         A previous version of this file used a more sophisticated algorithm
+   27  *      (by Fiala and Greene) which is guaranteed to run in linear amortized
+   28  *      time, but has a larger average cost, uses more memory and is patented.
+   29  *      However the F&G algorithm may be faster for some highly redundant
+   30  *      files if the parameter max_chain_length (described below) is too large.
+   31  *
+   32  *  ACKNOWLEDGEMENTS
+   33  *
+   34  *      The idea of lazy evaluation of matches is due to Jan-Mark Wams, and
+   35  *      I found it in 'freeze' written by Leonid Broukhis.
+   36  *      Thanks to many people for bug reports and testing.
+   37  *
+   38  *  REFERENCES
+   39  *
+   40  *      Deutsch, L.P.,"DEFLATE Compressed Data Format Specification".
+   41  *      Available in ftp://ds.internic.net/rfc/rfc1951.txt
+   42  *
+   43  *      A description of the Rabin and Karp algorithm is given in the book
+   44  *         "Algorithms" by R. Sedgewick, Addison-Wesley, p252.
+   45  *
+   46  *      Fiala,E.R., and Greene,D.H.
+   47  *         Data Compression with Finite Windows, Comm.ACM, 32,4 (1989) 490-595
+
+
+lib/zstd/fse_compress.c
+
+    2  * FSE : Finite State Entropy encoder
+
+   36  * You can contact the author at :
+   37  * - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
+
+  121 	/* For explanations on how to distribute symbol values over the table :
+  122 	*  http://fastcompression.blogspot.fr/2014/02/fse-distributing-symbol-values.html */
+
+
+lib/rbtree.c
+
+   28  * red-black trees properties:  http://en.wikipedia.org/wiki/Rbtree
+   29  *
+   30  *  1) A node is either red or black
+   31  *  2) The root is black
+   32  *  3) All leaves (NULL) are black
+   33  *  4) Both children of every red node are black
+   34  *  5) Every simple path from root to leaves contains the same number
+   35  *     of black nodes.
+   36  *
+   37  *  4 and 5 give the O(log n) guarantee, since 4 implies you cannot have two
+   38  *  consecutive red nodes in a path and every red node is therefore followed by
+   39  *  a black. So if B is the number of black nodes on every simple path (as per
+   40  *  5), then the longest possible path due to 4 is 2B.
+   41  *
+   42  *  We shall indicate color with case, where black nodes are uppercase and red
+   43  *  nodes will be lowercase. Unknown color nodes shall be drawn as red within
+   44  *  parentheses and have some accompanying text comment.
