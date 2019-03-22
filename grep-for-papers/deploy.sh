@@ -22,7 +22,7 @@ deploy() {
   local dest_dir=oilshell.org/grep-for-papers
 
   ssh $name@$host mkdir -p $dest_dir
-  rsync --archive --verbose *.wwz $name@$host:$dest_dir/
+  rsync --archive --verbose llvm.txt *.wwz $name@$host:$dest_dir/
 }
 
 "$@"

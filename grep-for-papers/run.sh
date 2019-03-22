@@ -169,6 +169,7 @@ ocaml-pubs() { html-pubs ~/src/languages/ocaml-4.06.0; }
 # This needs to search .ts files
 typescript-pubs() { html-pubs ~/git/languages/TypeScript; }
 v8-pubs() { html-pubs ~/git/languages/v8; }
+linux-pubs() { html-pubs ~/src/linux-5.0.3; }
 
 to-html() {
   local dir=$1

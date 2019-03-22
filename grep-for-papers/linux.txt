@@ -1,0 +1,426 @@
+Comments From the Linux Source Code Regarding Algorithms
+--------------------------------------------------------
+
+INCOMPLETE
+
+I obtained these excepts by following the links I generated here:
+
+http://www.oilshell.org/grep-for-papers/linux-5.0.3.wwz/
+
+lib/div64.c
+
+  131  * div64_u64 - unsigned 64bit divide with 64bit divisor
+  132  * @dividend:	64bit dividend
+  133  * @divisor:	64bit divisor
+  134  *
+  135  * This implementation is a modified version of the algorithm proposed
+  136  * by the book 'Hacker's Delight'.  The original source and full proof
+  137  * can be found here and is available for use without restriction.
+  138  *
+  139  * 'http://www.hackersdelight.org/hdcodetxt/divDouble.c.txt'
+
+
+scripts/gcc-plugins/cyc_complexity_plugin.c
+
+    5  * Homepage:
+    6  * https://github.com/ephox-gcc-plugins/cyclomatic_complexity
+    7  *
+    8  * http://en.wikipedia.org/wiki/Cyclomatic_complexity
+    9  * The complexity M is then defined as:
+   10  * M = E - N + 2P
+   11  * where
+   12  *
+   13  *  E = the number of edges of the graph
+   14  *  N = the number of nodes of the graph
+   15  *  P = the number of connected components (exit nodes).
+
+scripts/gcc-plugins/sancov_plugin.c
+
+    5  * Homepage:
+    6  * https://github.com/ephox-gcc-plugins/sancov
+    7  *
+    8  * This plugin inserts a __sanitizer_cov_trace_pc() call at the start of basic blocks.
+    9  * It supports all gcc versions with plugin support (from gcc-4.5 on).
+   10  * It is based on the commit "Add fuzzing coverage support" by Dmitry Vyukov <dvyukov@google.com>.
+   11  *
+   12  * You can read about it more here:
+   13  *  https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=231296
+   14  *  http://lwn.net/Articles/674854/
+   15  *  https://github.com/google/syzkaller
+   16  *  https://lwn.net/Articles/677764/
+
+
+scripts/gcc-plugins/stackleak_plugin.c
+
+   11  * This gcc plugin is needed for tracking the lowest border of the kernel stack.
+   12  * It instruments the kernel code inserting stackleak_track_stack() calls:
+   13  *  - after alloca();
+   14  *  - for the functions with a stack frame size greater than or equal
+   15  *     to the "track-min-size" plugin parameter.
+   16  *
+   17  * This plugin is ported from grsecurity/PaX. For more information see:
+   18  *   https://grsecurity.net/
+   19  *   https://pax.grsecurity.net/
+
+
+scripts/gcc-plugins/structleak_plugin.c
+
+   10  * gcc plugin to forcibly initialize certain local variables that could
+   11  * otherwise leak kernel stack to userland if they aren't properly initialized
+   12  * by later code
+   13  *
+   14  * Homepage: http://pax.grsecurity.net/
+   15  *
+   16  * Options:
+   17  * -fplugin-arg-structleak_plugin-disable
+   18  * -fplugin-arg-structleak_plugin-verbose
+   19  * -fplugin-arg-structleak_plugin-byref-all
+
+xxhash.h
+
+    2  * xxHash - Extremely Fast Hash algorithm
+
+   36  * You can contact the author at:
+   37  * - xxHash homepage: http://cyan4973.github.io/xxHash/
+   38  * - xxHash source repository: https://github.com/Cyan4973/xxHash
+
+   42  * Notice extracted from xxHash homepage:
+   43  *
+   44  * xxHash is an extremely fast Hash algorithm, running at RAM speed limits.
+   45  * It also successfully passes all tests from the SMHasher suite.
+
+
+lib/test_siphash.c
+
+    7  * SipHash: a fast short-input PRF
+    8  * https://131002.net/siphash/
+    9  *
+   10  * This implementation is specifically for SipHash2-4 for a secure PRF
+   11  * and HalfSipHash1-3/SipHash1-3 for an insecure PRF only suitable for
+   12  * hashtables.
+
+
+block/partitions/efi.c
+
+  126  * Description: Returns EFI-style CRC32 value for @buf
+  127  * 
+  128  * This function uses the little endian Ethernet polynomial
+  129  * but seeds the function with ~0, and xor's with ~0 at the end.
+  130  * Note, the EFI Specification, v1.02, has a reference to
+  131  * Dr. Dobbs Journal, May 1994 (actually it's in May 1992).
+  132  */
+  133 static inline u32
+  134 efi_crc32(const void *buf, unsigned long len)
+
+
+block/bfq-iosched.c
+
+   25  * BFQ is a proportional-share I/O scheduler, with some extra
+   26  * low-latency capabilities. BFQ also supports full hierarchical
+   27  * scheduling through cgroups. Next paragraphs provide an introduction
+   28  * on BFQ inner workings. Details on BFQ benefits, usage and
+   29  * limitations can be found in Documentation/block/bfq-iosched.txt.
+
+   94  * BFQ is described in [1], where also a reference to the initial,
+   95  * more theoretical paper on BFQ can be found. The interested reader
+   96  * can find in the latter paper full details on the main algorithm, as
+   97  * well as formulas of the guarantees and formal proofs of all the
+   98  * properties.  With respect to the version of BFQ presented in these
+   99  * papers, this implementation adds a few more heuristics, such as the
+  100  * ones that guarantee a low latency to interactive and soft real-time
+  101  * applications, and a hierarchical extension based on H-WF2Q+.
+  102  *
+  103  * B-WF2Q+ is based on WF2Q+, which is described in [2], together with
+  104  * H-WF2Q+, while the augmented tree used here to implement B-WF2Q+
+  105  * with O(log N) complexity derives from the one introduced with EEVDF
+  106  * in [3].
+  107  *
+  108  * [1] P. Valente, A. Avanzini, "Evolution of the BFQ Storage I/O
+  109  *     Scheduler", Proceedings of the First Workshop on Mobile System
+  110  *     Technologies (MST-2015), May 2015.
+  111  *     http://algogroup.unimore.it/people/paolo/disk_sched/mst-2015.pdf
+  112  *
+  113  * [2] Jon C.R. Bennett and H. Zhang, "Hierarchical Packet Fair Queueing
+  114  *     Algorithms", IEEE/ACM Transactions on Networking, 5(5):675-689,
+  115  *     Oct 1997.
+  116  *
+  117  * http://www.cs.cmu.edu/~hzhang/papers/TON-97-Oct.ps.gz
+  118  *
+  119  * [3] I. Stoica and H. Abdel-Wahab, "Earliest Eligible Virtual Deadline
+  120  *     First: A Flexible and Accurate Mechanism for Proportional Share
+  121  *     Resource Allocation", technical report.
+  122  *
+  123  * http://www.cs.berkeley.edu/~istoica/papers/eevdf-tr-95.pdf
+
+
+lib/prime_numbers.c -- Where is this used?  It seems like it might be only for
+testing RCU?
+
+  108 static bool expand_to_next_prime(unsigned long x)
+
+  113 
+  114 	/* Betrand's Postulate (or Chebyshev's theorem) states that if n > 3,
+  115 	 * there is always at least one prime p between n and 2n - 2.
+  116 	 * Equivalently, if n > 1, then there is always at least one prime p
+  117 	 * such that n < p < 2n.
+  118 	 *
+  119 	 * http://mathworld.wolfram.com/BertrandsPostulate.html
+  120 	 * https://en.wikipedia.org/wiki/Bertrand's_postulate
+
+lib/vsprintf.c
+
+  137  * Decimal conversion is by far the most typical, and is used for
+  138  * /proc and /sys data. This directly impacts e.g. top performance
+  139  * with many processes running. We optimize it for speed by emitting
+  140  * two characters at a time, using a 200 byte lookup table. This
+  141  * roughly halves the number of multiplications compared to computing
+  142  * the digits one at a time. Implementation strongly inspired by the
+  143  * previous version, which in turn used ideas described at
+  144  * <http://www.cs.uiowa.edu/~jones/bcd/divide.html> (with permission
+  145  * from the author, Douglas W. Jones).
+
+lib/bch.c
+
+  291 static inline int parity(unsigned int x)
+  292 {
+  293 	/*
+  294 	 * public domain code snippet, lifted from
+  295 	 * http://www-graphics.stanford.edu/~seander/bithacks.html
+  296 	 */
+
+
+lib/ts_bm.c
+
+    2  * lib/ts_bm.c		Boyer-Moore text search implementation
+
+   15  *   [1] A Fast String Searching Algorithm, R.S. Boyer and Moore.
+   16  *       Communications of the Association for Computing Machinery, 
+   17  *       20(10), 1977, pp. 762-772.
+   18  *       http://www.cs.utexas.edu/users/moore/publications/fstrpos.pdf
+   19  *
+   20  *   [2] Handbook of Exact String Matching Algorithms, Thierry Lecroq, 2004
+   21  *       http://www-igm.univ-mlv.fr/~lecroq/string/string.pdf
+   22  *
+   23  *   Note: Since Boyer-Moore (BM) performs searches for matchings from right 
+   24  *   to left, it's still possible that a matching could be spread over 
+   25  *   multiple blocks, in that case this algorithm won't find any coincidence.
+   26  *   
+   27  *   If you're willing to ensure that such thing won't ever happen, use the
+   28  *   Knuth-Pratt-Morris (KMP) implementation instead. In conclusion, choose 
+   29  *   the proper string search algorithm depending on your setting. 
+   30  *
+   31  *   Say you're using the textsearch infrastructure for filtering, NIDS or 
+   32  *   any similar security focused purpose, then go KMP. Otherwise, if you 
+   33  *   really care about performance, say you're classifying packets to apply
+   34  *   Quality of Service (QoS) policies, and you don't mind about possible
+   35  *   matchings spread over multiple fragments, then go BM.
+
+
+lib/rational.c
+
+   15  * calculate best rational approximation for a given fraction
+   16  * taking into account restricted register size, e.g. to find
+   17  * appropriate values for a pll with 5 bit denominator and
+   18  * 8 bit numerator register fields, trying to set up with a
+   19  * frequency ratio of 3.1415, one would say:
+   20  *
+   21  * rational_best_approximation(31415, 10000,
+   22  *		(1 << 8) - 1, (1 << 5) - 1, &n, &d);
+   23  *
+   24  * you may look at given_numerator as a fixed point number,
+   25  * with the fractional part size described in given_denominator.
+   26  *
+   27  * for theoretical background, see:
+   28  * http://en.wikipedia.org/wiki/Continued_fraction
+
+
+lib/chacha.c
+
+    2  * The "hash function" used as the core of the ChaCha stream cipher (RFC7539)
+
+  101  * HChaCha is the ChaCha equivalent of HSalsa and is an intermediate step
+  102  * towards XChaCha (see https://cr.yp.to/snuffle/xsalsa-20081128.pdf).  HChaCha
+  103  * skips the final addition of the initial state, and outputs only certain words
+  104  * of the state.  It should not be used for streaming directly.
+
+
+net/ipv4/tcp_highspeed.c
+
+    2  * Sally Floyd's High Speed TCP (RFC 3649) congestion control
+    3  *
+    4  * See http://www.icir.org/floyd/hstcp.html
+
+
+net/ipv4/tcp_scalable.c
+
+    1 /* Tom Kelly's Scalable TCP
+    2  *
+    3  * See http://www.deneholme.net/tom/scalable/
+    4  *
+    5  * John Heffner <jheffner@sc.edu>
+
+
+net/ipv4/tcp_westwood.c
+
+    2  * TCP Westwood+: end-to-end bandwidth estimation for TCP
+    3  *
+    4  *      Angelo Dell'Aera: author of the first version of TCP Westwood+ in Linux 2.4
+    5  *
+    6  * Support at http://c3lab.poliba.it/index.php/Westwood
+    7  * Main references in literature:
+    8  *
+    9  * - Mascolo S, Casetti, M. Gerla et al.
+   10  *   "TCP Westwood: bandwidth estimation for TCP" Proc. ACM Mobicom 2001
+   11  *
+   12  * - A. Grieco, s. Mascolo
+   13  *   "Performance evaluation of New Reno, Vegas, Westwood+ TCP" ACM Computer
+   14  *     Comm. Review, 2004
+   15  *
+   16  * - A. Dell'Aera, L. Grieco, S. Mascolo.
+   17  *   "Linux 2.4 Implementation of Westwood+ TCP with Rate-Halving :
+   18  *    A Performance Evaluation Over the Internet" (ICC 2004), Paris, June 2004
+   19  *
+   20  * Westwood+ employs end-to-end bandwidth measurement to set cwnd and
+   21  * ssthresh after packet loss. The probing phase is as the original Reno.
+
+
+net/ipv4/tcp_yeah.c
+
+    3  *   YeAH TCP
+    4  *
+    5  * For further details look at:
+    6  *   https://web.archive.org/web/20080316215752/http://wil.cs.caltech.edu/pfldnet2007/paper/YeAH_TCP.pdf
+
+
+net/ipv4/tcp_htcp.c
+
+    2  * H-TCP congestion control. The algorithm is detailed in:
+    3  * R.N.Shorten, D.J.Leith:
+    4  *   "H-TCP: TCP for high-speed and long-distance networks"
+    5  *   Proc. PFLDnet, Argonne, 2004.
+    6  * http://www.hamilton.ie/net/htcp3.pdf
+
+
+net/ipv4/tcp_bbr.c
+
+    1 /* Bottleneck Bandwidth and RTT (BBR) congestion control
+    2  *
+    3  * BBR congestion control computes the sending rate based on the delivery
+    4  * rate (throughput) estimated from ACKs. In a nutshell:
+
+   47  * BBR is described in detail in:
+   48  *   "BBR: Congestion-Based Congestion Control",
+   49  *   Neal Cardwell, Yuchung Cheng, C. Stephen Gunn, Soheil Hassas Yeganeh,
+   50  *   Van Jacobson. ACM Queue, Vol. 14 No. 5, September-October 2016.kkk
+
+net/sched/sch_netem.c
+
+   34 /*	Network Emulation Queuing algorithm.
+   35 	====================================
+   36 
+   37 	Sources: [1] Mark Carson, Darrin Santay, "NIST Net - A Linux-based
+   38 		 Network Emulation Tool
+   39 		 [2] Luigi Rizzo, DummyNet for FreeBSD
+   40 
+   41 	 ----------------------------------------------------------------
+   42 
+   43 	 This started out as a simple way to delay outgoing packets to
+   44 	 test TCP but has grown to include most of the functionality
+   45 	 of a full blown network emulator like NISTnet. It can delay
+   46 	 packets and add random jitter (and correlation). The random
+   47 	 distribution can be loaded from a table as well to provide
+   48 	 normal, Pareto, or experimental curves. Packet loss,
+   49 	 duplication, and reordering can also be emulated.
+   50 
+   51 	 This qdisc does not do classification that can be handled in
+   52 	 layering other disciplines.  It does not need to do bandwidth
+   53 	 control either since that can be handled by using token
+   54 	 bucket or other rate control.
+   55 
+   56      Correlated Loss Generator models
+   57 
+   58 	Added generation of correlated loss according to the
+   59 	"Gilbert-Elliot" model, a 4-state markov model.
+   60 
+   61 	References:
+   62 	[1] NetemCLG Home http://netgroup.uniroma2.it/NetemCLG
+   63 	[2] S. Salsano, F. Ludovici, A. Ordine, "Definition of a general
+   64 	and intuitive loss model for packet networks and its implementation
+   65 	in the Netem module in the Linux kernel", available in [1]
+
+
+net/sched/sch_qfq.c 
+
+   23 /*  Quick Fair Queueing Plus
+   24     ========================
+   25 
+   26     Sources:
+   27 
+   28     [1] Paolo Valente,
+   29     "Reducing the Execution Time of Fair-Queueing Schedulers."
+   30     http://algo.ing.unimo.it/people/paolo/agg-sched/agg-sched.pdf
+   31 
+   32     Sources for QFQ:
+   33 
+   34     [2] Fabio Checconi, Luigi Rizzo, and Paolo Valente: "QFQ: Efficient
+   35     Packet Scheduling with Tight Bandwidth Distribution Guarantees."
+   36 
+   37     See also:
+   38     http://retis.sssup.it/~fabio/linux/qfq/
+
+net/sched/sch_sfb.c
+
+    2  * net/sched/sch_sfb.c	  Stochastic Fair Blue
+
+   11  * W. Feng, D. Kandlur, D. Saha, K. Shin. Blue:
+   12  * A New Class of Active Queue Management Algorithms.
+   13  * U. Michigan CSE-TR-387-99, April 1999.
+   14  *
+   15  * http://www.thefengs.com/wuchang/blue/CSE-TR-387-99.pdf
+
+
+fs/gfs2/dir.c
+
+   11  * Implements Extendible Hashing as described in:
+   12  *   "Extendible Hashing" by Fagin, et al in
+   13  *     __ACM Trans. on Database Systems__, Sept 1979.
+
+
+drivers/misc/echo/echo.h
+
+    2  * SpanDSP - a series of DSP components for telephony
+    3  *
+    4  * echo.c - A line echo canceller.  This code is being developed
+    5  *          against and partially complies with G168.
+
+   32 Line echo cancellation for voice
+   33 
+   34 What does it do?
+   35 
+   36 This module aims to provide G.168-2002 compliant echo cancellation, to remove
+   37 electrical echoes (e.g. from 2-4 wire hybrids) from voice calls.
+   38 
+   39 How does it work?
+   40 
+   41 The heart of the echo cancellor is FIR filter. This is adapted to match the
+   42 echo impulse response of the telephone line. It must be long enough to
+   43 adequately cover the duration of that impulse response. The signal transmitted
+   44 to the telephone line is passed through the FIR filter. Once the FIR is
+   45 properly adapted, the resulting output is an estimate of the echo signal
+   46 received from the line. This is subtracted from the received signal. The result
+   47 is an estimate of the signal which originated at the far end of the line, free
+   48 from echos of our own transmitted signal.
+   49 
+   50 The least mean squares (LMS) algorithm is attributed to Widrow and Hoff, and
+   51 was introduced in 1960. It is the commonest form of filter adaption used in
+   52 things like modem line equalisers and line echo cancellers. There it works very
+   53 well.  However, it only works well for signals of constant amplitude. It works
+   54 very poorly for things like speech echo cancellation, where the signal level
+   55 varies widely.  This is quite easy to fix. If the signal level is normalised -
+   56 similar to applying AGC - LMS can work as well for a signal of varying
+   57 amplitude as it does for a modem signal. This normalised least mean squares
+   58 (NLMS) algorithm is the commonest one used for speech echo cancellation. Many
+   59 other algorithms exist - e.g. RLS (essentially the same as Kalman filtering),
+   60 FAP, etc. Some perform significantly better than NLMS.  However, factors such
+   61 as computational complexity and patents favour the use of NLMS.
+
