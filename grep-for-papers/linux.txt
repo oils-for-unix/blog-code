@@ -76,7 +76,42 @@ scripts/gcc-plugins/structleak_plugin.c
    18  * -fplugin-arg-structleak_plugin-verbose
    19  * -fplugin-arg-structleak_plugin-byref-all
 
-xxhash.h
+include/linux/reciprocal_div.h
+
+    8  * This algorithm is based on the paper "Division by Invariant
+    9  * Integers Using Multiplication" by Torbjörn Granlund and Peter
+   10  * L. Montgomery.
+   11  *
+   12  * The assembler implementation from Agner Fog, which this code is
+   13  * based on, can be found here:
+   14  * http://www.agner.org/optimize/asmlib.zip
+   15  *
+   16  * This optimization for A/B is helpful if the divisor B is mostly
+   17  * runtime invariant. The reciprocal of B is calculated in the
+   18  * slow-path with reciprocal_value(). The fast-path can then just use
+   19  * a much faster multiplication operation with a variable dividend A
+   20  * to calculate the division A/B.
+
+
+include/linux/jhash.h
+
+    4 /* jhash.h: Jenkins hash support.
+    5  *
+    6  * Copyright (C) 2006. Bob Jenkins (bob_jenkins@burtleburtle.net)
+    7  *
+    8  * http://burtleburtle.net/bob/hash/
+    9  *
+   10  * These are the credits from Bob's sources:
+   11  *
+   12  * lookup3.c, by Bob Jenkins, May 2006, Public Domain.
+   13  *
+   14  * These are functions for producing 32-bit hashes for hash table lookup.
+   15  * hashword(), hashlittle(), hashlittle2(), hashbig(), mix(), and final()
+   16  * are externally useful functions.  Routines to test the hash are included
+   17  * if SELF_TEST is defined.  You can use this free for any purpose.  It's in
+   18  * the public domain.  It has no warranty.
+
+include/linux/xxhash.h
 
     2  * xxHash - Extremely Fast Hash algorithm
 
@@ -722,3 +757,4 @@ lib/rbtree.c
    42  *  We shall indicate color with case, where black nodes are uppercase and red
    43  *  nodes will be lowercase. Unknown color nodes shall be drawn as red within
    44  *  parentheses and have some accompanying text comment.
+
