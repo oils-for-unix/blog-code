@@ -210,6 +210,11 @@ with-ksh93() {
   ~/git/languages/ast/build/src/cmd/ksh93/ksh ./ss2-minimal.sh
 }
 
+# NOT exploitable.
+with-yash() {
+  yash ./ss2-minimal.sh
+}
+
 one-liner() {
   local sh=${1:-bash}
   rm -f PWNED
