@@ -1,0 +1,14 @@
+This is the error that happens when you have
+
+class DoubleQuoted : public expr_t, public word_part_t {
+
+
+mult-inherit.cc:40:6: error: request for member ‘lineno’ is ambiguous
+   dq.lineno = 1;
+      ^
+mult-inherit.cc:17:7: note: candidates are: int word_part_t::lineno
+   int lineno;
+       ^
+mult-inherit.cc:23:7: note:                 int expr_t::lineno
+   int lineno;
+       ^
