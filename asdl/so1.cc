@@ -34,14 +34,16 @@ struct Down : Left, Right
 // Hooray, this version compiles.
 struct Down : Left, Right
 {
-    Down() : Base(42), Left(), Right()
+    Down() : Base(123), Left(), Right()
     {}
 };
 
 int main(int argc, char **argv) {
   Down d;
 
-  // This would print 16!!!
-  printf("d = %zu\n", sizeof(d));
   printf("d tag = %d\n", d.x);
+
+  // 32 bytes!!!  Not OK.  Also requires the C++ runtime library with
+  // -lstdc++.
+  printf("sizeof(d) = %d\n", sizeof(d));
 }
