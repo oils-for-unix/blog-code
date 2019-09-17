@@ -19,4 +19,16 @@ virtual() {
   ./virtual
 }
 
+# After doing Python code gen
+simple-mi() {
+  cc -std=c++11 -o simple-mi simple-mi.cc
+  ./simple-mi
+}
+
+# StackOverflow
+so1() {
+  cc -std=c++11 -o so1 so1.cc
+  ./so1
+}
+
 "$@"
