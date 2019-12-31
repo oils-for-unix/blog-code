@@ -1,11 +1,4 @@
-#!/bin/bash
-#
-# Usage:
-#   ./demo.sh <function name>
-
-set -o nounset
-set -o pipefail
-set -o errexit
+#!/bin/sh
 
 LEFT='['
 RIGHT=']'
