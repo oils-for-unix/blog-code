@@ -62,7 +62,8 @@ sink3() {
 prog3() {
   rm -f fifo
   mkfifo fifo
-  (echo 2; (src | sink3 {primes}<fifo)) | tee fifo
+  # Why is there an extra 2 here?  Curious.
+  { echo 2; src | sink3 {primes}<fifo; } | tee fifo
 }
 
 "$@"
