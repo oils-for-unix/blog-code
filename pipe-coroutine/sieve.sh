@@ -5,9 +5,13 @@
 # Usage:
 #   ./sieve.sh <function name>
 
-set -o nounset
-set -o pipefail
-set -o errexit
+#set -o nounset
+#set -o pipefail
+#set -o errexit
+
+log() {
+  echo "$@" >&2
+}
 
 download() {
   wget --no-clobber \
@@ -23,13 +27,16 @@ src() {
 
 cull() {
   while true; do
-    read n
+    read n || exit
     (($n % $1 != 0)) && echo $n
   done
 }
 
 sink2() {
   read p
+  test -n "$p" || die "done"
+  #log "P $p"
+
   echo $p
 
   # Ah this is recursive!
@@ -38,6 +45,13 @@ sink2() {
 
 prog2() {
   src | sink2
+
+  return
+  # Hm this doesn't help?
+  while true; do
+    wait -n
+    echo "wait => $?"
+  done
 }
 
 #
@@ -53,8 +67,9 @@ sink3() {
   read -u $primes pp
   while
     read p
-    # Hm this fixes a bug?
+    # Hm this fixes a bug?  Only for pipefail
     test -n "$p" || die "done"
+
     (($p < $pp * $pp))
   do
     echo $p
@@ -127,8 +142,44 @@ go-port() {
 }
 
 
+#
+# Ideas for Oil APIs:
+#
+# High level:
+#
+# make-pipeline :p
+# for i in {1..3}; do
+#   add-process :p -- filter $i
+#
+#   # or maybe
+#   add --pipeline :p -- filter $i
+# done
+#
+# $ repr p
+# [Pipeline with 3 components]
+#
+# $ p   # invoke it like this?
+# $ $p  # or like this?  It's not a string
+# $ run p
+# $ fork run p; wait   
+# $ run .p 
+# run(p)
+
+#
+# Tangent: annoys me to start a process for a loop
+#
+# for i in @seq(n) {
+#   echo $i
+# }
+# problems: these are strings
+#
+# special case:
+# for (i in 1..n) {
+# }
+
+# push-dup
+#
+
 
 "$@"
-
-
 
