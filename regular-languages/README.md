@@ -3,12 +3,14 @@ Engine Support For Regular Languages
 
 This is some research for Eggex.
 
+    # test with a?a, a?a?aa, a?a?a?aaa, ... per rsc
     ./compare.sh regex-bracktrack
 
 Result: As you would expect, Perl and Python backtrack, but
 bash/zsh/egrep/awk/sed don't.  (bash and osh use libc's `regexec()`.
 Not sure what zsh uses.)
 
+    # test with glob a*b, a*a*b, a*a*a*b, ... per rsc
     ./compare.sh glob-bracktrack
     ./compare.sh fnmatch-backtrack
 
@@ -16,6 +18,7 @@ Result: Perl, Python, and bash/mksh internal glob backtrack.
 dash/ash/osh don't.  (osh uses libc's `glob()` and `fnmatch()`, but
 bash doesn't).
 
+    # test with <.*> on HTML-like data
     ./compare.sh greedy
 
 Result: They're all greedy.  (sed has some issues related to the
@@ -23,6 +26,7 @@ semantics of `s` and implicit `.*` at the front.
 
 Only Perl and Python have the nongreedy `.*?` operator.
 
+    # test with (a|bc|ab|c)*
     ./compare.sh submatch
 
 Result: they all have the same behavior.  Is there a better test?
@@ -31,9 +35,9 @@ Result: they all have the same behavior.  Is there a better test?
 
 - `osh` doesn't backtrack anywhere!  That's just because it uses libc.
 - None of the GNU tools tested backtrack.
-- `bash` backtracks on glob and fnmatch, but not regex.  That is, its
-  internal implementations backtrack, but the ones delegated to libc
-  don't.
+- `bash` and `mksh` backtrack on glob and fnmatch, but not regex.
+  It looks like the project-specific pattern matching algorithms
+  backtrack, but the ones delegated to libc don't.
 
 ## TODO
 
