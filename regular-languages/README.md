@@ -6,14 +6,15 @@ This is some research for Eggex.
     ./compare.sh regex-bracktrack
 
 Result: As you would expect, Perl and Python backtrack, but
-libc/egrep/awk/sed don't.  (bash and osh use libc's `regexec()`.)
+bash/zsh/egrep/awk/sed don't.  (bash and osh use libc's `regexec()`.
+Not sure what zsh uses.)
 
     ./compare.sh glob-bracktrack
     ./compare.sh fnmatch-backtrack
 
-Result: Perl, Python, and bash's internal glob backtrack.
-libc/egrep/awk/sed don't.  (osh uses libc's `glob()` and `fnmatch()`,
-but bash doesn't).
+Result: Perl, Python, and bash/mksh internal glob backtrack.
+dash/ash/osh don't.  (osh uses libc's `glob()` and `fnmatch()`, but
+bash doesn't).
 
     ./compare.sh greedy
 
@@ -26,6 +27,13 @@ Only Perl and Python have the nongreedy `.*?` operator.
 
 Result: they all have the same behavior.  Is there a better test?
 
+## Interpretation
+
+- `osh` doesn't backtrack anywhere!  That's just because it uses libc.
+- None of the GNU tools tested backtrack.
+- `bash` backtracks on glob and fnmatch, but not regex.  That is, its
+  internal implementations backtrack, but the ones delegated to libc
+  don't.
 
 ## TODO
 

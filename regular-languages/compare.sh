@@ -59,7 +59,11 @@ regex-backtrack() {
 
     time egrep-task "$text" "$pattern"
     time sed-task "$text" "$pattern"
+
+    # Does zsh use libc?  Not sure
     time libc-task "$text" "$pattern"
+    time zsh-task "$text" "$pattern"
+
     time gawk-task "$text" "$pattern"
     time mawk-task "$text" "$pattern"
     time python-task "$text" "$pattern"

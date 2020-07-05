@@ -39,6 +39,16 @@ libc-task() {
   [[ "$text" =~ $pattern ]] && echo $text
 }
 
+zsh-task() {
+  ### bash is linked against libc
+  local text=$1
+  local pattern=$2
+
+  echo -n 'zsh   '
+  # note: pattern can't be quoted
+  zsh -c '[[ "$1" =~ $2 ]] && echo $1' dummy "$text" "$pattern"
+}
+
 python-task() {
   local text=$1
   local pattern=$2
