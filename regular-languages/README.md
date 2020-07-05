@@ -4,14 +4,14 @@ Engine Support For Regular Languages
 This is some research for Eggex.
 
     # test with a?a, a?a?aa, a?a?a?aaa, ... per rsc
-    ./compare.sh regex-bracktrack
+    ./compare.sh regex-backtrack
 
 Result: As you would expect, Perl and Python backtrack, but
 bash/zsh/egrep/awk/sed don't.  (bash and osh use libc's `regexec()`.
 Not sure what zsh uses.)
 
     # test with glob a*b, a*a*b, a*a*a*b, ... per rsc
-    ./compare.sh glob-bracktrack
+    ./compare.sh glob-backtrack
     ./compare.sh fnmatch-backtrack
 
 Result: Perl, Python, and bash/mksh internal glob backtrack.
