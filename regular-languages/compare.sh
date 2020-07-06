@@ -183,4 +183,39 @@ submatch() {
   js-submatch "$text" "$pat"
 }
 
+# From Table 4
+# https://www3.cs.stonybrook.edu/~dongyoon/papers/FSE-19-LinguaFranca.pdf
+submatch-case() {
+  local text=$1
+  local pat=$2
+
+  local submatch=${3:-1}
+
+  echo
+  echo "Matching pattern  $pat  on  $text, submatch $submatch"
+
+  # they all print 'g' ?
+  # So there's no difference?
+
+  # These are POSIX conformance bugs?
+  # 2010: http://hackage.haskell.org/package/regex-posix-unittest
+  # https://wiki.haskell.org/Regex_Posix
+
+  libc-submatch "$text" "$pat" "$submatch"
+  gawk-submatch "$text" "$pat" "$submatch"
+  sed-submatch "$text" "$pat" "$submatch"
+
+  python-submatch "$text" "$pat" "$submatch"
+  perl-submatch "$text" "$pat" "$submatch"
+  js-submatch "$text" "$pat" "$submatch"
+}
+
+submatch2() {
+  submatch-case 'aa' '(a*)+' 1
+  submatch-case 'ab' '((a)|(b))+' 1
+
+  submatch-case 'aa' '(a*)+' 2
+  submatch-case 'ab' '((a)|(b))+' 2
+}
+
 "$@"
