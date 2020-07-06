@@ -212,10 +212,13 @@ submatch-case() {
 
 submatch2() {
   submatch-case 'aa' '(a*)+' 1
-  submatch-case 'ab' '((a)|(b))+' 1
-
   submatch-case 'aa' '(a*)+' 2
+
+  submatch-case 'ab' '((a)|(b))+' 1
   submatch-case 'ab' '((a)|(b))+' 2
+
+  # v8 is different!
+  submatch-case ']' '([]])' 1
 }
 
 "$@"

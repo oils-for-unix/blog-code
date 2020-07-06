@@ -73,7 +73,11 @@ var text = argv[1];
 var pattern  = argv[2];
 var submatch = parseInt(argv[3]);
 var m = text.match(pattern);
-console.log(m[submatch]);
+if (m) {
+  console.log(m[submatch]);
+} else {
+  console.log("NO MATCH");
+}
 
 ' "$text" "$pattern" "$submatch"
 }
