@@ -70,3 +70,19 @@ perl-match() {
   echo
 }
 
+js-match() {
+  local text=$1
+  local pattern=$2
+
+  echo -n 'js    '
+  nodejs -e '
+//console.log(process.argv)
+argv = process.argv
+var text = argv[1];
+var pattern  = argv[2];
+var m = text.match(pattern);
+console.log(m[0]);
+
+' "$text" "$pattern"
+}
+

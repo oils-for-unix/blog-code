@@ -77,3 +77,19 @@ perl-task() {
   # https://stackoverflow.com/questions/4794145/perl-one-liner-like-grep
 }
 
+js-task() {
+  local text=$1
+  local pattern=$2
+
+  echo -n 'js    '
+  nodejs -e '
+//console.log(process.argv)
+argv = process.argv
+var text = argv[1];
+var pattern  = argv[2];
+if (text.match(pattern)) {
+  console.log(text)
+}
+' "$text" "$pattern"
+}
+

@@ -68,6 +68,10 @@ regex-backtrack() {
     time mawk-task "$text" "$pattern"
     time python-task "$text" "$pattern"
     time perl-task "$text" "$pattern"
+
+    # This backtracks, but it's harder to tell than Perl/Python due to
+    # startup overhead
+    time js-task "$text" "$pattern"
     echo
   done
 }
@@ -135,6 +139,7 @@ greedy() {
     time gawk-match "$text" "$pat"
     time python-match "$text" "$pat"
     time perl-match "$text" "$pat"
+    time js-match "$text" "$pat"
   done
 
   echo
@@ -175,6 +180,7 @@ submatch() {
 
   python-submatch "$text" "$pat"
   perl-submatch "$text" "$pat"
+  js-submatch "$text" "$pat"
 }
 
 "$@"
