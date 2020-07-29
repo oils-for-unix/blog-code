@@ -1,0 +1,10 @@
+doctools/oil_doc.py:(.*?)             # arbitrary text
+doctools/oil_doc.py:  .*?
+doctools/oil_doc.py:.*?             # arbitrary text
+lazylex/html.py:  (r'<!-- .*? -->', Comment),
+lazylex/html.py:  (r'<\? .*? \?>', Processing),
+osh/glob_test.py:    m = re.match('^(.*?)c.*$', s)
+osh/glob_test.py:    m = re.match('^.*?b(.*)$', s)
+pgen2/tokenize.py:#cookie_re = re.compile(r'^[ \t\f]*#.*?coding[:=][ \t]*([-\w.]+)', re.ASCII)
+test/jsontemplate.py:        r'\S.*?' +
+types/refactor.py:(?P<begin>.*?)
