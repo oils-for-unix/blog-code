@@ -50,14 +50,31 @@ for line in sys.stdin:
 '
 }
 
+lines() {
+  echo spam
+  echo eggs
+}
+
+
+RG=~/install/ripgrep-0.10.0-x86_64-unknown-linux-musl/rg
+
 submatch-demo() {
-  csv | ./pygrep.py '(.+)(.+)'
+  # note:  POSIX regexes don't have this construct, so we use ripgrep.
+  for g in ./pygrep.py $RG; do
+    echo $g
+    echo ===
 
-  csv | ./pygrep.py '(.+?)(.+?)'
+    for pat in \
+      '(.+)(.+)' \
+      '(.+?)(.+?)' \
+      '(.+)(.+?)' \
+      '(.+?)(.+)'
+    do
+      # woah ripgrep does multiple matches on a line
 
-  csv | ./pygrep.py '(.+?)(.+)'
-
-  csv | ./pygrep.py '(.+)(.+?)'
+      lines | $g $pat -r '[ 1: $1 2: $2 ]'
+    done
+  done
 }
 
 survey() {
