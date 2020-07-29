@@ -50,6 +50,16 @@ for line in sys.stdin:
 '
 }
 
+submatch-demo() {
+  csv | ./pygrep.py '(.+)(.+)'
+
+  csv | ./pygrep.py '(.+?)(.+?)'
+
+  csv | ./pygrep.py '(.+?)(.+)'
+
+  csv | ./pygrep.py '(.+)(.+?)'
+}
+
 survey() {
   local out=$PWD/survey.txt
   cd ~/git/oilshell/oil
