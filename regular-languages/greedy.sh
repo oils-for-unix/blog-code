@@ -16,6 +16,10 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+pygrep() {
+  ./pygrep.py "$@"
+}
+
 csv() {
   cat <<EOF
 foo,bar
@@ -30,6 +34,31 @@ html() {
 EOF
 }
 
+quotes() {
+  cat <<EOF
+foo,bar
+"spam","eggs"
+EOF
+}
+
+quotes-demo() {
+  # .* matches inner quotes
+  quotes | gawk 'match($0, "\"(.*)\"", a) {
+    print "0=" a[0] "\t1=" a[1] "\t2=" a[2]
+  }
+  '
+
+  # more specific
+  quotes | gawk 'match($0, "\"([^\"]+)\"", a) {
+    print "0=" a[0] "\t1=" a[1] "\t2=" a[2]
+  }
+  '
+
+  quotes | pygrep '"(.*)"'
+  quotes | pygrep '"(.*?)"'
+  quotes | pygrep '"([^"]*)"'
+}
+
 
 demo() {
   csv | gawk 'match($0, "(.*),(.*)", a) { print "0=" a[0] "\t1=" a[1] "\t2=" a[2] }'
@@ -38,16 +67,7 @@ demo() {
 
   html | gawk 'match($0, "<(.*)>", a) { print "0=" a[0] "\t1=" a[1] }'
 
-  html | python2 -c '
-import re, sys
-
-pat = re.compile("<(.*)>")
-
-for line in sys.stdin:
-  m = pat.match(line)
-  if m:
-    print(m.groups())
-'
+  html | ./pygrep.py '<(.*)>'
 }
 
 lines() {
