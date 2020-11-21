@@ -67,8 +67,6 @@ csv2sqlite() {
 EOF
 }
 
-# credit to jeb and terminus-est on lobste.rs
-# https://lobste.rs/s/hnfc6a/what_is_data_frame_python_r_sql
 with-sql() {
   sqlite3 $DB <<EOF
 SELECT 'Daily Traffic:';  -- silly way to print
@@ -77,13 +75,53 @@ SELECT date, SUM(num_hits) FROM traffic GROUP BY date;
 SELECT '';
 SELECT 'Popular Pages:';
 
--- Use common table expression
+-- Style from blog post
+SELECT url,
+       SUM(num_hits) * 100.0 / (SELECT SUM(num_hits) FROM traffic)
+       AS percentage
+FROM traffic
+GROUP BY url
+ORDER BY percentage DESC;
+
+EOF
+}
+
+# This selects from two tables.
+# credit to jeb and terminus-est on lobste.rs
+# https://lobste.rs/s/hnfc6a/what_is_data_frame_python_r_sql
+with-cte() {
+  sqlite3 $DB <<EOF
+-- Use common table expression.  This table has a single column: the total
+-- number of hits in the data set.
 WITH     total (num_hits) AS (SELECT SUM(num_hits) FROM traffic)
 SELECT   url,
          traffic.num_hits * 100.0 / total.num_hits AS percentage
 FROM     traffic, total
 GROUP BY url
 ORDER BY percentage DESC;
+EOF
+}
+
+# Window functions use the "OVER" keyword.
+# https://sqlite.org/windowfunctions.html
+
+# Doesn't work?  Syntax error on line 1.  sqlite supports the WINDOW keyword
+# for intermediate definitions.
+
+with-window() {
+  sqlite3 $DB <<EOF
+SELECT date, url, num_hits FROM traffic;
+EOF
+
+  sqlite3 $DB <<EOF
+WITH total_hits_per_url AS (
+  SELECT url, sum(hits) AS hits
+  FROM traffic
+  GROUP BY url
+)
+SELECT url, hits * 100.0 / sum(hits) OVER () AS percentage
+FROM total_hits_per_url
+ORDER BY percentage desc;
 EOF
 }
 
