@@ -61,10 +61,14 @@ all() {
 readonly DB='traffic.sqlite3 '
 
 csv2sqlite() {
+  rm -v -f $DB
+
   sqlite3 $DB <<EOF
 .mode csv
 .import traffic.csv traffic
 EOF
+
+  echo "Imported into $DB"
 }
 
 with-sql() {
