@@ -103,7 +103,7 @@ with-cte() {
 -- number of hits in the data set.
 WITH     total (num_hits) AS (SELECT SUM(num_hits) FROM traffic)
 SELECT   url,
-         traffic.num_hits * 100.0 / total.num_hits AS percentage
+         SUM(traffic.num_hits) * 100.0 / total.num_hits AS percentage
 FROM     traffic, total
 GROUP BY url
 ORDER BY percentage DESC;
@@ -120,6 +120,19 @@ with-window() {
   sqlite3 $DB <<EOF
 SELECT date, url, num_hits FROM traffic;
 EOF
+
+sqlite3 <<EOF
+CREATE TABLE t0(x INTEGER PRIMARY KEY, y TEXT);
+INSERT INTO t0 VALUES (1, 'aaa'), (2, 'ccc'), (3, 'bbb');
+SELECT x, y, row_number() OVER (ORDER BY y) AS row_number FROM t0 ORDER BY x;
+EOF
+  return
+
+  echo
+  sqlite3 $DB <<EOF
+SELECT url, sum(num_hits) OVER (GROUP BY url) as hits_per_url FROM traffic;
+EOF
+  return
 
   sqlite3 $DB <<EOF
 WITH total_hits_per_url AS (
