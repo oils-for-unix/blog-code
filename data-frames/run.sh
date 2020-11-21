@@ -69,6 +69,10 @@ EOF
 
 with-sql() {
   sqlite3 $DB <<EOF
+SELECT 'Rows:';
+SELECT date, url, num_hits FROM traffic;
+
+SELECT '';
 SELECT 'Daily Traffic:';  -- silly way to print
 SELECT date, SUM(num_hits) FROM traffic GROUP BY date;
 
