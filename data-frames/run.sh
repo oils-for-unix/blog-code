@@ -71,6 +71,16 @@ EOF
   echo "Imported into $DB"
 }
 
+show-db() {
+  sqlite3 -header $DB <<EOF
+SELECT * FROM traffic;
+
+SELECT '';
+SELECT 'Total';
+SELECT SUM(num_hits) FROM traffic;
+EOF
+}
+
 with-sql() {
   sqlite3 $DB <<EOF
 SELECT 'Rows:';
@@ -115,22 +125,12 @@ EOF
 # Only available as of version 3.25 as of 9/2018!
 
 sqlite3-new() {
-  ~/src/sqlite-autoconf-3330000/sqlite3 "$@"
+  ~/src/sqlite-autoconf-3330000/sqlite3 -header "$@"
 }
 
-# From peter on lobste.rs:
-# https://lobste.rs/s/0mpcxv/tab_programming_language#c_ewkmc6
-
 with-window() {
-  # The subtotals query
-  sqlite3-new $DB <<EOF
-  SELECT url, SUM(num_hits) AS url_hits
-  FROM traffic
-  GROUP BY url
-EOF
-
-  echo
-
+  # From peter on lobste.rs:
+  # https://lobste.rs/s/0mpcxv/tab_programming_language#c_ewkmc6
   sqlite3-new $DB <<EOF
 WITH subtotals AS (
   SELECT url, SUM(num_hits) AS url_hits
@@ -138,11 +138,48 @@ WITH subtotals AS (
   GROUP BY url
 )
 SELECT url,
-       -- sum() OVER () is a window function over the whole table
-       url_hits * 100.0 / sum(url_hits) OVER () AS percentage
+       -- SUM() OVER () is a window function over the whole table
+       url_hits * 100.0 / SUM(url_hits) OVER () AS percentage
 FROM subtotals
 ORDER BY percentage DESC;
 EOF
+
+  echo
+
+  # Factor it into two CTEs
+
+  sqlite3-new $DB <<EOF
+WITH
+subtotals AS (
+  SELECT url, SUM(num_hits) AS url_hits
+  FROM traffic
+  GROUP BY url
+),
+percentages AS (
+  SELECT url,
+         -- SUM() OVER () is a window function over the whole table
+         url_hits * 100.0 / SUM(url_hits) OVER () AS percentage
+  FROM subtotals
+  ORDER BY percentage DESC
+)
+SELECT * FROM percentages;
+EOF
+
+  echo
+
+  return
+
+  # Why isn't this the same?  I can't do it without a CTE?
+  # Oh it's because OVER() is respecting GROUP BY first.  The order is very random!
+  sqlite3-new $DB <<EOF
+SELECT url,
+       SUM(num_hits) * 100.0 / SUM(num_hits) OVER () AS percentage,
+       SUM(num_hits) OVER ()
+FROM traffic
+GROUP BY url
+ORDER BY percentage DESC;
+EOF
+
 }
 
 "$@"
