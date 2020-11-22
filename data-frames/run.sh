@@ -121,12 +121,10 @@ sqlite3-new() {
 # From peter on lobste.rs:
 # https://lobste.rs/s/0mpcxv/tab_programming_language#c_ewkmc6
 
-# This is cool, but I don't really get why you need OVER ()
-
 with-window() {
   # The subtotals query
   sqlite3-new $DB <<EOF
-  SELECT url, sum(num_hits) AS url_hits
+  SELECT url, SUM(num_hits) AS url_hits
   FROM traffic
   GROUP BY url
 EOF
@@ -135,13 +133,15 @@ EOF
 
   sqlite3-new $DB <<EOF
 WITH subtotals AS (
-  SELECT url, sum(num_hits) AS url_hits
+  SELECT url, SUM(num_hits) AS url_hits
   FROM traffic
   GROUP BY url
 )
-SELECT url, url_hits * 100.0 / sum(url_hits) OVER () AS percentage
+SELECT url,
+       -- sum() OVER () is a window function over the whole table
+       url_hits * 100.0 / sum(url_hits) OVER () AS percentage
 FROM subtotals
-ORDER BY percentage desc;
+ORDER BY percentage DESC;
 EOF
 }
 
