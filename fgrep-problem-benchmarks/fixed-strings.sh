@@ -310,6 +310,13 @@ viz-trie() {
   viz trie
 }
 
+do-done-edited() {
+  local name=do-done-edited
+  local dot=$name.dot
+  dot -T png -o _gen/$name.png $dot
+}
+
+
 # GrepFast() is 682 bytes only.
 code-size() {
   ~/git/other/bloaty/bloaty -d symbols _tmp/fixed-strings | tee _gen/code-size.txt
