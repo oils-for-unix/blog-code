@@ -9,7 +9,7 @@
 #   ./fixed-strings.sh all-benchmarks
 #
 # Also useful:
-#   viz, vis-trie
+#   viz, viz-all
 
 source common.sh
 source words.sh  # for constructing patterns
@@ -303,19 +303,22 @@ viz() {
   local name=${1:-fixed-strings}
   local dot=_gen/$name.dot
   re2c --emit-dot -o $dot $name.re2c.cc
+  re2c -o _gen/$name.cc $name.re2c.cc
   dot -T png -o _gen/$name.png $dot
 }
 
-viz-trie() {
+viz-all() {
   viz trie
+  viz do-done
+  viz else-elif
 }
 
-do-done-edited() {
-  local name=do-done-edited
-  local dot=$name.dot
-  dot -T png -o _gen/$name.png $dot
+edited() {
+  for name in do-done-edited else-elif-edited; do
+    local dot=$name.dot
+    dot -T png -o _gen/$name.png $dot
+  done
 }
-
 
 # GrepFast() is 682 bytes only.
 code-size() {

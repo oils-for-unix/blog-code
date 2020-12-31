@@ -6,5 +6,8 @@
   "elif" {
     printf("elif\n");
   }
+  * {
+    printf("NO MATCH\n");
+  }
 
 */
