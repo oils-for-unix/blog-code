@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e -o pipefail
+
+# Oil fixes an external binary
+
+if test "$1" = 'try-oil'; then
+  run --status-ok SIGPIPE /usr/bin/printf '%65538s' | head -c 1
+else
+  /usr/bin/printf '%65538s' | head -c 1
+fi
+
+# This is still messed up!
+#run --status-ok SIGPIPE printf '%65538s' | head -c 1
+
+echo "this is not executed"
