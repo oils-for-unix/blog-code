@@ -1,0 +1,51 @@
+fd-passing
+----------
+
+- TODO: client should call socketpair()
+  - fork() it 
+  - then connect the child's stdin/stdout to it?
+  - then exec() the child
+  - does the child need COPROCESS=1 to indicate the mode?
+    - or should it be --coprocess?
+
+- TODO: we want a better name like
+
+
+Message Structure
+-----------------
+
+- Netstrings?
+  - recv() take a number of bytes?
+
+- can it just read(1) until it hits :, and then gets a length
+  - then it will call recvmsg()
+
+- what happens to the descriptors if you call read() or recv() instead of
+  recvmsg()?  Do they just disappear?
+
+
+- then it can PARSE the whole payload?
+  - like ARGV foo
+  - 32:MAIN\0foo.py\0arg\0,
+  - should there be another SETENV command?
+    - 42:SETENV\0FOO=BAR\BAR=BAZ\0,?
+
+
+- when it's MAIN or ARGV, then the server should get FDs along with it, and
+  then do the dup2() dance!  for its own stdin and stdout.
+
+- yes
+
+
+Coprocess Commands
+-------------------
+
+- ENV, ARGV, MAIN or something?
+
+- CD -- change directories?
+  - not supported by default?
+
+- it's basically a mirror of the process state ?
+
+
+- for the shell: maybe you should have STATE ARGV or something?
