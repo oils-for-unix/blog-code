@@ -13,7 +13,7 @@ serve() {
   ./server.py $SOCKET
 }
 
-to-stdout() {
+to-my-stdout() {
   ./headless_client.py $SOCKET
 }
 

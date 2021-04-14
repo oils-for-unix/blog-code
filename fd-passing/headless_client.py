@@ -23,7 +23,7 @@ def main(argv):
   try:
     where = argv[2]  # could be 'file'
   except IndexError:
-    where = 'stdout'
+    where = 'my-stdout'
 
   sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
@@ -39,7 +39,7 @@ def main(argv):
     # NUL terminator
     msg = b'MAIN\0'
 
-    if where == 'stdout':
+    if where == 'my-stdout':
       stdout_fd = sys.stdout.fileno()
 
     elif where == 'pty':
@@ -69,7 +69,7 @@ def main(argv):
     log('closing socket')
     sock.close()
 
-  os.close(slave_fd)
+  #os.close(slave_fd)
   if master_fd != -1:
     # This hangs because the server still has the terminal open?  Not sure
     # where to close it.

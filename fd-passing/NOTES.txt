@@ -1,14 +1,129 @@
 fd-passing
-----------
+==========
 
-- TODO: client should call socketpair()
+Tasks
+-----
+
+- Write recvmsg() wrapper in Python 2
+
+Usage:
+
+   fd_out = []
+
+   while True:
+     # This does the netstring protocol I think
+     msg = libc.CoprocessRecv(sock, fd_out)
+     ...
+
+     del fd_out[:}
+
+
+
+Naming
+------
+
+osh --c5po-socket /tmp/oil-socket
+
+osh --c5po-descriptors '3 5'
+osh --c5po-socket-pair '3 5'
+
+And then it will do sendmsg / recvmsg on them?
+
+similar to BASH_XTRACE_FD?
+
+
+I want a better name than "Coprocess protocol"
+
+   --copopotoco
+
+   Copotoco protocol
+   Co protocol
+   Cop protocol
+   Copro protocol
+
+--unix-coprocess
+
+--unix-domain-coproc
+
+--control-socket /tmp/oil-123.socket
+
+--coprocess-socket /tmp/oil-123.socket
+
+
+C5PO, sort of like C-3PO
+
+"coprocess protocol" has 5 O's
+
+Protocol
+--------
+
+STARTING IT:
+
+  osh -i --coprocess /tmp/oil.socket
+  osh -i --shellac /tmp/oil.socket
+
+-i is important so the oshrc is sourced!
+
+REQUEST: (BLOB, [optional list of FDs])
+
+-> BLOB
+
+Blobs are encoded as netstrings.
+
+
+Two cases:
+
+- Coprocess protocol
+  - ARGV -> STATUS
+    - Key point: this is STATELESS
+    - the shell can wipe thes tae
+    - it's like sh -C
+  - what about ENV and CD, etc.
+
+- Stateful Shell
+  - ECMD -> OK / FAIL
+    - CANNOT be done with ARGV because it's stateful
+      - it's NOT equivalent to sh -c
+    - does NOT return status?  I don't think so
+
+    - does this do the dup2() dance?  is it canned?
+      - or should it  there be separate DUP commands?
+      - so does the main loop need a handle to fd_state?
+
+  - COMPLETE -- ECMD 'complete' better?
+  - DUMP -- ECMD 'declare -p' might be enough?
+   
+- IEVAL
+
+CO_EVAL == co-proecss eval?
+
+
+Typical Client Usage
+--------------------
+
+A typical entry requires 3 commands: prompt, execute, and dump-state
+
+ECMD echo ${PS1@P}
+ECMD cd / 
+ECMD dump-state  # this retrieves $?, pwd, etc.
+
+Common snippets
+---------------
+
+ECMD echo ${PS1@P}
+
+Notes
+-----
+
+- should client call socketpair()
   - fork() it 
   - then connect the child's stdin/stdout to it?
   - then exec() the child
   - does the child need COPROCESS=1 to indicate the mode?
     - or should it be --coprocess?
 
-- TODO: we want a better name like
+- then we don't have to worry about concurren usage?
+  - the parent process OWNS the coprocess?
 
 
 Message Structure
@@ -49,3 +164,4 @@ Coprocess Commands
 
 
 - for the shell: maybe you should have STATE ARGV or something?
+
