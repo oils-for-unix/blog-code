@@ -4,6 +4,8 @@ netstring.py
 """
 from __future__ import print_function
 
+import array
+import socket
 import sys
 
 
@@ -17,10 +19,23 @@ def Encode(s):
   return b'%d:%s,' % (len(s), s)
 
 
-def Receive(connection):
+def recv_fds(sock, msglen, maxfds):
+  """From Python docs"""
+
+  fds = array.array("i")   # Array of ints
+  msg, ancdata, flags, addr = sock.recvmsg(
+     msglen, socket.CMSG_LEN(maxfds * fds.itemsize))
+  for cmsg_level, cmsg_type, cmsg_data in ancdata:
+    if cmsg_level == socket.SOL_SOCKET and cmsg_type == socket.SCM_RIGHTS:
+      # Append data, ignoring any truncated integers at the end.
+      fds.frombytes(cmsg_data[:len(cmsg_data) - (len(cmsg_data) % fds.itemsize)])
+  return msg, list(fds)
+
+
+def Receive(sock):
   len_buf = []
   while True:
-    byte = connection.recv(1)
+    byte = sock.recv(1)
     #log('byte = %r', byte)
 
     if len(byte) == 0:
@@ -35,9 +50,10 @@ def Receive(connection):
       raise RuntimeError('Invalid netstring length byte %r' % byte)
 
   num_bytes = int(b''.join(len_buf))
-  #log('num_bytes = %d', num_bytes)
+  log('num_bytes = %d', num_bytes)
 
-  data, ancdata, msg_flags, address = connection.recvmsg(16)
-  log("recvmsg = %r %r %r %r", data, ancdata, msg_flags, address)
+  # +1 for the comma
+  msg, fds = recv_fds(sock, num_bytes + 1, 3)
+  log("msg %r, FDs %s", msg, fds)
 
-  return data, ancdata
+  return msg, fds

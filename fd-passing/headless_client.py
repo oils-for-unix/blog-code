@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import array
 import socket
+import os
 import sys
 
 import netstring
@@ -30,34 +31,30 @@ def main(argv):
     sys.exit(1)
 
   try:
-    mode = argv[1]
+    where = argv[1]  # could be 'file'
   except IndexError:
-    mode = 'dta'
+    mode = 'stdout'
 
   try:
     # NUL terminator
     msg = b'MAIN\0'
 
-    if mode == 'fd':
+    if where == 'stdout':
       stdout_fd = sys.stdout.fileno()
-      log('stdout_fd = %d', stdout_fd)
-
-      sock.send(b'%d:' % len(msg))  # netstring prefix
-
-      # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
-      result = sock.sendmsg([msg], [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd]))])
-      log('sendmsg returned %s', result)
-
-      sock.send(b',')  # trailing netstring thing
-
     else:
-      # Just send DATA, no file descriptor
-      message = netstring.Encode(msg)
-      log('sending %r', message)
-      sock.sendall(message)
+      stdout_fd = os.open(where, os.O_RDWR | os.O_CREAT)
 
-    data, ancdata = netstring.Receive(sock)
-    log('data %r, ancdata %r', data, ancdata)
+    log('stdout_fd = %d', stdout_fd)
+
+    sock.send(b'%d:' % len(msg))  # netstring prefix
+
+    # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
+    result = sock.sendmsg([msg], [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd]))])
+    log('sendmsg returned %s', result)
+
+    sock.send(b',')  # trailing netstring thing
+
+    msg, _ = netstring.Receive(sock)
 
   finally:
     log('closing socket')

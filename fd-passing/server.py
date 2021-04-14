@@ -6,9 +6,10 @@ https://pymotw.com/2/socket/uds.html
 """
 from __future__ import print_function
 
+import os
 import socket
 import sys
-import os
+import subprocess
 
 import netstring
 from netstring import log
@@ -38,8 +39,15 @@ while True:
   connection, client_address = sock.accept()
   try:
     log('connection from %s', client_address)
-    data, ancdata = netstring.Receive(connection)
-    log('data %r, ancdata %r', data, ancdata)
+    msg, descriptors = netstring.Receive(connection)
+
+    #log('ancdata %s', type(ancdata))
+    #os.write(ancdata, 'TESTING')
+
+    # Why isn't 'ls' enough?
+    p = subprocess.Popen(['ls', '--color=auto'], stdout=descriptors[0])
+    status = p.wait()
+    log('status = %d', status)
 
     reply = netstring.Encode(b'OK')
     connection.sendall(reply)
