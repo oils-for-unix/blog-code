@@ -7,8 +7,9 @@ Python 3 supports descriptor passing.
 from __future__ import print_function
 
 import array
-import socket
+import pty
 import os
+import socket
 import sys
 
 import netstring
@@ -16,13 +17,16 @@ from netstring import log
 
 
 def main(argv):
+  server_address = argv[1]
+
+  # Where to write the response
+  try:
+    where = argv[2]  # could be 'file'
+  except IndexError:
+    where = 'stdout'
+
   sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-  print(sys.version)
-  print('Hello from headless_client.py')
-  print(sock.sendmsg)
-
-  server_address = './uds_socket'
   log('Connecting to %s', server_address)
   try:
     sock.connect(server_address)
@@ -30,17 +34,19 @@ def main(argv):
     log('error: %s', e)
     sys.exit(1)
 
-  try:
-    where = argv[1]  # could be 'file'
-  except IndexError:
-    mode = 'stdout'
-
+  master_fd, slave_fd = -1, -1
   try:
     # NUL terminator
     msg = b'MAIN\0'
 
     if where == 'stdout':
       stdout_fd = sys.stdout.fileno()
+
+    elif where == 'pty':
+      master_fd, slave_fd = os.openpty()
+      stdout_fd = slave_fd
+      log('master %d slave %d', master_fd, slave_fd)
+
     else:
       stdout_fd = os.open(where, os.O_RDWR | os.O_CREAT)
 
@@ -49,7 +55,10 @@ def main(argv):
     sock.send(b'%d:' % len(msg))  # netstring prefix
 
     # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
-    result = sock.sendmsg([msg], [(socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd]))])
+    ancillary = (
+      socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd])
+    )
+    result = sock.sendmsg([msg], [ancillary])
     log('sendmsg returned %s', result)
 
     sock.send(b',')  # trailing netstring thing
@@ -59,6 +68,16 @@ def main(argv):
   finally:
     log('closing socket')
     sock.close()
+
+  os.close(slave_fd)
+  if master_fd != -1:
+    # This hangs because the server still has the terminal open?  Not sure
+    # where to close it.
+    while True:
+      chunk = os.read(master_fd, 1024)
+      if not chunk:
+        break
+      log('pty %r', chunk)
 
 
 if __name__ == '__main__':
