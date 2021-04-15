@@ -7,6 +7,7 @@ https://pymotw.com/2/socket/uds.html
 from __future__ import print_function
 
 import errno
+import optparse
 import os
 import socket
 import sys
@@ -17,22 +18,48 @@ from netstring import log
 
 
 def main(argv):
-  server_address = argv[1]
+  p = optparse.OptionParser(__doc__)
+  p.add_option(
+      '--socket-path', dest='socket_path', default=None,
+      help='Socket path to connect to')
+  p.add_option(
+      '--socket-fd', dest='socket_fd', type='int', default=None,
+      help='File descriptor for our end of socketpair()')
 
-  # Make sure the socket does not already exist
-  # If we don't do this, we get 'address already in use'
-  try:
-    os.unlink(server_address)
-  except OSError as e:
-    if e.errno != errno.ENOENT:  # some error deleting it
-      raise
+  opts, _ = p.parse_args(argv[1:])
 
-  sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+  if opts.socket_path:  # PATH like /tmp/c5po.socket
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-  log('Binding to %s', server_address)
-  sock.bind(server_address)
+    # Make sure the socket does not already exist
+    # If we don't do this, we get 'address already in use'
+    try:
+      os.unlink(opts.socket_path)
+    except OSError as e:
+      if e.errno != errno.ENOENT:  # some error deleting it
+        raise
+
+    log('Binding to %s', opts.socket_path)
+    sock.bind(opts.socket_path)
+
+  elif opts.socket_fd:
+    fd = opts.socket_fd
+    log('server.py got fd %d', fd)
+    log('server.py descriptor state')
+    os.system('ls -l /proc/%d/fd' % os.getpid())
+    # This creates a NEW SOCKET, which is bad
+    #sock = socket.fromfd(fd, socket.AF_UNIX, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, fileno=fd)
+    log('socket %s from FD %d', sock, fd)
+
+  else:
+    raise AssertionError()
 
   # Listen for incoming connections
+  try:
+    sock.listen(1)
+  except OSError as e:
+    log('listen error: %s', e)
 
   # TODO: Should we MAINTAIN the connections?
   #
@@ -44,14 +71,19 @@ def main(argv):
   #   ECMD cd / 
   #   ECMD dump-state
 
-  sock.listen(1)
-
   while True:
     # Wait for a connection
     log('accept()')
-    conn, client_address = sock.accept()
     try:
+      conn, client_address = sock.accept()
+    except OSError as e:
+      log("accept error: %s", e)
+      # Uh what, you don't have to listen() here!  socketpair() is different?
+      conn = sock
+    else:
       log('Connection from %r', client_address)
+
+    try:
 
       # Note: This can raise various exceptions
       msg, descriptors = netstring.Receive(conn)

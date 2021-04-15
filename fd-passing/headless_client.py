@@ -2,12 +2,13 @@
 """
 headless_client.py
 
-Python 3 supports descriptor passing.
+We're using Python 3 because it supports descriptor passing.
 """
 from __future__ import print_function
 
 import array
 import pty
+import optparse
 import os
 import socket
 import sys
@@ -17,38 +18,86 @@ from netstring import log
 
 
 def main(argv):
-  server_address = argv[1]
+  p = optparse.OptionParser(__doc__)
+  p.add_option(
+      '--socket-path', dest='socket_path', default=None,
+      help='Socket path to connect to')
+  p.add_option(
+      '--socket-pair', dest='socket_pair', default=None,
+      help='Create a new socket pair and fork the server')
 
-  # Where to write the response
-  try:
-    where = argv[2]  # could be 'file'
-  except IndexError:
-    where = 'my-stdout'
+  p.add_option(
+      '--to-file', dest='to_file', default=None,
+      help='Where the server should send child stdout')
+  p.add_option(
+      '--to-new-pty', dest='to_new_pty', default=False, action='store_true',
+      help='Send the child stdout to a new PTY')
 
-  sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+  opts, _ = p.parse_args(argv[1:])
 
-  log('Connecting to %s', server_address)
-  try:
-    sock.connect(server_address)
-  except socket.error as e:
-    log('error: %s', e)
-    sys.exit(1)
+  if opts.socket_pair:
+    # Try to FORK THE SERVER and pass it a socket.
+    # Doesn't work yet
+
+    sock, sock2 = socket.socketpair()
+    log('sock %s %d', sock, sock.fileno())
+    log('sock2 %s %d', sock2, sock2.fileno())
+
+    log('parent/client pid = %d', os.getpid())
+
+    log('client descriptor state')
+    os.system('ls -l /proc/%d/fd' % os.getpid())
+
+    # This is necessary so that the child gets it
+    os.set_inheritable(sock2.fileno(), True)
+
+    # If we do this then we can't see descriptor 4 in the child
+    import fcntl
+    # fcntl.fcntl(sock2.fileno(), fcntl.F_SETFD, fcntl.FD_CLOEXEC)
+
+    #fcntl.fcntl(sock.fileno(), fcntl.F_SETFD, fcntl.FD_CLOEXEC)
+
+    child_argv = ['./server.py', str(sock2.fileno())]
+
+    ret = os.fork()
+    if ret == 0:
+      os.close(sock.fileno())  # close parent end in child
+      log('child pid = %d', os.getpid())
+      os.execv(child_argv[0], child_argv)
+    else:
+      os.close(sock2.fileno())  # close child end in parent
+
+      log('client descriptor state AFTER')
+      os.system('ls -l /proc/%d/fd' % os.getpid())
+
+  elif opts.socket_path:
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
+    log('Connecting to %s', opts.socket_path)
+    try:
+      sock.connect(opts.socket_path)
+    except socket.error as e:
+      log('error: %s', e)
+      sys.exit(1)
+
+  else:
+    raise AssertionError()
 
   master_fd, slave_fd = -1, -1
   try:
     # NUL terminator
     msg = b'MAIN\0'
 
-    if where == 'my-stdout':
-      stdout_fd = sys.stdout.fileno()
+    if opts.to_file:
+      stdout_fd = os.open(opts.to_file, os.O_RDWR | os.O_CREAT)
 
-    elif where == 'pty':
+    elif opts.to_new_pty:
       master_fd, slave_fd = os.openpty()
       stdout_fd = slave_fd
       log('master %d slave %d', master_fd, slave_fd)
 
     else:
-      stdout_fd = os.open(where, os.O_RDWR | os.O_CREAT)
+      raise AssertionError()
 
     log('stdout_fd = %d', stdout_fd)
 
