@@ -42,36 +42,22 @@ def main(argv):
     log('Binding to %s', opts.socket_path)
     sock.bind(opts.socket_path)
 
-  elif opts.socket_fd:
-    fd = opts.socket_fd
-    log('server.py got fd %d', fd)
-    log('server.py descriptor state')
-    os.system('ls -l /proc/%d/fd' % os.getpid())
-    # This creates a NEW SOCKET, which is bad
-    #sock = socket.fromfd(fd, socket.AF_UNIX, socket.SOCK_STREAM)
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, fileno=fd)
-    log('socket %s from FD %d', sock, fd)
+    # Listen for incoming connections
+    try:
+      sock.listen(1)
+    except OSError as e:
+      log('listen error: %s', e)
 
-  else:
-    raise AssertionError()
+    # TODO: Should we MAINTAIN the connections?
+    #
+    # We don't need netstrings if the client opens and closes
+    # every time?  But that's slower for coprocesses.
+    #
+    # A typical entry requires 3 commands: prompt, execute, and dump-state
+    #   ECMD echo ${PS1@P}
+    #   ECMD cd / 
+    #   ECMD dump-state
 
-  # Listen for incoming connections
-  try:
-    sock.listen(1)
-  except OSError as e:
-    log('listen error: %s', e)
-
-  # TODO: Should we MAINTAIN the connections?
-  #
-  # We don't need netstrings if the client opens and closes
-  # every time?  But that's slower for coprocesses.
-  #
-  # A typical entry requires 3 commands: prompt, execute, and dump-state
-  #   ECMD echo ${PS1@P}
-  #   ECMD cd / 
-  #   ECMD dump-state
-
-  while True:
     # Wait for a connection
     log('accept()')
     try:
@@ -83,8 +69,25 @@ def main(argv):
     else:
       log('Connection from %r', client_address)
 
-    try:
+  elif opts.socket_fd:
+    fd = opts.socket_fd
+    log('server.py got fd %d', fd)
+    log('server.py descriptor state')
+    os.system('ls -l /proc/%d/fd' % os.getpid())
+    # This creates a NEW SOCKET, which is bad
+    #sock = socket.fromfd(fd, socket.AF_UNIX, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, fileno=fd)
+    log('socket %s from FD %d', sock, fd)
 
+    # Weird
+    conn = sock
+
+  else:
+    raise AssertionError()
+
+
+  try:
+    while True:
       # Note: This can raise various exceptions
       msg, descriptors = netstring.Receive(conn)
 
@@ -103,8 +106,8 @@ def main(argv):
       conn.sendall(reply)
       log('')
             
-    finally:
-      conn.close()
+  finally:
+    conn.close()
 
 
 if __name__ == '__main__':

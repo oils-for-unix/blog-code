@@ -35,7 +35,7 @@ to-disk() {
 # Doesn't work, we get EINVAL on sock.listen() or sock.accept(), after
 # socket.fromfd()
 socket-pair() {
-  ./headless_client.py UNUSED
+  ./headless_client.py --socket-pair --to-file /dev/stdout "$@"
 }
 
 "$@"

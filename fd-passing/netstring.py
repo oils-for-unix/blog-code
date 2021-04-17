@@ -53,7 +53,10 @@ def Receive(sock):
   log('num_bytes = %d', num_bytes)
 
   # +1 for the comma
-  msg, fds = recv_fds(sock, num_bytes + 1, 3)
+  msg, fds = recv_fds(sock, num_bytes, 3)
   log("msg %r, FDs %s", msg, fds)
+
+  byte = sock.recv(1)
+  assert byte == b','
 
   return msg, fds

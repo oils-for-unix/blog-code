@@ -23,7 +23,7 @@ def main(argv):
       '--socket-path', dest='socket_path', default=None,
       help='Socket path to connect to')
   p.add_option(
-      '--socket-pair', dest='socket_pair', default=None,
+      '--socket-pair', dest='socket_pair', default=False, action='store_true',
       help='Create a new socket pair and fork the server')
 
   p.add_option(
@@ -57,12 +57,12 @@ def main(argv):
 
     #fcntl.fcntl(sock.fileno(), fcntl.F_SETFD, fcntl.FD_CLOEXEC)
 
-    child_argv = ['./server.py', str(sock2.fileno())]
+    child_argv = ['./server.py', '--socket-fd', str(sock2.fileno())]
 
     ret = os.fork()
     if ret == 0:
       os.close(sock.fileno())  # close parent end in child
-      log('child pid = %d', os.getpid())
+      log('child/server pid = %d', os.getpid())
       os.execv(child_argv[0], child_argv)
     else:
       os.close(sock2.fileno())  # close child end in parent
@@ -77,7 +77,7 @@ def main(argv):
     try:
       sock.connect(opts.socket_path)
     except socket.error as e:
-      log('error: %s', e)
+      log('connect() error: %s', e)
       sys.exit(1)
 
   else:
@@ -86,7 +86,7 @@ def main(argv):
   master_fd, slave_fd = -1, -1
   try:
     # NUL terminator
-    msg = b'MAIN\0'
+    msg = b'ECMD\0'
 
     if opts.to_file:
       stdout_fd = os.open(opts.to_file, os.O_RDWR | os.O_CREAT)
@@ -101,18 +101,20 @@ def main(argv):
 
     log('stdout_fd = %d', stdout_fd)
 
-    sock.send(b'%d:' % len(msg))  # netstring prefix
+    # Send 2 messages across one connection
+    for i in range(2):
+      sock.send(b'%d:' % len(msg))  # netstring prefix
 
-    # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
-    ancillary = (
-      socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd])
-    )
-    result = sock.sendmsg([msg], [ancillary])
-    log('sendmsg returned %s', result)
+      # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
+      ancillary = (
+        socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd])
+      )
+      result = sock.sendmsg([msg], [ancillary])
+      log('sendmsg returned %s', result)
 
-    sock.send(b',')  # trailing netstring thing
+      sock.send(b',')  # trailing netstring thing
 
-    msg, _ = netstring.Receive(sock)
+      msg, _ = netstring.Receive(sock)
 
   finally:
     log('closing socket')
@@ -126,7 +128,7 @@ def main(argv):
       chunk = os.read(master_fd, 1024)
       if not chunk:
         break
-      log('pty %r', chunk)
+      log('from pty: %r', chunk)
 
 
 if __name__ == '__main__':
