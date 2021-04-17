@@ -53,10 +53,18 @@ def Receive(sock):
   log('num_bytes = %d', num_bytes)
 
   # +1 for the comma
-  msg, fds = recv_fds(sock, num_bytes, 3)
-  log("msg %r, FDs %s", msg, fds)
+  n = num_bytes + 1
 
-  byte = sock.recv(1)
-  assert byte == b','
+  msg = b''
+  fd_list = []
 
-  return msg, fds
+  while True:
+    chunk, fds = recv_fds(sock, n, 3)
+    log("chunk %r  FDs %s", chunk, fds)
+
+    fd_list.extend(fds)
+    msg += chunk
+    if len(msg) == n:
+      break
+
+  return msg, fd_list

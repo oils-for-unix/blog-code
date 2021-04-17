@@ -17,59 +17,70 @@ Usage:
 
      del fd_out[:}
 
+Bindings We Need in the server
+------------------------------
+
+We get --c5po-socket-fd, so we DO NOT need socketpair() 
+We don't need accept(), listen(), etc.
+
+We need to create a socket from an FD.  
+
+# Honestly we don't really need this
+sock = c5po.CreateSocket(fd)
+
+
+msg, descriptors = c5po.Receive(c5po_socket_fd)
+
+fd_out = []
+msg = c5po.Receive(c5po_socket_fd, fd_out)
+
+c5po.Send(c5po_socket_fd, reply)
 
 
 Naming
 ------
 
-osh --c5po-socket /tmp/oil-socket
-
-osh --c5po-descriptors '3 5'
-osh --c5po-socket-pair '3 5'
-
-And then it will do sendmsg / recvmsg on them?
-
-similar to BASH_XTRACE_FD?
-
-
-I want a better name than "Coprocess protocol"
-
-   --copopotoco
-
-   Copotoco protocol
-   Co protocol
-   Cop protocol
-   Copro protocol
-
---unix-coprocess
-
---unix-domain-coproc
-
---control-socket /tmp/oil-123.socket
-
---coprocess-socket /tmp/oil-123.socket
-
-
 C5PO, sort of like C-3PO
 
-"coprocess protocol" has 5 O's
 
 Protocol
 --------
 
-STARTING IT:
+### Invocation
 
-  osh -i --coprocess /tmp/oil.socket
-  osh -i --shellac /tmp/oil.socket
+- client calls socketpair()
+  - fork() the server
+  - then connect the child's stdin/stdout to it?
+  - then exec() the child
+  - then we don't have to worry about concurrent usage?
+    - the parent process OWNS the coprocess?
+
+
+osh -i --c5po-socket-fd=4
+osh -i --c5po-socket-fd 4   # Is the = optional or required?
 
 -i is important so the oshrc is sourced!
+
+
+# LATER:
+osh -i --c5po-socket-path /tmp/oil-socket
+
+similar to BASH_XTRACE_FD?
+
+"coprocess protocol" has 5 O's
+
+
+### C5PO Wire Protocol
 
 REQUEST: (BLOB, [optional list of FDs])
 
 -> BLOB
 
-Blobs are encoded as netstrings.
+Where BLOB is both a netstring.
 
+### C5PO Commands
+
+Blobs are encoded as netstrings.
 
 Two cases:
 
@@ -92,11 +103,14 @@ Two cases:
 
   - COMPLETE -- ECMD 'complete' better?
   - DUMP -- ECMD 'declare -p' might be enough?
-   
-- IEVAL
+  - PARSE or SHPARSE: for auto-suggestions, incomplete command lines, etc.
 
-CO_EVAL == co-proecss eval?
+More comments:
 
+- ENV
+- CD -- change directories?
+  - not supported by default?
+- it's basically a mirror of the process state ?
 
 Typical Client Usage
 --------------------
@@ -106,25 +120,6 @@ A typical entry requires 3 commands: prompt, execute, and dump-state
 ECMD echo ${PS1@P}
 ECMD cd / 
 ECMD dump-state  # this retrieves $?, pwd, etc.
-
-Common snippets
----------------
-
-ECMD echo ${PS1@P}
-
-Notes
------
-
-- should client call socketpair()
-  - fork() it 
-  - then connect the child's stdin/stdout to it?
-  - then exec() the child
-  - does the child need COPROCESS=1 to indicate the mode?
-    - or should it be --coprocess?
-
-- then we don't have to worry about concurren usage?
-  - the parent process OWNS the coprocess?
-
 
 Message Structure
 -----------------
@@ -138,30 +133,11 @@ Message Structure
 - what happens to the descriptors if you call read() or recv() instead of
   recvmsg()?  Do they just disappear?
 
-
 - then it can PARSE the whole payload?
   - like ARGV foo
   - 32:MAIN\0foo.py\0arg\0,
   - should there be another SETENV command?
     - 42:SETENV\0FOO=BAR\BAR=BAZ\0,?
 
-
 - when it's MAIN or ARGV, then the server should get FDs along with it, and
   then do the dup2() dance!  for its own stdin and stdout.
-
-- yes
-
-
-Coprocess Commands
--------------------
-
-- ENV, ARGV, MAIN or something?
-
-- CD -- change directories?
-  - not supported by default?
-
-- it's basically a mirror of the process state ?
-
-
-- for the shell: maybe you should have STATE ARGV or something?
-
