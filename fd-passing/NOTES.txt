@@ -4,18 +4,61 @@ fd-passing
 Tasks
 -----
 
-- Write recvmsg() wrapper in Python 2
+Rename this to py_cp5o
 
-Usage:
+py_cp5o.send()
+py_cp5o.recv()
 
-   fd_out = []
+Naming Idea: FastCLI
+--------------------
 
-   while True:
-     # This does the netstring protocol I think
-     msg = libc.CoprocessRecv(sock, fd_out)
-     ...
+Kind of like FastCGI
 
-     del fd_out[:}
+
+In fact you can recast CGI in this protocol!!!
+
+
+- cp5o: The Unix Coprocess Protocol
+  - it's a TRANSPORT protocol which is a thin layer over Unix Domain Sockets (socketpair() usually)
+  - FastCLI is a set of cp5o commands:
+    - GETPID (maybe: GETCWD for debugging)
+    - CHDIR, SETENV, ARGV -> STATUS 0
+  - HEADLESS SHELL is a set of commands tooo
+    - ECMD (entered command)
+    - PARSE (for completion and autosuggestions, TODO)
+    - osh --c5po
+
+- problem: fastcli is TAKEN
+  - need another catchy name for it
+
+  - how about FCLI
+  - QuickCLI
+    - QCLI
+    - but the Q in QTT means something else -- quoted, typed tables
+  - low latency
+  - typing speed
+- RapidCLI
+- WarmCLI
+
+- flycli -- FlyCLI
+- snapcli
+
+- FastCGI, SCGI
+
+
+- this can ENCOMPASS CGI protocol!
+  - it's kind of like HTTP 2.0 to HTTP 1.1.  The logical structure is the same
+    (argv, env, stdin, stdout, stderr), but the "transport" is changed.
+
+    argv and env go over CONTROL CHANNEL, and stdin/stdout/stderr go over
+    DESCRIPTORS PASSED BETEEEN PROCESSES over that control channel (that Unix
+    domain socket.)
+
+- TODO: really need some diagrams
+  - Technical drawing
+  - should you make them with dot or something?  Or RichardHipp's tool?
+    - need webpipe 2
+
 
 Bindings We Need in the server
 ------------------------------
@@ -35,13 +78,6 @@ fd_out = []
 msg = c5po.Receive(c5po_socket_fd, fd_out)
 
 c5po.Send(c5po_socket_fd, reply)
-
-
-Naming
-------
-
-C5PO, sort of like C-3PO
-
 
 Protocol
 --------
@@ -70,15 +106,33 @@ similar to BASH_XTRACE_FD?
 "coprocess protocol" has 5 O's
 
 
-### C5PO Wire Protocol
+### cp5o Wire Protocol
 
-REQUEST: (BLOB, [optional list of FDs])
+REQUEST: (BLOB, [optional list of FDs]) -> BLOB
 
--> BLOB
+Where BLOB is encoded as netstring.
 
-Where BLOB is both a netstring.
+### cp5o API
 
-### C5PO Commands
+cp5o.send(sock_fd, blob, fd0, fdh, f2) -> bytes written?
+  Can raise IOError
+
+cp5o.receive(sock_fd, fd_out) -> blob
+
+
+TODO: Should this be send/recv, or read/write?
+
+cp5o_get()
+cp5o_put()
+
+cp5o.get()
+cp5o.put()
+
+I think read/write is more traditional
+
+send/recv is also OK
+
+### cp5o Commands
 
 Blobs are encoded as netstrings.
 
@@ -89,7 +143,11 @@ Two cases:
     - Key point: this is STATELESS
     - the shell can wipe thes tae
     - it's like sh -C
-  - what about ENV and CD, etc.
+  - SETENV
+  - CHDIR
+  - GETPWD
+  - GETPID (sanity check)
+- it's basically a mirror of the process state ?
 
 - Stateful Shell
   - ECMD -> OK / FAIL
@@ -105,12 +163,21 @@ Two cases:
   - DUMP -- ECMD 'declare -p' might be enough?
   - PARSE or SHPARSE: for auto-suggestions, incomplete command lines, etc.
 
-More comments:
+### Extensions for Concurrency?
 
-- ENV
-- CD -- change directories?
-  - not supported by default?
-- it's basically a mirror of the process state ?
+You could put a request ID somehwere?
+
+like 
+
+1 ECMD ls /
+
+1 OK
+
+532 ECMD echo hi
+532 OK
+
+533 ECMD (    # This results in a parse error, but is OK
+533 OK
 
 Typical Client Usage
 --------------------
@@ -124,14 +191,7 @@ ECMD dump-state  # this retrieves $?, pwd, etc.
 Message Structure
 -----------------
 
-- Netstrings?
-  - recv() take a number of bytes?
-
-- can it just read(1) until it hits :, and then gets a length
-  - then it will call recvmsg()
-
-- what happens to the descriptors if you call read() or recv() instead of
-  recvmsg()?  Do they just disappear?
+- Netstrings, with the descriptors attached to 'foo' in '3:foo,'
 
 - then it can PARSE the whole payload?
   - like ARGV foo

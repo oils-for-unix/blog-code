@@ -19,7 +19,22 @@ def Encode(s):
   return b'%d:%s,' % (len(s), s)
 
 
-def recv_fds(sock, msglen, maxfds):
+def send(sock, msg, fds=None):
+  fds = fds or []
+
+  sock.send(b'%d:' % len(msg))  # netstring prefix
+
+  # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
+  ancillary = (
+    socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", fds)
+  )
+  result = sock.sendmsg([msg], [ancillary])
+  log('sendmsg returned %s', result)
+
+  sock.send(b',')  # trailing netstring thing
+
+
+def recv_fds_once(sock, msglen, maxfds):
   """From Python docs"""
 
   fds = array.array("i")   # Array of ints
@@ -32,7 +47,7 @@ def recv_fds(sock, msglen, maxfds):
   return msg, list(fds)
 
 
-def Receive(sock):
+def recv(sock):
   len_buf = []
   while True:
     byte = sock.recv(1)
@@ -59,7 +74,7 @@ def Receive(sock):
   fd_list = []
 
   while True:
-    chunk, fds = recv_fds(sock, n, 3)
+    chunk, fds = recv_fds_once(sock, n, 3)
     log("chunk %r  FDs %s", chunk, fds)
 
     fd_list.extend(fds)

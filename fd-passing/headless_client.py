@@ -6,15 +6,14 @@ We're using Python 3 because it supports descriptor passing.
 """
 from __future__ import print_function
 
-import array
 import pty
 import optparse
 import os
 import socket
 import sys
 
-import netstring
-from netstring import log
+import py_cp5o
+from py_cp5o import log
 
 
 def main(argv):
@@ -103,18 +102,9 @@ def main(argv):
 
     # Send 2 messages across one connection
     for i in range(2):
-      sock.send(b'%d:' % len(msg))  # netstring prefix
+      py_cp5o.send(sock, msg, [stdout_fd])
 
-      # Send the FILE DESCRIPTOR with the NETSTRING PAYLOAD
-      ancillary = (
-        socket.SOL_SOCKET, socket.SCM_RIGHTS, array.array("i", [stdout_fd])
-      )
-      result = sock.sendmsg([msg], [ancillary])
-      log('sendmsg returned %s', result)
-
-      sock.send(b',')  # trailing netstring thing
-
-      msg, _ = netstring.Receive(sock)
+      msg, _ = py_cp5o.recv(sock)
 
   finally:
     log('closing socket')
