@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 """
-netstring.py
+py_nuds.py
 """
 from __future__ import print_function
 
@@ -13,10 +13,6 @@ def log(msg, *args):
   if args:
     msg = msg % args
   print(msg, file=sys.stderr)
-
-
-def Encode(s):
-  return b'%d:%s,' % (len(s), s)
 
 
 def send(sock, msg, fds=None):
