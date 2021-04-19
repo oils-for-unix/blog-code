@@ -13,8 +13,8 @@ import socket
 import sys
 import subprocess
 
-import py_cp5o
-from py_cp5o import log
+import py_fanos
+from py_fanos import log
 
 
 def main(argv):
@@ -89,7 +89,7 @@ def main(argv):
   try:
     while True:
       # Note: This can raise various exceptions
-      msg, descriptors = py_cp5o.recv(conn)
+      msg, descriptors = py_fanos.recv(conn)
 
       # Why isn't 'ls' enough?
       p = subprocess.Popen(['ls', '--color=auto'], stdout=descriptors[0])
@@ -102,7 +102,7 @@ def main(argv):
       os.close(descriptors[0])
       log('status = %d', status)
 
-      py_cp5o.send(conn, b'OK')
+      py_fanos.send(conn, b'OK')
       log('')
             
   finally:

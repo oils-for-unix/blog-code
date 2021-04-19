@@ -12,8 +12,8 @@ import os
 import socket
 import sys
 
-import py_cp5o
-from py_cp5o import log
+import py_fanos
+from py_fanos import log
 
 
 def main(argv):
@@ -102,9 +102,9 @@ def main(argv):
 
     # Send 2 messages across one connection
     for i in range(2):
-      py_cp5o.send(sock, msg, [stdout_fd])
+      py_fanos.send(sock, msg, [stdout_fd])
 
-      msg, _ = py_cp5o.recv(sock)
+      msg, _ = py_fanos.recv(sock)
 
   finally:
     log('closing socket')

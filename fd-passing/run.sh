@@ -7,7 +7,7 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
-readonly SOCKET='osh.c5po-socket'
+readonly SOCKET='osh.fanos-socket'
 
 serve() {
   ./server.py --socket-path $SOCKET
