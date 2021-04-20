@@ -70,13 +70,15 @@ def recv(sock, fd_out=None):
       else:
         raise ValueError('Unexpected EOF')
 
-    if i > 0 and byte == b':':  # We got digits and then :
-      break
-
     if b'0' <= byte and byte <= b'9':
       len_buf.append(byte)
     else:
-      raise ValueError('Invalid netstring length byte %r' % byte)
+      break
+
+  if len(len_buf) == 0:
+    raise ValueError('Expected netstring length')
+  if byte != b':':
+    raise ValueError('Expected : after length')
 
   num_bytes = int(b''.join(len_buf))
   #log('num_bytes = %d', num_bytes)

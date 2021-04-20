@@ -34,6 +34,10 @@ class FanosTest(unittest.TestCase):
 
     right.close()
 
+
+class InvalidMessageTests(unittest.TestCase):
+  """COPIED to native/fanos_test.py."""
+
   def testInvalidColon(self):
     left, right = socket.socketpair()
 
@@ -53,6 +57,22 @@ class FanosTest(unittest.TestCase):
     left, right = socket.socketpair()
 
     left.send(b'34')  # EOF in the middle of length
+    left.close()
+    try:
+      msg = py_fanos.recv(right)
+    except ValueError as e:
+      print(type(e))
+      print(e)
+    else:
+      self.fail('Expected failure')
+
+    right.close()
+
+  def testInvalidMissingColon(self):
+    left, right = socket.socketpair()
+
+    left.send(b'34foo')  # missing colon
+
     left.close()
     try:
       msg = py_fanos.recv(right)
