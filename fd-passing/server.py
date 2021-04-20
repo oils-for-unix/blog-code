@@ -89,18 +89,22 @@ def main(argv):
   try:
     while True:
       # Note: This can raise various exceptions
-      msg, descriptors = py_fanos.recv(conn)
+      fd_out = []
+      msg = py_fanos.recv(conn, fd_out=fd_out)
+      if msg is None:
+        break  # valid EOF
 
+      fd = fd_out[0]
       # Why isn't 'ls' enough?
-      p = subprocess.Popen(['ls', '--color=auto'], stdout=descriptors[0])
+      p = subprocess.Popen(['ls', '--color=auto'], stdout=fd)
       status = p.wait()
+      #log('status = %d', status)
 
-      p = subprocess.Popen(['sleep', '1'])
-      status = p.wait()
+      #p = subprocess.Popen(['sleep', '1'])
+      #status = p.wait()
 
       # Close so we don't leak
-      os.close(descriptors[0])
-      log('status = %d', status)
+      os.close(fd)
 
       py_fanos.send(conn, b'OK')
       log('')

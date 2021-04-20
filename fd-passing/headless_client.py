@@ -94,6 +94,7 @@ def main(argv):
       master_fd, slave_fd = os.openpty()
       stdout_fd = slave_fd
       log('master %d slave %d', master_fd, slave_fd)
+      #os.close(slave_fd)
 
     else:
       raise AssertionError()
@@ -104,13 +105,13 @@ def main(argv):
     for i in range(2):
       py_fanos.send(sock, msg, [stdout_fd])
 
-      msg, _ = py_fanos.recv(sock)
+      msg = py_fanos.recv(sock)
+      print('reply %r' % msg)
 
   finally:
     log('closing socket')
     sock.close()
 
-  #os.close(slave_fd)
   if master_fd != -1:
     # This hangs because the server still has the terminal open?  Not sure
     # where to close it.
