@@ -10,7 +10,13 @@
 # exponential-time implementation."
 #
 # Usage:
-#   ./regex-backtrack.sh <function name>
+#   ./compare.sh <function name>
+#
+# Example:
+#   ./compare.sh glob-setup
+#   ./compare.sh glob-backtrack
+#   ./compare.sh fnmatch-backtrack
+#   ./compare.sh regex-backtrack
 
 set -o nounset
 set -o pipefail
@@ -54,24 +60,26 @@ regex-backtrack() {
   local max=${1:-22}
 
   for i in $(seq $max); do
-    local pattern=$(pattern $i)
     local text=$(text $i)
+    local pattern=$(pattern $i)
+    # non-matching performs differently
+    #local pattern=$(pattern $i)b
 
-    time egrep-task "$text" "$pattern"
-    time sed-task "$text" "$pattern"
+    time egrep-task "$text" "$pattern" || echo no
+    time sed-task "$text" "$pattern" || echo no
 
     # Does zsh use libc?  Not sure
-    time libc-task "$text" "$pattern"
-    time zsh-task "$text" "$pattern"
+    time libc-task "$text" "$pattern" || echo no
+    time zsh-task "$text" "$pattern" || echo no
 
-    time gawk-task "$text" "$pattern"
-    time mawk-task "$text" "$pattern"
-    time python-task "$text" "$pattern"
-    time perl-task "$text" "$pattern"
+    time gawk-task "$text" "$pattern" || echo no
+    time mawk-task "$text" "$pattern" || echo no
+    time python-task "$text" "$pattern" || echo no
+    time perl-task "$text" "$pattern" || echo no
 
     # This backtracks, but it's harder to tell than Perl/Python due to
     # startup overhead
-    time js-task "$text" "$pattern"
+    #time js-task "$text" "$pattern"
     echo
   done
 }
@@ -109,10 +117,20 @@ fnmatch-backtrack() {
   # Same for fnmatch(): bash and mksh backtrack
   # osh doesn't
   # but dash and ash somehow don't like 'time shellfunc'?
-
   for sh in ${SHELLS[@]}; do
     echo === $sh
     $sh -c '. ./op-glob.sh; fnmatch_bench'
+  done
+}
+
+ext-fnmatch-backtrack() {
+  # these shells have extended globs
+  for sh in bash mksh osh; do
+    echo === $sh
+    #$sh -c '. ./op-glob.sh; ext_fnmatch_bench "" glob'
+
+    # 2nd workload, doesn't back
+    $sh -c '. ./op-glob.sh; ext_fnmatch_bench "" regex'
   done
 }
 

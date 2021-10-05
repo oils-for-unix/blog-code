@@ -38,6 +38,8 @@ Result: they all have the same behavior.  Is there a better test?
 - `bash` and `mksh` backtrack on glob and fnmatch, but not regex.
   It looks like the project-specific pattern matching algorithms
   backtrack, but the ones delegated to libc don't.
+- 10/2021 update: extended globs always backtrack!  Even when a similar regex
+  or glob doesn't.
 
 ## TODO
 
@@ -61,5 +63,7 @@ Regex:
 
 Other:
 
-- `op-glob`: `glob()` and `fnmatch()` via shell
-
+- `op-glob`
+  - `glob()` and `fnmatch()` via shell
+  - 10/2021 update: extended glob via bash implementation or GNU libc
+    `FNM_EXMATCH` with osh
