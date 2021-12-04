@@ -35,4 +35,9 @@ demo() {
   # also where are the instructions to build?  I guess you need a tarbal
 }
 
+demo2() {
+  # OK this works!  And is very fast.
+  time bwrap --ro-bind _container/rootfs/ / -- sh -c 'echo hi'
+}
+
 "$@"
