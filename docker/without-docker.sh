@@ -44,7 +44,7 @@ show-layers() {
 # TODO: We also need uncompressed sizes.  Is there a way to get that other than
 # untarring?
 
-readonly TASKS=(dummy dev-minimal other-tests)
+readonly TASKS=(dummy dev-minimal other-tests ovm-tarball cpp)
 
 fetch-mine() {
   for task in "${TASKS[@]}"; do
