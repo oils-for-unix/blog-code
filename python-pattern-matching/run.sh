@@ -36,8 +36,21 @@ typed() {
   $PY_310 typed.py
 }
 
+# Change PYTHONPATH to match this for $PY_310
+pythonpath() {
+  python3 -c 'import sys; print(sys.path)'
+}
+
 mypy() {
-  ~/.local/bin/mypy "$@"
+  # we need to run with Python 3.10 for pattern matching
+
+  PYTHONPATH=~/.local/lib/python3.6/site-packages $PY_310 ~/.local/bin/mypy "$@"
+}
+
+# match statement support
+# https://mypy-lang.blogspot.com/2022/03/mypy-0940-released.html
+install-mypy() {
+  pip3 install mypy
 }
 
 readonly REPO_ROOT=~/git/oilshell/oil
@@ -55,6 +68,20 @@ parse-one() {
 syntax-error() {
   parse-one syntax_error.py
 }
+
+check-all() {
+  for p in *.py; do
+    if test "$p" = 'syntax_error.py'; then
+      continue
+    fi
+    echo
+    echo "=== $p ==="
+    echo
+    mypy $p
+  done
+}
+
+
 
 
 "$@"
