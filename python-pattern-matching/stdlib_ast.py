@@ -8,12 +8,13 @@ from __future__ import print_function
 
 import sys
 import ast
-from ast import BinOp, UnaryOp, Constant, Add, Sub, USub
+from ast import expr, Expr, BinOp, UnaryOp, Constant, Add, Sub, USub
 
+from typing import cast
 
 # https://gvanrossum.github.io/docs/PyPatternMatching.pdf
 
-def fact(arg):
+def fact(arg) -> int:
   match arg:
     case 0 | 1:
       f = 1
@@ -22,10 +23,10 @@ def fact(arg):
   return f
 
 
-def mysum(seq):
+def mysum(seq) -> int:
   match seq:
     case []:
-      s = 0
+      s: int = 0
     case [head, *tail]:
       s = head + mysum(tail)
   return s
@@ -35,7 +36,7 @@ def mysum(seq):
 #
 # Hm this depends on __match_args__ ?  Is it set in the ast module nodes?
 
-def simplify(node):
+def simplify(node) -> expr:
   match node:
     case BinOp(Constant(left), Add(), Constant(right)):
       return Constant(left + right)
@@ -47,7 +48,7 @@ def simplify(node):
       return node
 
 
-def main(argv):
+def main(argv) -> None:
   print('Hello from demo.py')
 
   print(fact(6))
@@ -56,14 +57,22 @@ def main(argv):
 
   # Test out all the optimizations
   for code_str in ['3 + 4', '3 - 0', '- - 5']:
-    print('     %s' % code_str)
+    print('   %s' % code_str)
 
     module = ast.parse(code_str)
-    expr = module.body[0].value
+    print(ast.dump(module))
 
-    print(ast.dump(expr))
-    opt = simplify(expr)
-    print('     => optimized')
+    # unwrap the expression
+    stmt = module.body[0]
+    e = cast(Expr, stmt).value
+
+    print('   AST')
+    print(ast.dump(e))
+
+    opt = simplify(e)
+
+    print()
+    print(' => optimized')
     print(opt)
     print(ast.dump(opt))
 
