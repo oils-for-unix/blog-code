@@ -8,3 +8,6 @@ Bug
   evaluation](https://unix.stackexchange.com/questions/172103/security-implications-of-using-unsanitized-data-in-shell-arithmetic-evaluation/172109#172109)
   by Stéphane Chazelas on StackOverflow
 
+I mentioned this in my 2019 BayLISA talk:
+
+- [A Story About a 30-Year Old Security Problem](https://www.oilshell.org/blog/2019/01/18.html#a-story-about-a-30-year-old-security-problem)
