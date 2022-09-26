@@ -44,13 +44,23 @@ show-layers() {
 # TODO: We also need uncompressed sizes.  Is there a way to get that other than
 # untarring?
 
-readonly TASKS=(dummy dev-minimal other-tests ovm-tarball cpp clang)
+readonly TASKS=(dummy dev-minimal other-tests ovm-tarball cpp clang pea)
 
 fetch-mine() {
   for task in "${TASKS[@]}"; do
     ./registry.sh latest-manifest oilshell/soil-$task
   done
 }
+
+# TODO:
+# - Pick out "config" field of manifest.json
+# - Fetch that
+# - And then it has all the comments
+# - Make a TSV file
+#   - image_id, tag, layer digest, layer size, created_at, created_by ?
+# - and then you can find:
+#   - total size of each image
+#   - total size of all layers
 
 my-sizes() {
   local task=${1:-dummy}
