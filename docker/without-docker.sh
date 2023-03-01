@@ -44,12 +44,17 @@ show-layers() {
 # TODO: We also need uncompressed sizes.  Is there a way to get that other than
 # untarring?
 
-readonly TASKS=(dummy dev-minimal other-tests ovm-tarball cpp clang pea)
+my-images() {
+  local out=$PWD/_tmp/my-images.txt
+  pushd ~/git/oilshell/oil
+  deps/images.sh list-images | tee $out
+  popd
+}
 
 fetch-mine() {
-  for task in "${TASKS[@]}"; do
-    ./registry.sh latest-manifest oilshell/soil-$task
-  done
+  while read task; do
+    ./registry.sh fetch-manifest oilshell/soil-$task
+  done < _tmp/my-images.txt
 }
 
 # TODO:
@@ -62,23 +67,28 @@ fetch-mine() {
 #   - total size of each image
 #   - total size of all layers
 
+sum-first-col() {
+  awk '
+      { sum += $1 }
+  END { printf("%.1f MB\n", sum / 1000000) }
+  '
+}
+
 my-sizes() {
   local task=${1:-dummy}
 
   #./my-docker.sh sizes library/alpine
 
-
-  for task in "${TASKS[@]}"; do
+  while read task; do
 
     echo $task
-    echo -----
 
-    ./registry.sh sizes _tmp/oilshell/soil-$task/manifest.json | commas
+    #./registry.sh sizes _tmp/oilshell/soil-$task/manifest.json | commas
     # sum it
-    ./registry.sh sizes _tmp/oilshell/soil-$task/manifest.json | pysum 1 | commas
+    ./registry.sh sizes _tmp/oilshell/soil-$task/manifest.json | sum-first-col
 
     echo
-  done
+  done < _tmp/my-images.txt
 
   # Compressed sizes from registry
   #

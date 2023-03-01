@@ -93,7 +93,7 @@ pull() {
 # - Get debian:buster-slim ?  That's a different label?
 # - Get history of uploads, not just the latest ones?
 
-latest-manifest() {
+fetch-manifest() {
   local image="${1:-library/golang}"
 
   # TODO: can we cache these?
