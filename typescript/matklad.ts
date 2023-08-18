@@ -175,11 +175,11 @@ function infer_types(expr: Expr<void>): Expr<Type> {
 function result_type(op: BinaryOp, location: Location): Type {
   switch(op) {
     case BinaryOp.Add:
-      return TypeInt;
+      return {tag: "int"}
     case BinaryOp.Eq:
-      return TypeBool;
+      return {tag: "bool"};
     default:
-      return {"tag": "Error", location, message: "oops"};
+      return {tag: "Error", location, message: "oops"};
   }
 }
 
@@ -187,7 +187,7 @@ function result_type(op: BinaryOp, location: Location): Type {
 
 var loc = {"file": "foo.lang", line: 1, column: 1};
 
-var expr = {"location": loc, data: undefined, kind: {tag: "bool", value: true }};
+var expr = {location: loc, data: undefined, kind: {tag: "bool", value: true }};
 
 var t = infer_types(expr);
 
