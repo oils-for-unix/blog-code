@@ -98,7 +98,13 @@ function result_type(op: BinaryOp, location: Location): Type {
 }
 
 function type_equal(lhs: Type, rhs: Type): boolean {
-  if (lhs.tag == "Error" || rhs.tag == "Error") return true;
+  if (lhs.tag == "Error" || rhs.tag == "Error") {
+    return false;
+
+    // Original code assigned a type to parent expression even if subexpression
+    // had an error
+    // return true;
+  }
   return lhs.tag == rhs.tag;
 }
 
@@ -119,15 +125,11 @@ function infer_types(expr: Expr<void>): Expr<Type> {
       };
 
     case "binary": {
-      const kind: ExprBinary<Type> = {
-        tag: "binary",
-        op: expr.kind.op,
-        lhs: infer_types(expr.kind.lhs),
-        rhs: infer_types(expr.kind.rhs),
-      };
+      var lhs = infer_types(expr.kind.lhs);
+      var rhs = infer_types(expr.kind.rhs);
 
       var err: Type | undefined = undefined;
-      if (!type_equal(kind.lhs.typ, kind.rhs.typ)) {
+      if (!type_equal(lhs.typ, rhs.typ)) {
         err = {
           tag: "Error",
           location: expr.location,
@@ -137,28 +139,30 @@ function infer_types(expr: Expr<void>): Expr<Type> {
 
       return {
         location: expr.location,
-        typ: err || result_type(kind.op, expr.location),
-        kind: kind,
+        typ: err || result_type(expr.kind.op, expr.location),
+        kind: {
+          tag: "binary",
+          op: expr.kind.op,
+          lhs: lhs,
+          rhs: rhs,
+        }
       };
     }
 
     case "if": {
-      const kind: ExprIf<Type> = {
-        tag: "if",
-        cond: infer_types(expr.kind.cond),
-        then_branch: infer_types(expr.kind.then_branch),
-        else_branch: infer_types(expr.kind.else_branch),
-      };
+      var cond = infer_types(expr.kind.cond);
+      var then_branch = infer_types(expr.kind.then_branch);
+      var else_branch = infer_types(expr.kind.else_branch);
 
       var err: Type | undefined = undefined;
-      if (!type_equal(kind.cond.typ, MyBool)) {
+      if (!type_equal(cond.typ, MyBool)) {
         err = {
           tag: "Error",
           location: expr.location,
           message: "if condition is not a boolean",
         };
       }
-      if (!type_equal(kind.then_branch.typ, kind.else_branch.typ)) {
+      if (!type_equal(then_branch.typ, else_branch.typ)) {
         err = {
           tag: "Error",
           location: expr.location,
@@ -168,9 +172,14 @@ function infer_types(expr: Expr<void>): Expr<Type> {
 
       return {
         location: expr.location,
-        typ: err || kind.then_branch.typ,
-        kind: kind,
-      };
+        typ: err || then_branch.typ,
+        kind: {
+          tag: "if",
+          cond: cond,
+          then_branch: then_branch,
+          else_branch: else_branch,
+        }
+      }
     }
   }
 }
@@ -214,4 +223,14 @@ console.log(t.typ);
 // if (true) { true } else { 42 }
 var if_bad = make_expr({tag: "if", cond: b, then_branch: b, else_branch: i})
 var t = infer_types(if_bad);
+console.log(t.typ);
+
+// if (true) { true } else { true + 42 }
+var else_bad = make_expr({tag: "if", cond: b, then_branch: b, else_branch: b_plus_i})
+var t = infer_types(else_bad);
+console.log(t.typ);
+
+// 42 + (true + 42)
+var r_bad = make_expr({tag: "binary", op: BinaryOp.Add, lhs: i, rhs: b_plus_i});
+var t = infer_types(r_bad);
 console.log(t.typ);
