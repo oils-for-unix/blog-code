@@ -1,45 +1,45 @@
-export interface Location {
+interface Location {
   file: string;
   line: number;
   column: number;
 }
 
-export interface Expr<T> {
+interface Expr<T> {
   location: Location;
   data: T;
   kind: ExprKind<T>;
 }
 
-export interface ExprLiteral<T, V, Tag> {
+interface ExprLiteral<T, V, Tag> {
   tag: Tag;
   value: V;
 }
 
-export type ExprBool<T> = ExprLiteral<T, boolean, "bool">;
-export type ExprInt<T> = ExprLiteral<T, number, "int">;
+type ExprBool<T> = ExprLiteral<T, boolean, "bool">;
+type ExprInt<T> = ExprLiteral<T, number, "int">;
 
-export type ExprKind<T> =
+type ExprKind<T> =
   | ExprBool<T>
   | ExprInt<T>
   | ExprBinary<T>
   | ExprControl<T>;
 
-export interface ExprBinary<T> {
+interface ExprBinary<T> {
   tag: "binary";
   op: BinaryOp;
   lhs: Expr<T>;
   rhs: Expr<T>;
 }
 
-export enum BinaryOp {
+enum BinaryOp {
   Add, Sub, Mul, Div,
   Eq, Neq,
   Lt, Gt, Le, Ge,
 }
 
-export type ExprControl<T> = ExprIf<T>;
+type ExprControl<T> = ExprIf<T>;
 
-export interface ExprIf<T> {
+interface ExprIf<T> {
   tag: "if";
   cond: Expr<T>;
   then_branch: Expr<T>;
@@ -63,14 +63,14 @@ interface TypeInt {
 const TypeInt: TypeInt = { tag: "int" };
 
 
-export type Visitor<T, R> = {
+type Visitor<T, R> = {
   bool(kind: ExprBool<T>): R;
   int(kind: ExprInt<T>): R;
   binary(kind: ExprBinary<T>, location: Location): R;
   if(kind: ExprIf<T>, location: Location): R;
 };
 
-export function visit<T, R>(
+function visit<T, R>(
   expr: Expr<T>,
   v: Visitor<T, R>,
 ): R {
@@ -82,7 +82,7 @@ export function visit<T, R>(
   }
 }
 
-export function transform<U, V>(expr: Expr<U>, v: Visitor<V, V>): Expr<V> {
+function transform<U, V>(expr: Expr<U>, v: Visitor<V, V>): Expr<V> {
   switch (expr.kind.tag) {
     case "bool":
       return {
@@ -183,13 +183,41 @@ function result_type(op: BinaryOp, location: Location): Type {
   }
 }
 
-//var t = infer_types( {"tag": "bool", value: true } );
-
 var loc = {"file": "foo.lang", line: 1, column: 1};
 
-var expr = {location: loc, data: undefined, kind: {tag: "bool", value: true }} as const;
+function make_expr(kind: ExprKind<void>) {
+  return {location: loc, data: undefined, kind: kind};
+}
 
-var t = infer_types(expr);
 
-//var t = infer_types( {"tag": "bool", value: true } );
+var b = {location: loc, data: undefined, kind: {tag: "bool", value: true }} as const;
+
+var t = infer_types(b);
 console.log(t);
+
+var i = make_expr({tag: "int", value: 42 })
+
+var t = infer_types(i);
+console.log(t);
+
+// true + 42
+var b_plus_i = make_expr({tag: "binary", op: BinaryOp.Add, lhs: b, rhs: i })
+
+var t = infer_types(b_plus_i);
+console.log(t);
+
+// if (42) { true } else { true }
+var if_1 = make_expr({tag: "if", cond: i, then_branch: b, else_branch: b})
+var t = infer_types(if_1);
+console.log(t);
+
+// if (true) { true } else { true }
+var if_true = make_expr({tag: "if", cond: b, then_branch: b, else_branch: b})
+var t = infer_types(if_true);
+console.log(t);
+
+// if (true) { true } else { 42 }
+var if_bad = make_expr({tag: "if", cond: b, then_branch: b, else_branch: i})
+var t = infer_types(if_bad);
+console.log(t);
+
