@@ -17,11 +17,11 @@ hi() {
 
 # https://matklad.github.io/2023/08/17/typescript-is-surprisingly-ok-for-compilers.html
 matklad() {
-  time deno run matklad.ts
+  time deno check matklad.ts
 
   echo --
 
-  time deno check matklad.ts
+  time deno run matklad.ts
 }
 
 "$@"

@@ -182,3 +182,14 @@ function result_type(op: BinaryOp, location: Location): Type {
       return {"tag": "Error", location, message: "oops"};
   }
 }
+
+//var t = infer_types( {"tag": "bool", value: true } );
+
+var loc = {"file": "foo.lang", line: 1, column: 1};
+
+var expr = {"location": loc, data: undefined, kind: {tag: "bool", value: true }};
+
+var t = infer_types(expr);
+
+//var t = infer_types( {"tag": "bool", value: true } );
+console.log(t);
