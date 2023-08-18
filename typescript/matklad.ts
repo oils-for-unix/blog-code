@@ -187,7 +187,7 @@ function result_type(op: BinaryOp, location: Location): Type {
 
 var loc = {"file": "foo.lang", line: 1, column: 1};
 
-var expr = {location: loc, data: undefined, kind: {tag: "bool", value: true }};
+var expr = {location: loc, data: undefined, kind: {tag: "bool", value: true }} as const;
 
 var t = infer_types(expr);
 
