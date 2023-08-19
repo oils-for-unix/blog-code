@@ -7,6 +7,56 @@ Type Checking in TypeScript
 - `bool-int-andy.ts` - Remove visitor, and report multiple errors with 'errors'
   out param.
 
+## Components
+
+- Syntax in the style of Scheme, more specifically Norvig's lis.py (begin,
+  set!), with Clojure [] sugar
+
+- Lexer in the style of Oils
+  - TODO: Lexer modes!
+
+- Parser and error messages in the style of Oils 
+  - Errors: unbalanced ()
+
+- "Transformer" in the style of CPython
+  - Errors: Arity of `if` and `+`
+
+- Type Inference (and checking) from matklad 
+  - errors:
+    - binary operands must have same type
+    - if condition is boolean
+    - then else must have same type
+
+- Type system: Str, Bool, Num, List (heterogeneous)
+  - this makes it homoiconic?  for NON
+
+  - Num is floating point, so we can do something arguably non-boring:
+    mandelbort (not just fibonacci)
+
+- Evaluator from lis.py
+  - scoping
+
+- Compiler!
+  - translator to C++
+  - begin, set! should be OK I think ?
+
+- Runtime
+  - Garbage collector for List?
+  - Tagged pointers?
+  - Small string?
+
+Later components:
+
+- Explicit typing
+  - casting?
+
+- Data language with proper string literals, and maybe float literals:  NON,
+  Nerd Object Notation
+  - See "Shape of Data" from Jamie Brandon
+
+- Comptime evaluation?  And then bundle the whole thing into a single text file
+  program?
+
 ## TODO
 
 - DONE Add a better syntax for testing
@@ -164,3 +214,6 @@ it's important to tame them.
 - Yaks
   - YDN -- Yaks Data Notation
   - I want to illustrate the principle of a data notation
+- Nerd: because I was nerd-sniped!
+
+

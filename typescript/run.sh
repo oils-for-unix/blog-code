@@ -23,6 +23,16 @@ hi() {
   time deno run hi.ts
 }
 
+readonly NERD_FILES='header.ts lex.ts parse.ts'
+
+fmt() {
+  deno fmt --single-quote $NERD_FILES tests.ts
+}
+
+lint() {
+  deno lint $NERD_FILES tests.ts
+}
+
 check-run() {
   local name=$1
 
@@ -42,8 +52,8 @@ bool-int-andy-test() {
   check-run bool-int-andy-test
 }
 
-parse-test() {
-  check-run parse-test
+tests() {
+  check-run tests
 }
 
 count() {
@@ -51,7 +61,7 @@ count() {
   echo
 
   # The production code
-  wc -l header.ts lex.ts parse.ts
+  wc -l $NERD_FILES
 }
 
 "$@"

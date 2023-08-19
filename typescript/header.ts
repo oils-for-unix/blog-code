@@ -1,14 +1,21 @@
 // Lexer -> [Token] -> Parser
 
-export type Id = 'lparen' | 'rparen' | 'lbrack' | 'rbrack' | 'bool' | 'int' |
-  'str' | 'eof';
+export type Id =
+  | 'lparen'
+  | 'rparen'
+  | 'lbrack'
+  | 'rbrack'
+  | 'bool'
+  | 'int'
+  | 'str'
+  | 'eof';
 
 export interface Token {
   id: Id;
-  start: number;  // 3
-  len: number;  // 1
-  source: string;  // Use the whole program for now
-                   // Avoid string allocations unless we need them
+  start: number; // 3
+  len: number; // 1
+  source: string; // Use the whole program for now
+  // Avoid string allocations unless we need them
 }
 
 // Parser -> [Node] -> Transformer
@@ -19,26 +26,26 @@ interface SyntaxError {
 }
 
 export interface Bool {
-  id: "bool";
+  id: 'bool';
   value: boolean;
-  loc: number,
+  loc: number;
 }
 
 export interface Int {
   id: 'int';
   value: number;
-  loc: number,
+  loc: number;
 }
 
 export interface Str {
-  id: "str";
+  id: 'str';
   value: string;
-  loc: number,
+  loc: number;
 }
 
 // (== 5 (+ 2 3))
 export interface List {
-  name: string,
+  name: string;
   loc: number;
   children: Node[];
 }
@@ -48,4 +55,11 @@ export type Node = Bool | Int | Str | List;
 // Transformer -> [Expr] -> Type Checker
 
 export interface Expr {
+}
+
+interface ExprIf<T> {
+  tag: 'if';
+  cond: Expr;
+  then: Expr;
+  else: Expr;
 }

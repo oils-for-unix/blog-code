@@ -18,10 +18,8 @@ function repeatString(s: string, n: number) {
   puts(out);
 }
 
-
 // Returns the position of the newline, or -1
 function findStartOfLine(s: string, blame_pos: number): [number, number] {
-
   var pos = -1;
   var line_num = 1;
 
@@ -42,8 +40,8 @@ function findStartOfLine(s: string, blame_pos: number): [number, number] {
 }
 
 function parseDemo(s: string) {
-  log('')
-  log('===========')
+  log('');
+  log('===========');
   log('PROGRAM ' + s);
   var tokens = lex(s);
 
@@ -51,9 +49,9 @@ function parseDemo(s: string) {
   //log(tokens);
 
   try {
-    var tree = parse(tokens)
+    var tree = parse(tokens);
   } catch (e) {
-    log('  PARSE ERROR')
+    log('  PARSE ERROR');
     log(e);
 
     var blame_tok = tokens[e.pos];
@@ -78,7 +76,7 @@ function parseDemo(s: string) {
     repeatString(' ', col);
 
     // Point to column
-    var n = max(blame_tok.len, 1);  // EOF is zero in length
+    var n = max(blame_tok.len, 1); // EOF is zero in length
     repeatString('^', n);
 
     puts('\n');
@@ -89,45 +87,45 @@ function parseDemo(s: string) {
     return;
   }
 
-  log('')
+  log('');
   log('  READ');
   log(tree);
 }
 
 function runTests() {
-  parseDemo('define')
-  parseDemo('(define)')
-  parseDemo('42')
+  parseDemo('define');
+  parseDemo('(define)');
+  parseDemo('42');
   parseDemo('(+ 5 6)');
   parseDemo('(== 11 (+ 5 6))');
-  parseDemo('(fn [x] (+ x 1))')
+  parseDemo('(fn [x] (+ x 1))');
 
   // Incomplete
-  parseDemo('(+ 42')
+  parseDemo('(+ 42');
 
   // Too many
-  parseDemo('(+ 42) oops')
+  parseDemo('(+ 42) oops');
 
-  parseDemo(']')
+  parseDemo(']');
 
   // String after (
-  parseDemo('( ] )')
+  parseDemo('( ] )');
 
   // Unbalanced
-  parseDemo('(fn [x) )')
+  parseDemo('(fn [x) )');
 
   parseDemo(`
   (define fib [x]
-    (+ x 42))]
-  `)
+    (+ x 42) ]
+  `);
 
   return;
-  console.log('-----------')
-  var t = lex('(+ 42 23 define true)')
+  console.log('-----------');
+  var t = lex('(+ 42 23 define true)');
   console.log(t);
 
-  console.log('-----------')
-  var t = lex('# comment\n hello\n #comment')
+  console.log('-----------');
+  var t = lex('# comment\n hello\n #comment');
   console.log(t);
 }
 

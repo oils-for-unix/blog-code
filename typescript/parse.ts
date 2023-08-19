@@ -1,4 +1,4 @@
-import { Token, Bool, Int, Str, List, Node } from './header.ts';
+import { Bool, Int, List, Node, Str, Token } from './header.ts';
 
 var log = console.log;
 
@@ -7,8 +7,8 @@ function tokenValue(tok: Token) {
 }
 
 interface Parser {
-  tokens: Token[],
-  pos: number,
+  tokens: Token[];
+  pos: number;
   current: Token;
 }
 
@@ -30,7 +30,7 @@ function next(p: Parser) {
 export function parseNode(p: Parser): Node {
   switch (p.current.id) {
     case 'eof':
-      throw {message: 'Unexpected end of file', pos: p.pos};
+      throw { message: 'Unexpected end of file', pos: p.pos };
 
     case 'lparen':
       return parseList(p, 'rparen');
@@ -39,63 +39,63 @@ export function parseNode(p: Parser): Node {
       return parseList(p, 'rbrack');
 
     case 'rparen':
-      throw {message: 'Unexpected )', pos: p.pos};
+      throw { message: 'Unexpected )', pos: p.pos };
 
     case 'rbrack':
-      throw {message: 'Unexpected ]', pos: p.pos};
+      throw { message: 'Unexpected ]', pos: p.pos };
 
     case 'bool': {
       let value = p.current.source[p.current.start] === 't';
-      let b: Bool = {id: 'bool', value, loc: p.pos};
+      let b: Bool = { id: 'bool', value, loc: p.pos };
       next(p);
-      return b ;
+      return b;
     }
 
     case 'int': {
       let value = parseInt(tokenValue(p.current));
-      let i: Int = {id: 'int', value, loc: p.pos}
+      let i: Int = { id: 'int', value, loc: p.pos };
       next(p);
       return i;
     }
 
     case 'str': {
-      let s: Str = {id: 'str', value: tokenValue(p.current), loc: p.pos}
+      let s: Str = { id: 'str', value: tokenValue(p.current), loc: p.pos };
       next(p);
       return s;
     }
 
     default:
       //log('tok ' + JSON.stringify(p.current))
-      throw new Error('ASSERT: Unexpected ID ' + p.current.id)
+      throw new Error('ASSERT: Unexpected ID ' + p.current.id);
   }
 }
 
 function parseList(p: Parser, end_id: string): List {
-  next(p);  // eat (
+  next(p); // eat (
 
   if (p.current.id !== 'str') {
-    throw {message: 'Expected string after (', pos: p.pos};
+    throw { message: 'Expected string after (', pos: p.pos };
   }
-  var node: Node = {name: tokenValue(p.current), loc: p.pos, children: []};
-  next(p);  // move past head
+  var node: Node = { name: tokenValue(p.current), loc: p.pos, children: [] };
+  next(p); // move past head
 
   while (p.current.id !== end_id) {
     //log('p.current.id ' + p.current.id);
     node.children.push(parseNode(p));
   }
-  next(p);  // eat rparen / rbrack
+  next(p); // eat rparen / rbrack
 
   return node;
 }
 
 export function parse(tokens: Token[]): Node {
-  var p = {tokens, pos: 0, current: tokens[0]}
+  var p = { tokens, pos: 0, current: tokens[0] };
   var node = parseNode(p);
 
   // We only parse one expression
   if (p.current.id !== 'eof') {
     //throw new Error('Extra token ' + p.current.id);
-    throw {message: `Extra token ${p.current.id} at ${p.pos}`, pos: p.pos};
+    throw { message: `Extra token ${p.current.id} at ${p.pos}`, pos: p.pos };
   }
 
   return node;
