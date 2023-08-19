@@ -113,10 +113,23 @@ it's important to tame them.
 ## List of Errors
 
 - Lexing -- there are no errors
-- Parsing -- matching `() []`, EOF, etc.
+- Reading -- matching `() []`, EOF, etc.
 - Transforming -- `if` and `+` have right arity
-- Type checking -- `+` has right args, etc.
+- Inference / Type checking -- `+` has right args, etc.
 - Runtime -- 1/0
+
+## Notes on Stages
+
+- Lexing: use regex for exhaustive reasoning.
+  - Weird JavaScript API, "sticky bit"
+- Reading: important to write out the grammar!
+  - Added [] synonym for (), allowing Clojure-like sugar
+- Why separate reading and parsing?
+  - CPython has parser and transformer
+    - homogeneous -> heterogeneous tree (untyped or "tagged" with dynamic type,
+      to TYPED)
+  - Matklad's type inference code operated on a heterogeneous
+  - "Reader" will be useful for JSON
 
 ## Notes on TypeScript
 
@@ -124,3 +137,30 @@ it's important to tame them.
   - I can see the tokens and the trees!
   - color from Deno is nice
   - Oils is going to be like this !!!
+
+- Inference of types from JSON-like object literals is fairly pleasant
+  - reminds me of Zig's type inference of anonymous struct literals
+
+
+## Work Log
+
+- Friday:
+  - install Deno, copy code and fix typos, get it to run
+  - got help on inference,
+  - remove visitor, report multiple type errors.
+  - add test cases
+- Saturday:
+  - Write lexer and "reader", with precise location information.  Many tests.
+
+
+## Naming Ideas
+
+- Statick
+- Licks
+- Lycks
+- Slicks
+- Statyck
+- Yack
+- Yaks
+  - YDN -- Yaks Data Notation
+  - I want to illustrate the principle of a data notation

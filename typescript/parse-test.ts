@@ -1,4 +1,5 @@
-import { lex, read } from './parse.ts';
+import { lex } from './lex.ts';
+import { parse } from './parse.ts';
 
 const log = console.log;
 
@@ -39,7 +40,7 @@ function findStartOfLine(s: string, blame_pos: number): [number, number] {
   }
 }
 
-function readDemo(s: string) {
+function parseDemo(s: string) {
   log('')
   log('===========')
   log('PROGRAM ' + s);
@@ -49,7 +50,7 @@ function readDemo(s: string) {
   //log(tokens);
 
   try {
-    var tree = read(tokens)
+    var tree = parse(tokens)
   } catch (e) {
     log('  PARSE ERROR')
     log(e);
@@ -93,28 +94,28 @@ function readDemo(s: string) {
 }
 
 function runTests() {
-  readDemo('define')
-  readDemo('(define)')
-  readDemo('42')
-  readDemo('(+ 5 6)');
-  readDemo('(== 11 (+ 5 6))');
-  readDemo('(fn [x] (+ x 1))')
+  parseDemo('define')
+  parseDemo('(define)')
+  parseDemo('42')
+  parseDemo('(+ 5 6)');
+  parseDemo('(== 11 (+ 5 6))');
+  parseDemo('(fn [x] (+ x 1))')
 
   // Incomplete
-  readDemo('(+ 42')
+  parseDemo('(+ 42')
 
   // Too many
-  readDemo('(+ 42) oops')
+  parseDemo('(+ 42) oops')
 
-  readDemo(']')
+  parseDemo(']')
 
   // String after (
-  readDemo('( ] )')
+  parseDemo('( ] )')
 
   // Unbalanced
-  readDemo('(fn [x) )')
+  parseDemo('(fn [x) )')
 
-  readDemo(`
+  parseDemo(`
   (define fib [x]
     (+ x 42))]
   `)

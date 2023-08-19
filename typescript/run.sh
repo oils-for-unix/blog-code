@@ -51,7 +51,7 @@ count() {
   echo
 
   # The production code
-  wc -l parse.ts
+  wc -l header.ts lex.ts parse.ts
 }
 
 "$@"
