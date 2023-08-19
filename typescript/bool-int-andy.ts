@@ -64,7 +64,7 @@ interface TypeInt {
 }
 const MyInt: TypeInt = { tag: "int" };
 
-interface TypeError {
+export interface TypeError {
   tag: "Error";
   location: Location;
   message: string;
@@ -106,7 +106,7 @@ function type_equal(lhs: Type, rhs: Type): boolean {
   return lhs.tag == rhs.tag;
 }
 
-export function infer_types(expr: Expr<void>): Expr<Type> {
+export function infer_types(expr: Expr<void>, errors: TypeError[]): Expr<Type> {
   switch (expr.kind.tag) {
     case "bool":
       return {
@@ -123,21 +123,22 @@ export function infer_types(expr: Expr<void>): Expr<Type> {
       };
 
     case "binary": {
-      var lhs = infer_types(expr.kind.lhs);
-      var rhs = infer_types(expr.kind.rhs);
+      var lhs = infer_types(expr.kind.lhs, errors);
+      var rhs = infer_types(expr.kind.rhs, errors);
 
-      var err: Type | undefined = undefined;
+      var ok = true;
       if (!type_equal(lhs.typ, rhs.typ)) {
-        err = {
+        errors.push({
           tag: "Error",
           location: expr.location,
           message: "binary expression operands have different types",
-        };
+        });
+        ok = false;
       }
 
       return {
         location: expr.location,
-        typ: err || result_type(expr.kind.op, expr.location),
+        typ: ok ? result_type(expr.kind.op, expr.location) : errors[0],
         kind: {
           tag: "binary",
           op: expr.kind.op,
@@ -148,29 +149,31 @@ export function infer_types(expr: Expr<void>): Expr<Type> {
     }
 
     case "if": {
-      var cond = infer_types(expr.kind.cond);
-      var then_branch = infer_types(expr.kind.then_branch);
-      var else_branch = infer_types(expr.kind.else_branch);
+      var cond = infer_types(expr.kind.cond, errors);
+      var then_branch = infer_types(expr.kind.then_branch, errors);
+      var else_branch = infer_types(expr.kind.else_branch, errors);
 
-      var err: Type | undefined = undefined;
+      var ok = true;
       if (!type_equal(cond.typ, MyBool)) {
-        err = {
+        errors.push({
           tag: "Error",
           location: expr.location,
           message: "if condition is not a boolean",
-        };
+        });
+        ok = false;
       }
       if (!type_equal(then_branch.typ, else_branch.typ)) {
-        err = {
+        errors.push({
           tag: "Error",
           location: expr.location,
           message: "if branches have different types",
-        };
+        });
+        ok = false;
       }
 
       return {
         location: expr.location,
-        typ: err || then_branch.typ,
+        typ: ok ? then_branch.typ : errors[0],
         kind: {
           tag: "if",
           cond: cond,

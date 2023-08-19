@@ -39,6 +39,10 @@ matklad-test() {
   check-run matklad-test
 }
 
+bool-int-andy-test() {
+  check-run bool-int-andy-test
+}
+
 andy-test() {
   sed 's/matklad/bool-int-andy/' matklad-test.ts > bool-int-andy-test.ts
 
