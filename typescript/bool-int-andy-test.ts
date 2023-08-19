@@ -1,7 +1,9 @@
 // Imported module must be string literal
 import { infer_types, ExprKind, BinaryOp, Expr, Type, TypeError } from './bool-int-andy.ts';
 
-import { parse, tokenize } from './parse.ts';
+import { lex, parse } from './parse.ts';
+
+const log = console.log;
 
 //
 // Test
@@ -26,8 +28,8 @@ function runCase(s: string, ex: Expr<void>) {
 }
 
 function parseDemo(s: string) {
-  var tokens = tokenize(s);
-  console.log(tokens);
+  log("PARSE");
+  var tokens = lex(s);
   try {
     var tree = parse(tokens)
   } catch (e) {
@@ -77,6 +79,15 @@ function run_tests() {
   parseDemo('define')
   parseDemo('42')
   parseDemo('(+ 1 2)');
+  parseDemo('(== 3 (+ 1 2))');
+
+  console.log('-----------')
+  var t = lex('(+ 42 23 define true)')
+  console.log(t);
+
+  console.log('-----------')
+  var t = lex('# comment\n hello\n #comment')
+  console.log(t);
 }
 
 run_tests();
