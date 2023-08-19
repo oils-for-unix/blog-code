@@ -28,7 +28,7 @@ You would have to use the Y combinator, but maybe we can do without it:
 ```lisp
 (begin
   # Using syntax from book ?
-  (deftype fib (-> (number) number)
+  (deftype fib (-> [number] number)
 
   (define fib
     (lambda [n]
@@ -81,8 +81,23 @@ But the reader is worth comparing.
 
 - Types and Programming Languages, e.g. Chapter 11 Lambda Calculus
   - Doesn't have examples!
+  - No parser!  Hard to write tests!
+
 - Dragon Book: Shockingly, doesn't have code for a type checker!
   - Somehow I didn't realize this for awhile
 
 - TODO: look at Essentials of Programming Languages?
   - Does not have parser?
+
+ 
+## Fiddly Things I learned from Oils
+
+- Representing Tokens, location info
+- Lexer modes for ""
+- Writing down the grammar first, then writing the recursive descent parser
+  - errors should "fall out" cleanly
+
+General them is "exhaustive reasoning" -- languages have many conditionals, and
+it's important to tame them.
+
+

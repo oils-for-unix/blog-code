@@ -28,14 +28,23 @@ function runCase(s: string, ex: Expr<void>) {
 }
 
 function parseDemo(s: string) {
-  log("PARSE");
+  log('')
+  log('===========')
+  log('PROGRAM ' + s);
   var tokens = lex(s);
+
+  log('  LEX');
+  log(tokens);
+
   try {
     var tree = parse(tokens)
   } catch (e) {
     console.log(e);
     return;
   }
+
+  log('')
+  log('  PARSE');
   console.log(tree);
 }
 
@@ -77,9 +86,21 @@ function run_tests() {
   runCase('if (42) { true + 42 } else { true + 42 }', three_errors);
 
   parseDemo('define')
+  parseDemo('(define)')
   parseDemo('42')
-  parseDemo('(+ 1 2)');
-  parseDemo('(== 3 (+ 1 2))');
+  parseDemo('(+ 5 6)');
+  parseDemo('(== 11 (+ 5 6))');
+  parseDemo('(fn [x] (+ x 1))')
+
+  // Incomplete
+  parseDemo('(+ 42')
+
+  // Too many
+  parseDemo('(+ 42))')
+
+  // Unbalanced
+  parseDemo('(fn [x) )')
+
 
   console.log('-----------')
   var t = lex('(+ 42 23 define true)')

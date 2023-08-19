@@ -1,21 +1,31 @@
+var log = console.log;
+
+type Id = 'lparen' | 'rparen' | 'lbrack' | 'rbrack' | 'bool' | 'int' | 'str' | 'eof';
+
 interface Token {
-  id: string,  // "rparen"
-  start: number,  // 3
-  len: number,  // 1
+  id: Id;
+  start: number;  // 3
+  len: number;  // 1
   source: string;  // Use the whole program for now
                    // Avoid string allocations unless we need them
+}
+
+function tokenValue(tok: Token) {
+  return tok.source.slice(tok.start, tok.start + tok.len);
 }
 
 // Shortcuts from https://norvig.com/lispy.html
 
 const MATCH = new RegExp(
-    '(\\s+)'         // whitespace ignored
-  + '|(#[^\\n]+)'    // comment until end of line ignored
-  + '|(\\()'         // lparen
-  + '|(\\))'         // rparen
-  + '|(true|false)'  // boolean
-  + '|([0-9]+)'      // integer
-  + '|(\\S+)',       // string: define, +, ==
+    '(\\s+)'               // whitespace ignored
+  + '|(#[^\\n]+)'          // comment until end of line ignored
+  + '|(\\()'               // lparen
+  + '|(\\))'               // rparen
+  + '|(\\[)'               // lbrack
+  + '|(\\])'               // rbrack
+  + '|(true|false)'        // boolean
+  + '|([0-9]+)'            // integer
+  + '|([-\\+a-z*/=<>]+)',  // string: define, + - * /  == != < >
   'y');             // sticky bit for exec()
 
 
@@ -32,7 +42,7 @@ export function lex(s: string) {
 
     pos = m.index;
 
-    var id: string | null = null;
+    var id: Id | null = null;
     var len = -1;
 
     if (m[1] !== undefined) {
@@ -48,16 +58,22 @@ export function lex(s: string) {
       id = "rparen";
 
     } else if (m[5] !== undefined) {
+      id = "lbrack";
+
+    } else if (m[6] !== undefined) {
+      id = "rbrack";
+
+    } else if (m[7] !== undefined) {
       id = "bool";
       // no length needed, parser looks at first char 't' or 'f'
 
-    } else if (m[6] !== undefined) {
+    } else if (m[8] !== undefined) {
       id = "int";
-      len = m[6].length;
+      len = m[8].length;
 
-    } else if (m[7] !== undefined) {
+    } else if (m[9] !== undefined) {
       id = 'str';
-      len = m[7].length;
+      len = m[9].length;
 
     } else {
       throw Error('should not happen')
@@ -73,19 +89,19 @@ export function lex(s: string) {
 interface Bool {
   id: "bool";
   value: boolean;
-  loc: Token,
+  loc: number,
 }
 
 interface Int {
   id: 'int';
   value: number;
-  loc: Token,
+  loc: number,
 }
 
 interface Str {
   id: "str";
   value: string;
-  loc: Token,
+  loc: number,
 }
 
 // Note: in an efficient implementation, this would be a flat list of
@@ -101,7 +117,8 @@ type Atom = Bool | Int | Str;
 
 // (== 5 (+ 2 3))
 interface List {
-  name: Token;
+  name: string,
+  loc: number;
   children: Node[];
 }
 
@@ -113,55 +130,80 @@ type Node = Atom | List;
 // Node ::= Atom | List
 // List ::= '(' Str Node* ')
 
-function parseList(tokens: Token[], pos: number): List {
-  pos++;  // eat (
+interface Parser {
+  tokens: Token[],
+  pos: number,
+  current: Token;
+}
 
-  if (tokens[pos].id !== 'str') {
+function next(p: Parser) {
+  p.pos++;
+  p.current = p.tokens[p.pos];
+}
+
+function parseList(p: Parser, end_id: string): List {
+  next(p);  // eat (
+
+  if (p.current.id !== 'str') {
     throw new Error('Expected string after (');
   }
+  var node: Node = {name: tokenValue(p.current), loc: p.pos, children: []};
+  next(p);  // move past head
 
-  var node: Node = {name: tokens[pos], children: []};
-  pos++;
-
-  while (tokens[pos].id !== 'rparen') {
-    node.children.push(parseNode(tokens, pos));
-    pos++;
+  while (p.current.id !== end_id) {
+    //log('p.current.id ' + p.current.id);
+    node.children.push(parseNode(p));
   }
-  pos++;  // eat rparen
+  next(p);  // eat rparen / rbrack
 
   return node;
 }
 
-export function parseNode(tokens: Token[], pos: number): Node {
-  var tok = tokens[pos];
-
-  switch (tok.id) {
+export function parseNode(p: Parser): Node {
+  switch (p.current.id) {
     case 'eof':
-      throw new Error('Unexpected EOF');
+      throw new Error('Unexpected end of file');
 
     case 'lparen':
-      return parseList(tokens, pos);
+      return parseList(p, 'rparen');
+
+    case 'lbrack':
+      return parseList(p, 'rbrack');
 
     case 'rparen':
       throw new Error('Unexpected )');
 
     case 'bool':
-      return {id: 'bool', value: tok.source[tok.start] === 't', loc: tok};
+      var b = p.current.source[p.current.start] === 't';
+      var atom: Atom = {id: 'bool', value: b, loc: p.pos};
+      next(p);
+      return atom;
 
     case 'int':
-      var i = parseInt(tok.source.slice(tok.start, tok.start + tok.len));
-      return {id: 'int', value: i, loc: tok}
+      var i = parseInt(tokenValue(p.current));
+      var atom: Atom = {id: 'int', value: i, loc: p.pos}
+      next(p);
+      return atom;
 
     case 'str':
-      var s = tok.source.slice(tok.start, tok.start + tok.len);
-      return {id: 'str', value: s, loc: tok}
+      var atom: Atom = {id: 'str', value: tokenValue(p.current), loc: p.pos}
+      next(p);
+      return atom;
 
     default:
-      throw new Error('should not happen')
+      //log('tok ' + JSON.stringify(p.current))
+      throw new Error('Unexpected ID ' + p.current.id)
   }
 }
 
 export function parse(tokens: Token[]): Node {
-  return parseNode(tokens, 0);  // from the first token
-}
+  var p = {tokens, pos: 0, current: tokens[0]}
+  var node = parseNode(p);
 
+  // We only parse one expression
+  if (p.current.id !== 'eof') {
+    throw new Error('Extra token ' + p.current.id);
+  }
+
+  return node;
+}
