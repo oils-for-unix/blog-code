@@ -35,6 +35,7 @@ export function lex(s: string) {
   var pos = 0;
   while (true) {
     var m = MATCH.exec(s);
+
     if (m === null) {
       tokens.push({id: "eof", start: pos, len: 0, source: s})
       break;
@@ -82,6 +83,10 @@ export function lex(s: string) {
     if (id !== null) {
       tokens.push({id, start: pos, len, source: s});
     }
+
+    // Set pos to end position of last token, so a potential EOF token will
+    // blame the right column position
+    pos = MATCH.lastIndex;
   }
   return tokens;
 }
@@ -124,6 +129,12 @@ interface List {
 
 type Node = Atom | List;
 
+interface SyntaxError {
+  message: string;
+  pos: number;
+}
+
+
 // S-Expression Grammar
 //
 // Atom ::= Bool | Int | Str
@@ -145,7 +156,7 @@ function parseList(p: Parser, end_id: string): List {
   next(p);  // eat (
 
   if (p.current.id !== 'str') {
-    throw new Error('Expected string after (');
+    throw {message: 'Expected string after (', pos: p.pos};
   }
   var node: Node = {name: tokenValue(p.current), loc: p.pos, children: []};
   next(p);  // move past head
@@ -162,7 +173,7 @@ function parseList(p: Parser, end_id: string): List {
 export function parseNode(p: Parser): Node {
   switch (p.current.id) {
     case 'eof':
-      throw new Error('Unexpected end of file');
+      throw {message: 'Unexpected end of file', pos: p.pos};
 
     case 'lparen':
       return parseList(p, 'rparen');
@@ -171,7 +182,10 @@ export function parseNode(p: Parser): Node {
       return parseList(p, 'rbrack');
 
     case 'rparen':
-      throw new Error('Unexpected )');
+      throw {message: 'Unexpected )', pos: p.pos};
+
+    case 'rbrack':
+      throw {message: 'Unexpected ]', pos: p.pos};
 
     case 'bool':
       var b = p.current.source[p.current.start] === 't';
@@ -192,17 +206,18 @@ export function parseNode(p: Parser): Node {
 
     default:
       //log('tok ' + JSON.stringify(p.current))
-      throw new Error('Unexpected ID ' + p.current.id)
+      throw new Error('ASSERT: Unexpected ID ' + p.current.id)
   }
 }
 
-export function parse(tokens: Token[]): Node {
+export function read(tokens: Token[]): Node {
   var p = {tokens, pos: 0, current: tokens[0]}
   var node = parseNode(p);
 
   // We only parse one expression
   if (p.current.id !== 'eof') {
-    throw new Error('Extra token ' + p.current.id);
+    //throw new Error('Extra token ' + p.current.id);
+    throw {message: `Extra token ${p.current.id} at ${p.pos}`, pos: p.pos};
   }
 
   return node;

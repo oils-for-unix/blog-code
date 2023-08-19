@@ -15,7 +15,6 @@ download() {
 # Puts it in $HOME/.deno/
 # I prefer ~/install, but OK
 
-
 deno() {
   ~/.deno/bin/deno "$@"
 }
@@ -43,14 +42,16 @@ bool-int-andy-test() {
   check-run bool-int-andy-test
 }
 
-andy-test() {
-  sed 's/matklad/bool-int-andy/' matklad-test.ts > bool-int-andy-test.ts
-
-  check-run bool-int-andy-test
+parse-test() {
+  check-run parse-test
 }
 
 count() {
   wc -l *.ts
+  echo
+
+  # The production code
+  wc -l parse.ts
 }
 
 "$@"

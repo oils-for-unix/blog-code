@@ -9,11 +9,20 @@ Type Checking in TypeScript
 
 ## TODO
 
-- Add a better syntax for testing
+- DONE Add a better syntax for testing
   - S-expressions with any type of thing
   - `(== (+ 1 2) (+ 3 4))`
 
-- Write an evaluator!
+- Print nice parse errors
+
+- read() vs. parse()
+  - if and binary operators need to be parsed to an AST
+
+- Add lexer modes for "\u{123456} \n \\"
+
+- then port the type checker
+
+- then write an evaluator!
 
 - Add enough to run statically typed Fibonacci!
   - bools and ints / conditions and arithmetic
@@ -101,3 +110,17 @@ General them is "exhaustive reasoning" -- languages have many conditionals, and
 it's important to tame them.
 
 
+## List of Errors
+
+- Lexing -- there are no errors
+- Parsing -- matching `() []`, EOF, etc.
+- Transforming -- `if` and `+` have right arity
+- Type checking -- `+` has right args, etc.
+- Runtime -- 1/0
+
+## Notes on TypeScript
+
+- Printing JSON is really underated!
+  - I can see the tokens and the trees!
+  - color from Deno is nice
+  - Oils is going to be like this !!!
