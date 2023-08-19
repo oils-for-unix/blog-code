@@ -1,5 +1,7 @@
 // Imported module must be string literal
-import { infer_types, ExprKind, BinaryOp, Expr, Type, TypeError } from './bool-int-andy.ts'
+import { infer_types, ExprKind, BinaryOp, Expr, Type, TypeError } from './bool-int-andy.ts';
+
+import { parse, tokenize } from './parse.ts';
 
 //
 // Test
@@ -21,6 +23,18 @@ function runCase(s: string, ex: Expr<void>) {
     console.log(t.typ);
   }
   console.log('---');
+}
+
+function parseDemo(s: string) {
+  var tokens = tokenize(s);
+  console.log(tokens);
+  try {
+    var tree = parse(tokens)
+  } catch (e) {
+    console.log(e);
+    return;
+  }
+  console.log(tree);
 }
 
 function run_tests() {
@@ -59,6 +73,10 @@ function run_tests() {
 
   var three_errors = make_expr({tag: "if", cond: i, then_branch: b_plus_i, else_branch: b_plus_i})
   runCase('if (42) { true + 42 } else { true + 42 }', three_errors);
+
+  parseDemo('define')
+  parseDemo('42')
+  parseDemo('(+ 1 2)');
 }
 
 run_tests();
