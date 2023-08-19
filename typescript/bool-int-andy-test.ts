@@ -1,42 +1,6 @@
 // Imported module must be string literal
 import { infer_types, ExprKind, BinaryOp, Expr, Type, TypeError } from './bool-int-andy.ts'
 
-// Find the first error by DFS, or return the top level type
-export function find_error(expr: Expr<Type>): Type {
-  switch (expr.kind.tag) {
-    case "bool":
-    case "int":
-      return expr.typ;
-
-    case "binary":
-      var lhs = find_error(expr.kind.lhs);
-      var rhs = find_error(expr.kind.rhs);
-      if (lhs.tag === "Error") {
-        return lhs;
-      }
-      if (rhs.tag === "Error") {
-        return rhs;
-      }
-      return expr.typ;  // top level type
-
-    case "if":
-      var cond = find_error(expr.kind.cond);
-      var then_branch = find_error(expr.kind.then_branch);
-      var else_branch = find_error(expr.kind.else_branch);
-
-      if (cond.tag === "Error") {
-        return cond;
-      }
-      if (then_branch.tag === "Error") {
-        return then_branch;
-      }
-      if (else_branch.tag === "Error") {
-        return else_branch;
-      }
-      return expr.typ;  // top level type
-  }
-}
-
 //
 // Test
 //

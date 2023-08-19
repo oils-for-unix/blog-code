@@ -107,6 +107,8 @@ function type_equal(lhs: Type, rhs: Type): boolean {
 }
 
 export function infer_types(expr: Expr<void>, errors: TypeError[]): Expr<Type> {
+  var ok = true;
+
   switch (expr.kind.tag) {
     case "bool":
       return {
@@ -126,7 +128,6 @@ export function infer_types(expr: Expr<void>, errors: TypeError[]): Expr<Type> {
       var lhs = infer_types(expr.kind.lhs, errors);
       var rhs = infer_types(expr.kind.rhs, errors);
 
-      var ok = true;
       if (!type_equal(lhs.typ, rhs.typ)) {
         errors.push({
           tag: "Error",
@@ -138,12 +139,13 @@ export function infer_types(expr: Expr<void>, errors: TypeError[]): Expr<Type> {
 
       return {
         location: expr.location,
+        // The type of a valid binary expression is determined by the operator
         typ: ok ? result_type(expr.kind.op, expr.location) : errors[0],
         kind: {
           tag: "binary",
           op: expr.kind.op,
-          lhs: lhs,
-          rhs: rhs,
+          lhs,
+          rhs,
         }
       };
     }
@@ -153,7 +155,6 @@ export function infer_types(expr: Expr<void>, errors: TypeError[]): Expr<Type> {
       var then_branch = infer_types(expr.kind.then_branch, errors);
       var else_branch = infer_types(expr.kind.else_branch, errors);
 
-      var ok = true;
       if (!type_equal(cond.typ, MyBool)) {
         errors.push({
           tag: "Error",
@@ -173,12 +174,13 @@ export function infer_types(expr: Expr<void>, errors: TypeError[]): Expr<Type> {
 
       return {
         location: expr.location,
+        // A valid if inherits the type of its branches
         typ: ok ? then_branch.typ : errors[0],
         kind: {
           tag: "if",
-          cond: cond,
-          then_branch: then_branch,
-          else_branch: else_branch,
+          cond,
+          then_branch,
+          else_branch,
         }
       }
     }
