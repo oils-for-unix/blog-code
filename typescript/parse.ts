@@ -1,17 +1,10 @@
-var log = console.log;
+import { Token, Bool, Int, Str, List, Node } from './header.ts';
 
-import { Token, Atom, List, Node } from './header.ts';
+var log = console.log;
 
 function tokenValue(tok: Token) {
   return tok.source.slice(tok.start, tok.start + tok.len);
 }
-
-
-// S-Expression Grammar
-//
-// Atom ::= Bool | Int | Str
-// Node ::= Atom | List
-// List ::= '(' Str Node* ')
 
 interface Parser {
   tokens: Token[],
@@ -24,23 +17,15 @@ function next(p: Parser) {
   p.current = p.tokens[p.pos];
 }
 
-function parseList(p: Parser, end_id: string): List {
-  next(p);  // eat (
-
-  if (p.current.id !== 'str') {
-    throw {message: 'Expected string after (', pos: p.pos};
-  }
-  var node: Node = {name: tokenValue(p.current), loc: p.pos, children: []};
-  next(p);  // move past head
-
-  while (p.current.id !== end_id) {
-    //log('p.current.id ' + p.current.id);
-    node.children.push(parseNode(p));
-  }
-  next(p);  // eat rparen / rbrack
-
-  return node;
-}
+// S-Expression Grammar
+//
+// Node    ::= Bool | Int | Str   # Atoms
+//           | List               # Compound data
+//
+// List    ::= '(' Str Node* ')'
+//           | '[' Str Node* ']'  # Clojure-like sugar
+//
+// Program ::= Node               # Top level
 
 export function parseNode(p: Parser): Node {
   switch (p.current.id) {
@@ -59,27 +44,48 @@ export function parseNode(p: Parser): Node {
     case 'rbrack':
       throw {message: 'Unexpected ]', pos: p.pos};
 
-    case 'bool':
-      var b = p.current.source[p.current.start] === 't';
-      var atom: Atom = {id: 'bool', value: b, loc: p.pos};
+    case 'bool': {
+      let value = p.current.source[p.current.start] === 't';
+      let b: Bool = {id: 'bool', value, loc: p.pos};
       next(p);
-      return atom;
+      return b ;
+    }
 
-    case 'int':
-      var i = parseInt(tokenValue(p.current));
-      var atom: Atom = {id: 'int', value: i, loc: p.pos}
+    case 'int': {
+      let value = parseInt(tokenValue(p.current));
+      let i: Int = {id: 'int', value, loc: p.pos}
       next(p);
-      return atom;
+      return i;
+    }
 
-    case 'str':
-      var atom: Atom = {id: 'str', value: tokenValue(p.current), loc: p.pos}
+    case 'str': {
+      let s: Str = {id: 'str', value: tokenValue(p.current), loc: p.pos}
       next(p);
-      return atom;
+      return s;
+    }
 
     default:
       //log('tok ' + JSON.stringify(p.current))
       throw new Error('ASSERT: Unexpected ID ' + p.current.id)
   }
+}
+
+function parseList(p: Parser, end_id: string): List {
+  next(p);  // eat (
+
+  if (p.current.id !== 'str') {
+    throw {message: 'Expected string after (', pos: p.pos};
+  }
+  var node: Node = {name: tokenValue(p.current), loc: p.pos, children: []};
+  next(p);  // move past head
+
+  while (p.current.id !== end_id) {
+    //log('p.current.id ' + p.current.id);
+    node.children.push(parseNode(p));
+  }
+  next(p);  // eat rparen / rbrack
+
+  return node;
 }
 
 export function parse(tokens: Token[]): Node {

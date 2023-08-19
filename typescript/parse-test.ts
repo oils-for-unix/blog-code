@@ -1,5 +1,6 @@
 import { lex } from './lex.ts';
 import { parse } from './parse.ts';
+import { transform } from './transform.ts';
 
 const log = console.log;
 
