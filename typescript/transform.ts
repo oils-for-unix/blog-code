@@ -32,15 +32,6 @@ export function transform(node: Node, errors: Error[]): Expr {
           return { tag: 'If', loc: node.loc, cond, then, else: else_ };
         }
 
-        // Unary
-        case 'not': {
-          if (!checkArity(node, 1, errors)) {
-            return errors[0];
-          }
-          let child = transform(node.children[0], errors);
-          return { tag: 'Unary', op: node.name, loc: node.loc, child };
-        }
-
         // Binary
         // Num -> Num
         case '+':

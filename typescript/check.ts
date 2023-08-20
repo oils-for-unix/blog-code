@@ -33,21 +33,12 @@ export function inferAndCheck(
   types: Map<Expr, Type>,
   errors: Error[],
 ) {
-  var ok = true;
+  let ok = true;
   switch (expr.tag) {
     case 'Bool':
     case 'Num':
     case 'Str':
       types.set(expr, expr.tag);
-      break;
-
-    case 'Unary':
-      inferAndCheck(expr.child, types, errors);
-
-      // Boolean 'not' is the only unary operator
-      if (typesEqual(types.get(expr.child), 'Bool')) {
-        types.set(expr, 'Bool');
-      }
       break;
 
     case 'Binary':
@@ -89,7 +80,7 @@ export function inferAndCheck(
         ok = false;
       }
       if (ok) {
-        var t = types.get(expr.then);
+        let t = types.get(expr.then);
         if (t) { // satisfy type system
           types.set(expr, t);
         }

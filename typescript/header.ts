@@ -68,13 +68,6 @@ export interface If {
   else: Expr;
 }
 
-export interface Unary {
-  tag: 'Unary';
-  op: 'not' | '-';
-  loc: number; // index of Token for op
-  child: Expr;
-}
-
 export interface Binary {
   tag: 'Binary';
   op: '+' | '-' | '/' | '*' | '==' | '!=' | '<' | '>' | 'and' | 'or';
@@ -83,8 +76,12 @@ export interface Binary {
   right: Expr;
 }
 
-export type Expr = Bool | Num | Str | If | Unary | Binary | Error;
+export type Expr = Bool | Num | Str | If | Binary | Error;
 
 // Type Checker -> [Expr with Types] -> Evaluator
 
 export type Type = 'Bool' | 'Num' | 'Str' | 'TypeError';
+
+// Evaluator -> [Value]
+
+export type Value = Bool | Num | Str;

@@ -23,7 +23,7 @@ hi() {
   time deno run hi.ts
 }
 
-readonly NERD_FILES='header.ts lex.ts parse.ts transform.ts check.ts'
+readonly NERD_FILES='header.ts lex.ts parse.ts transform.ts check.ts eval.ts main.ts'
 
 fmt() {
   deno fmt --single-quote $NERD_FILES tests.ts
@@ -33,6 +33,10 @@ lint() {
   deno lint \
     --rules-exclude='prefer-const,no-unreachable,no-unused-vars,no-fallthrough' \
     $NERD_FILES tests.ts
+}
+
+bundle() {
+  deno bundle main.ts bundle.js
 }
 
 check-run() {
