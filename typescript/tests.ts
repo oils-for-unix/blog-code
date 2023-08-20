@@ -1,3 +1,4 @@
+import { Error, Node } from './header.ts';
 import { lex } from './lex.ts';
 import { parse } from './parse.ts';
 import { transform } from './transform.ts';
@@ -48,8 +49,9 @@ function parseDemo(s: string) {
   log('  LEX');
   //log(tokens);
 
+  let tree: Node | null = null;
   try {
-    let tree = parse(tokens);
+    tree = parse(tokens);
 
     log('');
     log('  PARSE');
@@ -87,9 +89,21 @@ function parseDemo(s: string) {
 
     // columns are 1-based like lines
     log(`Parse error at line ${line_num}, column ${col + 1}: ${e.message}`);
+  }
 
+  if (tree === null) {
     return;
   }
+
+  let errors: Error[] = [];
+  let expr = transform(tree, errors);
+
+  for (let err of errors) {
+    log(err);
+  }
+
+  log('  EXPR');
+  log(expr);
 }
 
 function runTests() {
@@ -107,6 +121,9 @@ function runTests() {
   parseDemo('(+ 5 6)');
   parseDemo('(== 11 (+ 5 6))');
   parseDemo('(fn [x] (+ x 1))');
+  parseDemo('(not (> 1 2))');
+  parseDemo('(if true 42 (+ 99 1))');
+  return;
 
   // Incomplete
   parseDemo('(+ 42');

@@ -204,6 +204,13 @@ it's important to tame them.
 - Inference of types from JSON-like object literals is fairly pleasant
   - reminds me of Zig's type inference of anonymous struct literals
 
+- Minor: 'export' makes code very noisy
+
+- Structural types, and a string '(' or 'Bool' or '+' as a type is very
+  interesting
+
+- Dict punning {dict} is good
+  - Oils has it!
 
 ## Work Log
 

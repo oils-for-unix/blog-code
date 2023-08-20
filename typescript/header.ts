@@ -83,4 +83,4 @@ export interface Binary {
   right: Expr;
 }
 
-export type Expr = Bool | Int | Str | If | Unary | Binary;
+export type Expr = Bool | Int | Str | If | Unary | Binary | Error;

@@ -31,7 +31,7 @@ fmt() {
 
 lint() {
   deno lint \
-    --rules-exclude='prefer-const,no-unreachable,no-unused-vars' \
+    --rules-exclude='prefer-const,no-unreachable,no-unused-vars,no-fallthrough' \
     $NERD_FILES tests.ts
 }
 

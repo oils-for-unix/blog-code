@@ -34,13 +34,11 @@ export function parseNode(p: Parser): Node {
 
     case 'lparen':
       return parseList(p, 'rparen');
-
     case 'lbrack':
       return parseList(p, 'rbrack');
 
     case 'rparen':
       throw { message: 'Unexpected )', pos: p.pos };
-
     case 'rbrack':
       throw { message: 'Unexpected ]', pos: p.pos };
 
@@ -50,14 +48,12 @@ export function parseNode(p: Parser): Node {
       next(p);
       return b;
     }
-
     case 'int': {
       let value = parseInt(tokenValue(p.current));
       let i: Int = { tag: 'Int', value, loc: p.pos };
       next(p);
       return i;
     }
-
     case 'str': {
       let s: Str = { tag: 'Str', value: tokenValue(p.current), loc: p.pos };
       next(p);
@@ -102,6 +98,5 @@ export function parse(tokens: Token[]): Node {
     //throw new Error('Extra token ' + p.current.id);
     throw { message: `Extra token ${p.current.id} at ${p.pos}`, pos: p.pos };
   }
-
   return node;
 }

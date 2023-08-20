@@ -1,31 +1,75 @@
-import { Error, Expr, Node, ShouldNotGetHere } from './header.ts';
+import { Error, Expr, List, Node, ShouldNotGetHere } from './header.ts';
 
-var log = console.log;
+const log = console.log;
+
+function checkArity(node: List, expected: number, errors: Error[]) {
+  let actual = node.children.length;
+  if (actual !== expected) {
+    let message = `If expected ${expected} children, got ${actual}`;
+    errors.push({ tag: 'Transform', message, loc: node.loc });
+    return false;
+  }
+  return true;
+}
 
 export function transform(node: Node, errors: Error[]): Expr {
   switch (node.tag) {
-    case 'List': {
-      switch (node.name) {
-        case 'If': {
-          let actual = node.children.length;
-          if (actual !== 3) {
-            let message = `If expected 3 children, got ${actual}`;
-            errors.push({ tag: 'Transform', message, loc: node.loc });
-          }
-          break;
-        }
-        case 'Unary':
-          break;
-        case 'Binary':
-          break;
-      }
-      return { tag: 'Bool', value: true, loc: -1 };
-    }
-
+    // Atom PNodes are also valid expressions
     case 'Bool':
     case 'Int':
     case 'Str':
       return node;
+
+    case 'List': {
+      switch (node.name) {
+        case 'if': {
+          if (!checkArity(node, 3, errors)) {
+            return errors[0];
+          }
+          let cond = transform(node.children[0], errors);
+          let then = transform(node.children[1], errors);
+          let else_ = transform(node.children[2], errors);
+          return { tag: 'if', loc: node.loc, cond, then, else: else_ };
+        }
+
+        // Unary
+        case 'not': {
+          if (!checkArity(node, 1, errors)) {
+            return errors[0];
+          }
+          let child = transform(node.children[0], errors);
+          return { tag: 'Unary', op: node.name, loc: node.loc, child };
+        }
+
+        // Binary 
+        // Num -> Num
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        // Num -> Bool
+        case '==':
+        case '!=':
+        case '>':
+        case '<':
+        // Bool -> Bool
+        case 'and':
+        case 'or': {
+          if (!checkArity(node, 2, errors)) {
+            return errors[0];
+          }
+          let left = transform(node.children[0], errors);
+          let right = transform(node.children[1], errors);
+          return { tag: 'Binary', op: node.name, loc: node.loc, left, right };
+        }
+
+        default: {
+          let message = `Invalid node '${node.name}'`;
+          errors.push({ tag: 'Transform', message, loc: node.loc });
+          return errors[0];
+        }
+      }
+    }
   }
 
   throw ShouldNotGetHere;
