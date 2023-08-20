@@ -1,5 +1,6 @@
 // Most stages can have errors
 
+// Errors can be thrown (not checked by TypeScript), or put in an array
 export interface Error {
   tag: 'Parse' | 'Transform' | 'Type' | 'Runtime';
   message: string;

@@ -72,6 +72,9 @@ Deno.test(function testTransform() {
   // This transforms, but doesn't type check
   run('(+ 3 a)', trace);
 
+  // MULTIPLE transform errors
+  run('(+ (foo x) (if x))', trace);
+
   // Success
   run('(if (== 1 1) 42 43)', trace);
 
@@ -93,6 +96,9 @@ Deno.test(function testTypeCheck() {
   // operands don't match
   run('(== 3 (== 1 1))', trace);
 
+  // MULTIPLE type errors
+  run('(if 0 42 false)', trace);
+
   // TODO: this is a bug
   run('(+ true true)', trace);
 
@@ -106,10 +112,11 @@ Deno.test(function testEval() {
   let trace = TRACE_EVAL;
 
   // divide by zero
-  run('(/ 42 0)', trace);
+  let actual = run('(/ 42 0)', trace);
+  assertEquals(undefined, actual);
 
   // Bug
-  let actual = run('(== 5 (+ 2 3))', trace);
+  actual = run('(== 5 (+ 2 3))', trace);
   assert(actual !== undefined);
   assertEquals(true, actual.value);
 

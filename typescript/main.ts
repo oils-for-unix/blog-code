@@ -42,10 +42,11 @@ function findStartOfLine(s: string, blame_pos: number): [number, number] {
   }
 }
 
-function printError(prog: string, blame_tok: Token, e: Error) {
-  // Extract the right line, and find The LAST newline before the start
+function printError(prog: string, tokens: Token[], kind: string, e: Error) {
+  let blame_tok = tokens[e.loc];
   let blame_start = blame_tok.start;
 
+  // Extract the right line, and find The LAST newline before the start
   let [line_start, line_num] = findStartOfLine(prog, blame_start);
 
   let pos = prog.indexOf('\n', line_start);
@@ -66,9 +67,10 @@ function printError(prog: string, blame_tok: Token, e: Error) {
   puts('\n');
 
   // Columns are 1-based like lines
-  log(`Error at line ${line_num}, column ${col + 1}: ${e.message}`);
+  log(`${kind} error at line ${line_num}, column ${col + 1}: ${e.message}`);
 }
 
+// Control printing
 export const TRACE_LEX = 1 << 1;
 export const TRACE_PARSE = 1 << 2;
 export const TRACE_TRANSFORM = 1 << 3;
@@ -77,14 +79,13 @@ export const TRACE_EVAL = 1 << 5;
 
 export function run(prog: string, trace: number): Value | undefined {
   log('');
-  log('===========');
-  log(`  PROGRAM ${prog}`);
+  log(`    PROGRAM ${prog}`);
 
   let tokens = lex(prog); // failures deferred to parsing
 
-  log('  LEX');
   if (trace & TRACE_LEX) {
-    // Could print these more niecly -- they point to the whole program
+    log('    LEX');
+    // TODO: print these more nicely -- they point to the whole program
     log(tokens);
   }
 
@@ -92,17 +93,13 @@ export function run(prog: string, trace: number): Value | undefined {
   try {
     tree = parse(tokens);
 
-    log('');
-    log('  PARSE');
     if (trace & TRACE_PARSE) {
+      log('    PARSE');
       log(tree);
     }
   } catch (e) {
-    log('  PARSE ERROR');
-    //log(e);
-
-    let blame_tok = tokens[e.loc];
-    printError(prog, blame_tok, e);
+    log('    PARSE ERROR');
+    printError(prog, tokens, 'Parse', e);
     return;
   }
   if (tree === null) {
@@ -113,16 +110,14 @@ export function run(prog: string, trace: number): Value | undefined {
   let expr = transform(tree, tr_errors);
 
   if (tr_errors.length) {
-    log('  TRANSFORM ERRORS');
+    log('    TRANSFORM ERRORS');
     for (let e of tr_errors) {
-      let blame_tok = tokens[e.loc];
-      printError(prog, blame_tok, e);
+      printError(prog, tokens, 'Transform', e);
     }
     return;
   }
-
-  log('  TRANSFORM');
   if (trace & TRACE_TRANSFORM) {
+    log('    TRANSFORM');
     log(expr);
   }
 
@@ -131,33 +126,29 @@ export function run(prog: string, trace: number): Value | undefined {
   check(expr, types, type_errors);
 
   if (type_errors.length) {
-    log('  TYPE ERRORS');
+    log('    TYPE ERRORS');
     for (let e of type_errors) {
-      let blame_tok = tokens[e.loc];
-      printError(prog, blame_tok, e);
+      printError(prog, tokens, 'Type', e);
     }
     return;
   }
-
-  log('  TOP LEVEL TYPE');
   if (trace & TRACE_TYPE) {
-    log(types.get(expr));
+    log('    TOP LEVEL TYPE');
+    log(`    --> ${types.get(expr)}`);
   }
 
-  log('  EVAL');
   let val: Value | null = null;
   try {
     val = evaluate(expr);
   } catch (e) {
-    log('  PARSE ERROR');
-    //log(e);
-
-    let blame_tok = tokens[e.loc];
-    printError(prog, blame_tok, e);
+    log('    EVAL ERROR');
+    printError(prog, tokens, 'Runtime', e);
     return;
   }
 
   if (trace & TRACE_EVAL) {
+    log('    EVAL');
+    puts('    --> ');
     log(val);
   }
 

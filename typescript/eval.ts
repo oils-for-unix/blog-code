@@ -14,6 +14,14 @@ export function evaluate(expr: Expr): Value {
     case 'Str':
       return expr;
 
+    case 'If': {
+      if (evaluate(expr.cond)) {
+        return evaluate(expr.then);
+      } else {
+        return evaluate(expr.else);
+      }
+    }
+
     case 'Binary': {
       let left = evaluate(expr.left);
       let right = evaluate(expr.right);
@@ -26,7 +34,12 @@ export function evaluate(expr: Expr): Value {
         case '+': result = left.value + right.value; break;
         case '-': result = left.value - right.value; break;
         case '*': result = left.value * right.value; break;
-        case '/': result = left.value / right.value; break;
+        case '/': {
+          if (right.value === 0) {
+            throw { tag: 'Runtime', message: 'Divide by zero', loc: expr.loc };
+          }
+          result = left.value / right.value; break;
+        }
 
         // Exact equality
         case '==': result = left.value === right.value; break;
@@ -59,14 +72,6 @@ export function evaluate(expr: Expr): Value {
 
         default:
           throw ShouldNotGetHere;
-      }
-    }
-
-    case 'If': {
-      if (evaluate(expr.cond)) {
-        return evaluate(expr.then);
-      } else {
-        return evaluate(expr.else);
       }
     }
 
