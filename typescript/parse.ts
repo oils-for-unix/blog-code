@@ -1,4 +1,4 @@
-import { Bool, Int, List, Node, Str, Token } from './header.ts';
+import { Bool, List, Node, Num, Str, Token } from './header.ts';
 
 let log = console.log;
 
@@ -19,7 +19,7 @@ function next(p: Parser) {
 
 // S-Expression Grammar
 //
-// Node    ::= Bool | Int | Str   # Atoms
+// Node    ::= Bool | Num | Str   # Atoms
 //           | List               # Compound data
 //
 // List    ::= '(' Str Node* ')'
@@ -50,7 +50,7 @@ export function parseNode(p: Parser): Node {
     }
     case 'int': {
       let value = parseInt(tokenValue(p.current));
-      let i: Int = { tag: 'Int', value, loc: p.pos };
+      let i: Num = { tag: 'Num', value, loc: p.pos };
       next(p);
       return i;
     }

@@ -16,7 +16,7 @@ export function transform(node: Node, errors: Error[]): Expr {
   switch (node.tag) {
     // Atom PNodes are also valid expressions
     case 'Bool':
-    case 'Int':
+    case 'Num':
     case 'Str':
       return node;
 
@@ -29,7 +29,7 @@ export function transform(node: Node, errors: Error[]): Expr {
           let cond = transform(node.children[0], errors);
           let then = transform(node.children[1], errors);
           let else_ = transform(node.children[2], errors);
-          return { tag: 'if', loc: node.loc, cond, then, else: else_ };
+          return { tag: 'If', loc: node.loc, cond, then, else: else_ };
         }
 
         // Unary
@@ -41,7 +41,7 @@ export function transform(node: Node, errors: Error[]): Expr {
           return { tag: 'Unary', op: node.name, loc: node.loc, child };
         }
 
-        // Binary 
+        // Binary
         // Num -> Num
         case '+':
         case '-':

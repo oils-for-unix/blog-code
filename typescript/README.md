@@ -7,6 +7,34 @@ Type Checking in TypeScript
 - `bool-int-andy.ts` - Remove visitor, and report multiple errors with 'errors'
   out param.
 
+## Slogans
+
+- Oils parsing, TAPL Typed Arithmetic (by way of matklad), Norvig's Lispy
+  (syntax and evaluator)
+
+## Tiers to the Language
+
+- Nerd TAPL (by way of Matklad) -- the arithmetic language 
+  - forms: if, unary and binary ops
+  - types: Bool, Int
+
+- Nerd Mandelbrot -- 
+  - forms: lambda, apply, set!, begin, deftype
+  - types: Bool, Float, Str
+    - do you need List?  Well it might be good
+
+- Nerd Oils -- 
+  - Write a dynamically typed shell language ??
+    - Shnerd ?  Sherd?
+    - read(), eval(), apply()
+    - Can you write Sherd with Nerd mandelbrot?
+      - Depends if you need List or not?
+
+  - Data Language with NON -- Nerd Object Notation
+    - I guess this is in Sherd, because Nerd is statically typed.
+
+  - Explicit function level typing, with inference in the middle?
+
 ## Components
 
 - Syntax in the style of Scheme, more specifically Norvig's lis.py (begin,
@@ -53,6 +81,9 @@ Later components:
 - Data language with proper string literals, and maybe float literals:  NON,
   Nerd Object Notation
   - See "Shape of Data" from Jamie Brandon
+
+- String interpolation!
+  - (echo "hello \(var) \(fib 10)")
 
 - Comptime evaluation?  And then bundle the whole thing into a single text file
   program?
@@ -221,6 +252,9 @@ it's important to tame them.
   - add test cases
 - Saturday:
   - Write lexer and "reader", with precise location information.  Many tests.
+  - Wrote transformer -- straightforward.  Decided to let errors pass through
+  - Hooked up check.ts -- Map<> decision and undefined is a little awkward.
+    - code is shorter
 
 
 ## Naming Ideas

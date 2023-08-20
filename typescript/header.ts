@@ -36,8 +36,8 @@ export interface Bool {
   loc: number;
 }
 
-export interface Int {
-  tag: 'Int';
+export interface Num {
+  tag: 'Num';
   value: number;
   loc: number;
 }
@@ -56,12 +56,12 @@ export interface List {
   children: Node[];
 }
 
-export type Node = Bool | Int | Str | List;
+export type Node = Bool | Num | Str | List;
 
 // Transformer -> [Expr] -> Type Checker
 
 export interface If {
-  tag: 'if';
+  tag: 'If';
   loc: number; // index of Token for if
   cond: Expr;
   then: Expr;
@@ -83,4 +83,8 @@ export interface Binary {
   right: Expr;
 }
 
-export type Expr = Bool | Int | Str | If | Unary | Binary | Error;
+export type Expr = Bool | Num | Str | If | Unary | Binary | Error;
+
+// Type Checker -> [Expr with Types] -> Evaluator
+
+export type Type = 'Bool' | 'Num' | 'Str' | 'TypeError';

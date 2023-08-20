@@ -23,7 +23,7 @@ hi() {
   time deno run hi.ts
 }
 
-readonly NERD_FILES='header.ts lex.ts parse.ts transform.ts'
+readonly NERD_FILES='header.ts lex.ts parse.ts transform.ts check.ts'
 
 fmt() {
   deno fmt --single-quote $NERD_FILES tests.ts

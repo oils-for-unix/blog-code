@@ -1,7 +1,8 @@
-import { Error, Node } from './header.ts';
+import { Error, Expr, Node, Type } from './header.ts';
 import { lex } from './lex.ts';
 import { parse } from './parse.ts';
 import { transform } from './transform.ts';
+import { inferAndCheck } from './check.ts';
 
 const log = console.log;
 
@@ -95,15 +96,28 @@ function parseDemo(s: string) {
     return;
   }
 
-  let errors: Error[] = [];
-  let expr = transform(tree, errors);
+  let tr_errors: Error[] = [];
+  let expr = transform(tree, tr_errors);
 
-  for (let err of errors) {
+  // TODO: print locations
+  for (let err of tr_errors) {
     log(err);
   }
 
   log('  EXPR');
   log(expr);
+
+  let types: Map<Expr, Type> = new Map();
+  let type_errors: Error[] = [];
+  inferAndCheck(expr, types, type_errors);
+
+  // TODO: print locations
+  for (let err of type_errors) {
+    log(err);
+  }
+
+  log('  EXPR with TYPE: TOP');
+  log(types.get(expr));
 }
 
 function runTests() {
@@ -123,6 +137,14 @@ function runTests() {
   parseDemo('(fn [x] (+ x 1))');
   parseDemo('(not (> 1 2))');
   parseDemo('(if true 42 (+ 99 1))');
+
+  // binary operand mismatch
+  parseDemo('(+ 42 true)');
+  // condition is wrong type
+  parseDemo('(if 0 true true)');
+  // then-else match
+  parseDemo('(if true false 42)');
+
   return;
 
   // Incomplete
