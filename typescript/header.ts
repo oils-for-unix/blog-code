@@ -19,7 +19,7 @@ export type Id =
   | 'rbrack'
   | 'bool'
   | 'int'
-  | 'str'
+  | 'name'
   | 'eof';
 
 export interface Token {
@@ -44,8 +44,8 @@ export interface Num {
   loc: number;
 }
 
-export interface Str {
-  tag: 'Str';
+export interface Name {
+  tag: 'Name';
   value: string;
   loc: number;
 }
@@ -58,7 +58,7 @@ export interface List {
   children: Node[];
 }
 
-export type Node = Bool | Num | Str | List;
+export type Node = Bool | Num | Name | List;
 
 // Transformer -> [Expr] -> Type Checker
 
@@ -78,12 +78,12 @@ export interface Binary {
   right: Expr;
 }
 
-export type Expr = Bool | Num | Str | If | Binary | Error;
+export type Expr = Bool | Num | Name | If | Binary | Error;
 
 // Type Checker -> [Expr with Types] -> Evaluator
 
-export type Type = 'Bool' | 'Num' | 'Str' | 'TypeError';
+export type Type = 'Bool' | 'Num' | 'TypeError';
 
 // Evaluator -> [Value]
 
-export type Value = Bool | Num | Str;
+export type Value = Bool | Num;

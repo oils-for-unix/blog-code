@@ -14,7 +14,7 @@ Type Checking in TypeScript
 
 ## Tiers to the Language
 
-- Nerd TAPL (by way of Matklad) -- the arithmetic language 
+- Nerd TAPL -- the arithmetic language 
   - forms: if, unary and binary ops
   - types: Bool, Int
 
@@ -41,7 +41,7 @@ Type Checking in TypeScript
   set!), with Clojure [] sugar
 
 - Lexer in the style of Oils
-  - TODO: Lexer modes!
+  - TODO: Lexer modes!  for \n \u{123456} \\
 
 - Parser and error messages in the style of Oils 
   - Errors: unbalanced ()
@@ -102,21 +102,6 @@ Later components:
 - Value
 
 ## TODO
-
-- DONE Add a better syntax for testing
-  - S-expressions with any type of thing
-  - `(== (+ 1 2) (+ 3 4))`
-
-- Print nice parse errors
-
-- read() vs. parse()
-  - if and binary operators need to be parsed to an AST
-
-- Add lexer modes for "\u{123456} \n \\"
-
-- then port the type checker
-
-- then write an evaluator!
 
 - Add enough to run statically typed Fibonacci!
   - bools and ints / conditions and arithmetic
@@ -184,36 +169,6 @@ print((fib(10))
 - Turn it into a type CHECKED language, not type inferred
 
 - Port to Python 3 with pattern matching and MyPy, and see how long it is.
-
-## Comparable Projects
-
-Title: A Statically Typed Language in 500 lines of TypeScript (or Python)
-
-"Simplest code that's not a toy" -- Has a good parser with exhaustive
-reasoning, and gives precise error emssages.  Based on Oils.
-
-- Similar to "500 lines or less" book (which doesn't have this)
-
-NONE of these are statically typed.
-
-- https://mukulrathi.com/create-your-own-programming-language/intro-to-type-checking/
-  - best one, it's in OCaml and longer.
-- Make-a-Lisp: Much bigger codebase to read
-- Norvig's Lispy -- both languages dynamically typed, s.split('(') etc.
-- ocamlscheme -- Uses ML lex and yacc
-
-But the reader is worth comparing.
-
-- Types and Programming Languages, e.g. Chapter 11 Lambda Calculus
-  - Doesn't have examples!
-  - No parser!  Hard to write tests!
-
-- Dragon Book: Shockingly, doesn't have code for a type checker!
-  - Somehow I didn't realize this for awhile
-
-- TODO: look at Essentials of Programming Languages?
-  - Does not have parser?
-
  
 ## Fiddly Things I learned from Oils
 
@@ -265,6 +220,24 @@ it's important to tame them.
 - Dict punning {dict} is good
   - Oils has it!
 
+## Notes on Deno
+
+Used all the tools:
+
+- deno check && deno run
+  - ended up with @ts-nocheck on evaluator, but it's very useful in general
+- deno fmt -- helpful 
+  - just 2 few deno-fmt-ignore, on the lexer Regex, and evaluator switch statement
+- Deno lint
+  - fairly useful, although I silence some warnings
+  - also @ts-nocheck lint rule conflicts with deno check
+- deno bundle -- says it's deprecated?
+  - didn't deploy it, but it seems useful
+- deno test -- good enough test framework!
+  - just Deno.test() -- that's it!
+  - assert, assertEquals
+    - List and map equality in Oils
+
 ## Work Log
 
 - Friday:
@@ -277,7 +250,10 @@ it's important to tame them.
   - Wrote transformer -- straightforward.  Decided to let errors pass through
   - Hooked up check.ts -- Map<> decision and undefined is a little awkward.
     - code is shorter
-
+  - implemented evaluator with @ts-ignore
+- Sunday:
+  - evaluator uses dynamic JavaScript -- easier to read
+  - polish and test
 
 ## Naming Ideas
 

@@ -52,7 +52,7 @@ export function lex(s: string) {
       id = 'int';
       len = m[8].length;
     } else if (m[9] !== undefined) {
-      id = 'str';
+      id = 'name';
       len = m[9].length;
     } else if (m[10] !== undefined) {
       id = 'BAD';

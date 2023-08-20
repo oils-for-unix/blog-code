@@ -32,7 +32,6 @@ export function check(
   switch (expr.tag) {
     case 'Bool':
     case 'Num':
-    case 'Str':
       types.set(expr, expr.tag);
       break;
 

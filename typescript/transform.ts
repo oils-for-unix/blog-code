@@ -17,7 +17,6 @@ export function transform(node: Node, errors: Error[]): Expr {
     // Atom PNodes are also valid expressions
     case 'Bool':
     case 'Num':
-    case 'Str':
       return node;
 
     case 'List': {

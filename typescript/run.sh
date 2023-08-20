@@ -68,6 +68,17 @@ count() {
 
   # The production code
   wc -l $NERD_FILES
+  echo
+
+  # 410 lines!
+  echo 'Lexing / Parsing / Errors'
+  wc -l lex.ts parse.ts transform.ts main.ts
+  echo
+
+  # 187 lines
+  echo 'Logic'
+  wc -l check.ts eval.ts
+  echo
 }
 
 "$@"

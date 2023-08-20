@@ -26,7 +26,14 @@ Deno.test(function testLex() {
   run('42 ! bob', trace);
 
   // Success
-  let actual = run('42', trace);
+  let actual = run(
+    `
+  ( +    # operator
+    40   # 2 operatns
+    2
+  )`,
+    trace,
+  );
 
   assert(actual !== undefined);
   assertEquals(42, actual.value);
@@ -69,8 +76,8 @@ Deno.test(function testTransform() {
   // + arity 2
   run('(+ 3)', trace);
 
-  // This transforms, but doesn't type check
-  run('(+ 3 a)', trace);
+  // This transforms, but should not type check
+  //run('(+ 3 a)', trace);
 
   // MULTIPLE transform errors
   run('(+ (foo x) (if x))', trace);
@@ -110,6 +117,11 @@ Deno.test(function testTypeCheck() {
 // 1 runtime error
 Deno.test(function testEval() {
   let trace = TRACE_EVAL;
+
+  // BAD!!  Dynamic typing lets this through
+  // Need to add argument checking.  'a' is type 'symbol' for now, not string
+  // let actual = run('(+ a b)', trace);
+  // assertEquals(undefined, actual);
 
   // divide by zero
   let actual = run('(/ 42 0)', trace);

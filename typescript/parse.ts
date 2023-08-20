@@ -1,10 +1,10 @@
 import {
   Bool,
   List,
+  Name,
   Node,
   Num,
   ShouldNotGetHere,
-  Str,
   Token,
 } from './header.ts';
 
@@ -27,7 +27,7 @@ function next(p: Parser) {
 
 // S-Expression Grammar
 //
-// Node    ::= Bool | Num | Str   # Atoms
+// Node    ::= Bool | Num | Name  # Atoms
 //           | List               # Compound data
 //
 // List    ::= '(' Str Node* ')'
@@ -62,8 +62,8 @@ export function parseNode(p: Parser): Node {
       next(p);
       return i;
     }
-    case 'str': {
-      let s: Str = { tag: 'Str', value: tokenValue(p.current), loc: p.pos };
+    case 'name': {
+      let s: Name = { tag: 'Name', value: tokenValue(p.current), loc: p.pos };
       next(p);
       return s;
     }
@@ -79,8 +79,8 @@ export function parseNode(p: Parser): Node {
 function parseList(p: Parser, end_id: string): List {
   next(p); // eat (
 
-  if (p.current.id !== 'str') {
-    throw { message: 'Expected string after (', loc: p.pos };
+  if (p.current.id !== 'name') {
+    throw { message: 'Expected name after (', loc: p.pos };
   }
   let list: List = {
     tag: 'List',
