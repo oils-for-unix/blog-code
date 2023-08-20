@@ -40,6 +40,46 @@ function testParse() {
   run('(42)', trace);
 }
 
+function testTransform() {
+  let trace = TRACE_TRANSFORM;
+
+  run('(if true 1 2)', trace);
+
+  run('(zz true 1 2)', trace);
+}
+
+function testTypeCheck() {
+  let trace = TRACE_TYPE;
+
+  run('(if true 1 2)', trace);
+  run('(== 3 4)', trace);
+  run('(== 5 (+ 2 3))', trace);
+
+  run('(if 0 42 43)', trace);
+
+  run('(+ true true)', trace);
+}
+
+function testEval() {
+  let trace = TRACE_EVAL;
+
+  run('(if true 47 48)', trace);
+  run('(== 3 4)', trace);
+  run('(== 5 (+ 2 3))', trace);
+
+  run('(and true true)', trace);
+  run('(and false true)', trace);
+
+  run('(or false false)', trace);
+  run('(or false true)', trace);
+
+  run('(if 0 42 43)', trace);
+
+
+  // divide by zero
+  run('(/ 42 0)', trace);
+}
+
 /*
 function runTests() {
 
@@ -84,10 +124,10 @@ function runTests() {
 
 /*
 testLex();
-*/
 testParse();
-/*
 testTransform();
+*/
 testTypeCheck();
+/*
 testEval();
 */

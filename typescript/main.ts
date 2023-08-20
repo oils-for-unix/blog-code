@@ -46,18 +46,18 @@ function printError(prog: string, blame_tok: Token, e: Error) {
   // Extract the right line, and find The LAST newline before the start
   let blame_start = blame_tok.start;
 
-  let [line_begin, line_num] = findStartOfLine(prog, blame_start);
+  let [line_start, line_num] = findStartOfLine(prog, blame_start);
 
-  let pos = prog.indexOf('\n', line_begin);
+  let pos = prog.indexOf('\n', line_start);
   let line_end = (pos === -1) ? prog.length : pos;
 
-  //log(`line_num ${line_num} begin ${line_begin} end ${line_end}`);
+  //log(`line_num ${line_num} begin ${line_start} end ${line_end}`);
 
   // Show snippet
-  log(prog.slice(line_begin, line_end));
+  log(prog.slice(line_start, line_end));
 
   // Point to token
-  let col = blame_start - line_begin;
+  let col = blame_start - line_start;
   repeatString(' ', col);
 
   let n = max(blame_tok.len, 1); // EOF is zero in length
@@ -130,11 +130,11 @@ export function run(prog: string, trace: number): Value | undefined {
   let type_errors: Error[] = [];
   inferAndCheck(expr, types, type_errors);
 
-  // TODO: print locations
   if (type_errors.length) {
     log('  TYPE ERRORS');
-    for (let err of type_errors) {
-      log(err);
+    for (let e of type_errors) {
+      let blame_tok = tokens[e.loc];
+      printError(prog, blame_tok, e);
     }
     return;
   }
@@ -144,9 +144,19 @@ export function run(prog: string, trace: number): Value | undefined {
     log(types.get(expr));
   }
 
-  // TODO: Don't eval if there are any type errors
   log('  EVAL');
-  let val = evaluate(expr);
+  let val: Value | null = null;
+  try {
+    val = evaluate(expr);
+  } catch (e) {
+    log('  PARSE ERROR');
+    //log(e);
+
+    let blame_tok = tokens[e.loc];
+    printError(prog, blame_tok, e);
+    return;
+  }
+
   if (trace & TRACE_EVAL) {
     log(val);
   }

@@ -53,6 +53,12 @@ export function inferAndCheck(
         });
         ok = false;
       }
+
+      // TODO: should be invalid
+      //   (+ true true) should be invalid
+      //   (> true true)
+      //   (and 2 3)
+
       if (ok) {
         types.set(expr, resultType(expr));
       }

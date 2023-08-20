@@ -1,6 +1,8 @@
 // Imported module must be string literal
 import { infer_types, ExprKind, BinaryOp, Expr, Type } from './matklad.ts'
 
+let log = console.log;
+
 // Find the first error by DFS, or return the top level type
 export function find_error(expr: Expr<Type>): Type {
   switch (expr.kind.tag) {
@@ -86,4 +88,10 @@ console.log(find_error(t));
 // 42 + (true + 42)
 var r_bad = make_expr({tag: "binary", op: BinaryOp.Add, lhs: i, rhs: b_plus_i});
 var t = infer_types(r_bad);
+console.log(find_error(t));
+
+log('true + true')
+// (true + true)
+var bad2 = make_expr({tag: "binary", op: BinaryOp.Add, lhs: b, rhs: b});
+var t = infer_types(bad2);
 console.log(find_error(t));
