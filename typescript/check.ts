@@ -2,26 +2,27 @@ import { Binary, Error, Expr, ShouldNotGetHere, Type } from './header.ts';
 
 const log = console.log;
 
-function resultType(node: Binary): Type {
-  switch (node.op) {
-    case '+':
-    case '-':
-    case '*':
-    case '/':
-      return 'Num';
+type Sig = [Type, Type, Type];
 
-    case '==':
-    case '!=':
-    case '<':
-    case '>':
-    case 'and':
-    case 'or':
-      return 'Bool';
+const NNN: Sig = ['Num', 'Num', 'Num'];
+const NNB: Sig = ['Num', 'Num', 'Bool'];
+const BBB: Sig = ['Bool', 'Bool', 'Bool'];
 
-    default:
-      throw ShouldNotGetHere;
-  }
-}
+// Weird syntax for dictionary type!
+const OP_SIGNATURES: { [key: string]: Sig } = {
+  '+': NNN,
+  '-': NNN,
+  '*': NNN,
+  '/': NNN,
+
+  '==': NNB, // NOT polymorphic!  only for integers.
+  '!=': NNB,
+  '<': NNB,
+  '>': NNB,
+
+  'and': BBB,
+  'or': BBB,
+};
 
 export function check(
   expr: Expr,
@@ -30,6 +31,9 @@ export function check(
 ) {
   let ok = true;
   switch (expr.tag) {
+    case 'Name': // filtered out by transform()
+      throw ShouldNotGetHere;
+
     case 'Bool':
     case 'Num':
       types.set(expr, expr.tag);
@@ -41,23 +45,34 @@ export function check(
 
       let l = types.get(expr.left);
       let r = types.get(expr.right);
-      if (l != r) {
+
+      let sig = OP_SIGNATURES[expr.op];
+      var expected_left = sig[0];
+      var expected_right = sig[1];
+
+      //log(`left ${l}`)
+      //log(`ex ${expected_left}`)
+
+      if (l !== expected_left) {
         errors.push({
           tag: 'Error',
-          message:
-            `binary expression operands have different types, got ${l} and ${r}`,
-          loc: expr.loc,
+          message: `Left operand has type ${l}, expected ${expected_left}`,
+          loc: expr.left.loc,
+        });
+        ok = false;
+      }
+      if (r !== expected_right) {
+        errors.push({
+          tag: 'Error',
+          message: `Right operand has type ${r}, expected ${expected_right}`,
+          loc: expr.right.loc,
         });
         ok = false;
       }
 
-      // TODO: should be invalid
-      //   (+ true true) should be invalid
-      //   (> true true)
-      //   (and 2 3)
-
       if (ok) {
-        types.set(expr, resultType(expr));
+        let result_type: Type = sig[2];
+        types.set(expr, result_type);
       }
       break;
     }

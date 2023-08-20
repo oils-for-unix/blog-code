@@ -79,6 +79,10 @@ count() {
   echo 'Logic'
   wc -l check.ts eval.ts
   echo
+
+  echo 'Docs'
+  wc -l *.md
+  echo
 }
 
 "$@"

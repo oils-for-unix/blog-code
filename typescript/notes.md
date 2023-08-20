@@ -1,3 +1,14 @@
+## Fiddly Things I learned from Oils
+
+- Representing Tokens, location info
+  - quoting errors 
+- Lexer modes for ""
+- Writing down the grammar first, then writing the recursive descent parser
+  - errors should "fall out" cleanly
+
+General them is "exhaustive reasoning" -- languages have many conditionals, and
+it's important to tame them.
+
 ## Notes on TypeScript
 
 - Printing JSON is really underated!
@@ -34,7 +45,7 @@ Used all the tools:
   - assert, assertEquals
     - List and map equality in Oils
 
-Lessons
+### Lessons
 
 - static check + run at once is a good workflow!  Very fast and easy
   - wish we could do that with Oils
@@ -58,3 +69,45 @@ Lessons
 - Sunday:
   - evaluator uses dynamic JavaScript -- easier to read
   - polish and test
+
+## Lessons Learned
+
+- S-expressions are the same thing as Concrete syntax trees, like Python's pgen
+  / pgen2!!
+  - It's ID and then a variable list of children!
+  - I don't know why I didn't realize this before.  I haven't worked with
+    s-expressions in 20 years, although I certainly read them in blog posts and so forth.
+
+- Honestly this clarified macros and special forms
+  - especially the transformer stage, separate PNode and Expr types
+  - TODO: I'm curious about implementing macros, quoting, quasi-quoting
+
+- Tested out accumulator style for reporting multiple errors: it's
+  straightforward
+  - flatten a tree, so it's natural
+
+- Structural types are useful
+
+- Deno check/run is a good workflow
+
+- Type checking can be very simple - ignoring difficulties like ambiguous
+  literals (is 42 signed/unsigned?) is a good idea
+
+
+## Thoughts / Ideas
+
+- Now I want to look at Julia macros
+  - quoting, quasi-quoting, and substitution
+- Ditto Elixir
+- Look at Lispy part 2
+
+- I wonder if we can make the statically typed language compile to the mycpp runtime
+  - `(var [x (List int)] \(1 2 3))` etc.
+
+## Oils
+
+- procs have unevaluated args, which are kind of like macros
+  - should funcs too?
+
+
+

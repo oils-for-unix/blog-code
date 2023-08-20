@@ -1,5 +1,15 @@
 ## Syntax Notes
 
+### Clojure
+
+- `do` is `begin`
+  - `lambda` and `let` have implicit `do`
+- `fn` is `lambda`
+  - `defn` is `(def id (fn [x] x))`
+
+
+### More
+
 ```lisp
 (begin
   # Using syntax from book ?
@@ -116,4 +126,169 @@ string: "(<char> | \n | \t | \\ | \' | \" | \<hex><hex> | \u{<hex>+})*"
   - leave out hex
 - string syntax is pretty much what we want, it's double quoted and has \u{1234}
   - is hex really "\ff" ?  Not \xff
+
+
+
+## Clojure Quoting
+
+Quoting
+
+    (quote +)
+    => '+
+
+    '+
+    => '+
+
+    (quote 1 2 3)
+    => (1 2 3)
+
+List evaluates its arguments
+
+    (list '+ 1 (inc 1))
+    => (+ 1 2)
+
+Syntax quoting allows unquoting (evaluation)
+
+    `(+ 1 ~(inc 1))
+    => (+ 1 2)
+
+
+I think this was 'unquote' in Elixir
+
+### Macros
+
+Key idea: all macros can be written with list !!!
+
+    (defmacro code-critic
+      [bad good]
+      (list 'do
+        (list 'println "bad"
+              (list 'quote bad))
+        (list 'println "good"
+              (list 'quote good))))
+
+    =>
+
+    (do (println "1" (quote good)) (println "2") (quote bad))
+
+But syntax quoting makes it a bit nicer
+
+    (defmacro code-critic
+      [bad good]
+      `(do (println "bad" (quote ~bad))
+           (println "good" (quote ~good))))
+
+### unquote vs unquote-splicing
+
+    (def items [1 2 3])
+
+    `(0 ~@items 4)
+    => (0 1 2 3 4)
+
+    `(0 ~items 4)
+    => (0 (1 2 3) 4)
+
+
+### They're just Reader Macros
+
+    `(+ ~x)
+    (quasiquote (+ (unquote x))
+
+    `(+ ~@x)
+    (quasiquote (+ (unquote-splicing x))
+
+Ok that's easy enough
+
+I kind want to put that in
+
+## C-ish / Shell-ish syntax
+
+    (quote +)
+    \+
+
+And
+
+    \(+ 1 $(inc 1))
+
+    (defmacro code-critic
+      [bad good]
+      \(do (println "bad" (quote $bad))
+           (println "good" (quote $good)))
+
+So you have:
+
+    \name
+    \(a b)
+    $name
+    $(f a b)
+
+    @splice
+
+Do you need the difference between ' and backtick ?
+
+- In Clojure, there is the difference of NAMESPACES
+  - not sure about other Lisps
+
+You can use perhaps make 
+
+    \+   \(a b)
+
+And also
+
+    \\(a b $x @y)
+
+So `\` is quoting, and `\\` is quasi-quote
+
+## Julia Syntax
+
+    ex.head
+    ex.args
+
+    :call
+
+    ex = quote
+      x = 1
+      y = 2
+      x + y
+    end
+
+Hm Elixir also has the quote.
+
+I think for us Hay
+
+    Package {
+    }
+
+is similar to quoting?  It produces a data structure you can access with
+`_hay()`
+
+Interpolation
+
+    a = 1
+    ex = :($a + b)
+    :(1 + b)
+
+Splicing is $(a...)
+
+    a = [:x, :y, :z]
+    ex = f(1, $(a...))
+    :(f(1, x, y, z))
+
+Can also have multiple `$$` for nested quote blocks
+
+
+ 
+
+
+## Chat GPT Completely Wrong About Clojure and Macros
+
+2023-08: So many lies when asking it about macros
+
+
+Better
+
+- <https://tryclojure.org/>
+
+
+
 

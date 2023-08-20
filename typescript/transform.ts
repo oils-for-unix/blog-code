@@ -9,6 +9,24 @@ function checkArity(node: List, expected: number, errors: Error[]) {
     errors.push({ tag: 'Error', message, loc: node.loc });
     return false;
   }
+
+  for (let child of node.children) {
+    switch (child.tag) {
+      case 'Bool':
+      case 'Num':
+      case 'List':
+        break;
+
+      // Name is only for the head
+      // This only happens when we have no variables in the language!
+      default: {
+        let message = `Unexpected arg of type ${child.tag}`;
+        errors.push({ tag: 'Error', message, loc: child.loc });
+        return false;
+      }
+    }
+  }
+
   return true;
 }
 
@@ -17,6 +35,7 @@ export function transform(node: Node, errors: Error[]): Expr {
     // Atom PNodes are also valid expressions
     case 'Bool':
     case 'Num':
+    case 'Name':
       return node;
 
     case 'List': {

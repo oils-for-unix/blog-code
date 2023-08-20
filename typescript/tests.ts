@@ -76,8 +76,7 @@ Deno.test(function testTransform() {
   // + arity 2
   run('(+ 3)', trace);
 
-  // This transforms, but should not type check
-  //run('(+ 3 a)', trace);
+  run('(+ 3 a)', trace);
 
   // MULTIPLE transform errors
   run('(+ (foo x) (if x))', trace);
@@ -106,10 +105,13 @@ Deno.test(function testTypeCheck() {
   // MULTIPLE type errors
   run('(if 0 42 false)', trace);
 
-  // TODO: this is a bug
-  run('(+ true true)', trace);
+  let actual = run('(+ true true)', trace);
+  assert(actual === undefined);
 
-  let actual = run('(if true true false)', trace);
+  actual = run('(+ 10 true)', trace);
+  assert(actual === undefined);
+
+  actual = run('(if true true false)', trace);
   assert(actual !== undefined);
   assertEquals(true, actual.value);
 });
@@ -120,11 +122,11 @@ Deno.test(function testEval() {
 
   // BAD!!  Dynamic typing lets this through
   // Need to add argument checking.  'a' is type 'symbol' for now, not string
-  // let actual = run('(+ a b)', trace);
-  // assertEquals(undefined, actual);
+  let actual = run('(+ a b)', trace | TRACE_PARSE | TRACE_TRANSFORM);
+  assertEquals(undefined, actual);
 
   // divide by zero
-  let actual = run('(/ 42 0)', trace);
+  actual = run('(/ 42 0)', trace);
   assertEquals(undefined, actual);
 
   // Bug
