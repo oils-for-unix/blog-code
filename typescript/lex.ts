@@ -12,7 +12,8 @@ const MATCH = new RegExp(
   + '|(\\])'               // rbrack
   + '|(true|false)'        // boolean
   + '|([0-9]+)'            // integer
-  + '|([-\\+a-z*/=<>]+)',  // string: define, + - * /  == != < >
+  + '|([-\\+a-z*/=<>]+)'   // string: define, + - * /  == != < >
+  + '|(.)',                // BAD
   'y'); // sticky bit for exec()
 
 export function lex(s: string) {
@@ -53,6 +54,8 @@ export function lex(s: string) {
     } else if (m[9] !== undefined) {
       id = 'str';
       len = m[9].length;
+    } else if (m[10] !== undefined) {
+      id = 'BAD';
     } else {
       throw Error('should not happen');
     }

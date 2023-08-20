@@ -1,4 +1,4 @@
-import { Error, Expr, Node, Type, Value } from './header.ts';
+import { Error, Expr, Node, Token, Type, Value } from './header.ts';
 import { lex } from './lex.ts';
 import { parse } from './parse.ts';
 import { transform } from './transform.ts';
@@ -42,17 +42,51 @@ function findStartOfLine(s: string, blame_pos: number): [number, number] {
   }
 }
 
-export function run(s: string): Value | undefined {
+function printError(prog: string, blame_tok: Token, e: Error) {
+  // Extract the right line, and find The LAST newline before the start
+  let blame_start = blame_tok.start;
+
+  let [line_begin, line_num] = findStartOfLine(prog, blame_start);
+
+  let pos = prog.indexOf('\n', line_begin);
+  let line_end = (pos === -1) ? prog.length : pos;
+
+  //log(`line_num ${line_num} begin ${line_begin} end ${line_end}`);
+
+  // Show snippet
+  log(prog.slice(line_begin, line_end));
+
+  // Point to token
+  let col = blame_start - line_begin;
+  repeatString(' ', col);
+
+  let n = max(blame_tok.len, 1); // EOF is zero in length
+  repeatString('^', n);
+
+  puts('\n');
+
+  // Columns are 1-based like lines
+  log(`Error at line ${line_num}, column ${col + 1}: ${e.message}`);
+}
+
+export const TRACE_LEX = 1 << 1;
+export const TRACE_PARSE = 1 << 2;
+export const TRACE_TRANSFORM = 1 << 3;
+export const TRACE_TYPE = 1 << 4;
+export const TRACE_EVAL = 1 << 5;
+
+export function run(prog: string, trace: number): Value | undefined {
   log('');
   log('===========');
-  log('PROGRAM ' + s);
-  let tokens = lex(s);
-  // TODO:
-  // support \n \\ and maybe \u{123456}
-  // error like \z should be fatal
+  log(`  PROGRAM ${prog}`);
+
+  let tokens = lex(prog); // failures deferred to parsing
 
   log('  LEX');
-  //log(tokens);
+  if (trace & TRACE_LEX) {
+    // Could print these more niecly -- they point to the whole program
+    log(tokens);
+  }
 
   let tree: Node | null = null;
   try {
@@ -60,42 +94,17 @@ export function run(s: string): Value | undefined {
 
     log('');
     log('  PARSE');
-    log(tree);
+    if (trace & TRACE_PARSE) {
+      log(tree);
+    }
   } catch (e) {
     log('  PARSE ERROR');
-    log(e);
+    //log(e);
 
-    let blame_tok = tokens[e.pos];
-    //log(`blame ${JSON.stringify(blame_tok)}`);
-    //log(`blame ${blame_tok.start} ${blame_tok.len}`);
-
-    // Extract the right line, and find The LAST newline before the start
-
-    let blame_start = blame_tok.start;
-
-    let [line_begin, line_num] = findStartOfLine(s, blame_start);
-
-    let pos = s.indexOf('\n', line_begin);
-    let line_end = (pos === -1) ? s.length : pos;
-
-    log(`line_num ${line_num} begin ${line_begin} end ${line_end}`);
-
-    log(s.slice(line_begin, line_end));
-
-    // Quote line
-    let col = blame_start - line_begin;
-    repeatString(' ', col);
-
-    // Point to column
-    let n = max(blame_tok.len, 1); // EOF is zero in length
-    repeatString('^', n);
-
-    puts('\n');
-
-    // columns are 1-based like lines
-    log(`Parse error at line ${line_num}, column ${col + 1}: ${e.message}`);
+    let blame_tok = tokens[e.loc];
+    printError(prog, blame_tok, e);
+    return;
   }
-
   if (tree === null) {
     return;
   }
@@ -103,30 +112,42 @@ export function run(s: string): Value | undefined {
   let tr_errors: Error[] = [];
   let expr = transform(tree, tr_errors);
 
-  // TODO: print locations
-  for (let err of tr_errors) {
-    log(err);
+  if (tr_errors.length) {
+    log('  TRANSFORM ERRORS');
+    for (let e of tr_errors) {
+      let blame_tok = tokens[e.loc];
+      printError(prog, blame_tok, e);
+    }
+    return;
   }
 
-  // TODO: Don't type check if there are any transform errors
-
-  log('  EXPR');
-  log(expr);
+  log('  TRANSFORM');
+  if (trace & TRACE_TRANSFORM) {
+    log(expr);
+  }
 
   let types: Map<Expr, Type> = new Map();
   let type_errors: Error[] = [];
   inferAndCheck(expr, types, type_errors);
 
   // TODO: print locations
-  for (let err of type_errors) {
-    log(err);
+  if (type_errors.length) {
+    log('  TYPE ERRORS');
+    for (let err of type_errors) {
+      log(err);
+    }
+    return;
   }
 
-  log('  EXPR with TYPE: TOP');
-  log(types.get(expr));
+  log('  TOP LEVEL TYPE');
+  if (trace & TRACE_TYPE) {
+    log(types.get(expr));
+  }
 
   // TODO: Don't eval if there are any type errors
   log('  EVAL');
   let val = evaluate(expr);
-  log(val);
+  if (trace & TRACE_EVAL) {
+    log(val);
+  }
 }

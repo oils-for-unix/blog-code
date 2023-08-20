@@ -11,6 +11,7 @@ export const ShouldNotGetHere = { tag: 'Assert' };
 // Lexer -> [Token] -> Parser
 
 export type Id =
+  | 'BAD'
   | 'lparen'
   | 'rparen'
   | 'lbrack'

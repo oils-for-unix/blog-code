@@ -1,14 +1,47 @@
 import { lex } from './lex.ts';
-import { run } from './main.ts';
+import {
+  run,
+  TRACE_EVAL,
+  TRACE_LEX,
+  TRACE_PARSE,
+  TRACE_TRANSFORM,
+  TRACE_TYPE,
+} from './main.ts';
 
+function testLex() {
+  if (0) {
+    console.log('-----------');
+    let t = lex('(+ 42 23 define true)');
+    console.log(t);
+
+    console.log('-----------');
+    t = lex('# comment\n hello\n #comment');
+    console.log(t);
+  }
+
+  let trace = TRACE_LEX;
+  run('~', trace);
+  run('42 ~ bob', trace);
+
+  run('42', trace);
+  run('foo 43', trace);
+  run('(foo 43)', trace);
+}
+
+function testParse() {
+  let trace = TRACE_PARSE;
+  run('42', trace);
+
+  run('(* 42 (+ 99 1))', trace);
+
+  run('(fib 11', trace);
+  run('(fib 22]', trace);
+
+  run('(42)', trace);
+}
+
+/*
 function runTests() {
-  console.log('-----------');
-  let t = lex('(+ 42 23 define true)');
-  console.log(t);
-
-  console.log('-----------');
-  t = lex('# comment\n hello\n #comment');
-  console.log(t);
 
   run('define');
   run('(define)');
@@ -47,5 +80,14 @@ function runTests() {
     (+ x 42) ]
   `);
 }
+*/
 
-runTests();
+/*
+testLex();
+*/
+testParse();
+/*
+testTransform();
+testTypeCheck();
+testEval();
+*/
