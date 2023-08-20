@@ -23,12 +23,7 @@ function resultType(node: Binary): Type {
   }
 }
 
-// Need 'undefined' because of Map.get()
-function typesEqual(lhs: Type | undefined, rhs: Type | undefined): boolean {
-  return lhs === rhs;
-}
-
-export function inferAndCheck(
+export function check(
   expr: Expr,
   types: Map<Expr, Type>,
   errors: Error[],
@@ -41,14 +36,17 @@ export function inferAndCheck(
       types.set(expr, expr.tag);
       break;
 
-    case 'Binary':
-      inferAndCheck(expr.left, types, errors);
-      inferAndCheck(expr.right, types, errors);
+    case 'Binary': {
+      check(expr.left, types, errors);
+      check(expr.right, types, errors);
 
-      if (!typesEqual(types.get(expr.left), types.get(expr.right))) {
+      let l = types.get(expr.left);
+      let r = types.get(expr.right);
+      if (l != r) {
         errors.push({
           tag: 'Type',
-          message: 'binary expression operands have different types',
+          message:
+            `binary expression operands have different types, got ${l} and ${r}`,
           loc: expr.loc,
         });
         ok = false;
@@ -63,24 +61,29 @@ export function inferAndCheck(
         types.set(expr, resultType(expr));
       }
       break;
+    }
 
-    case 'If':
-      inferAndCheck(expr.cond, types, errors);
-      inferAndCheck(expr.then, types, errors);
-      inferAndCheck(expr.else, types, errors);
+    case 'If': {
+      check(expr.cond, types, errors);
+      check(expr.then, types, errors);
+      check(expr.else, types, errors);
 
-      if (!typesEqual(types.get(expr.cond), 'Bool')) {
+      let c = types.get(expr.cond);
+      if (c !== 'Bool') {
         errors.push({
           tag: 'Type',
-          message: 'if condition is not a boolean',
-          loc: expr.loc,
+          message: `if condition should be a Bool, got ${c}`,
+          loc: expr.cond.loc,
         });
         ok = false;
       }
-      if (!typesEqual(types.get(expr.then), types.get(expr.else))) {
+
+      let t = types.get(expr.then);
+      let e = types.get(expr.else);
+      if (t !== e) {
         errors.push({
           tag: 'Type',
-          message: 'if branches have different types',
+          message: `if branches must have same type: got ${t} and ${e}`,
           loc: expr.loc,
         });
         ok = false;
@@ -92,6 +95,7 @@ export function inferAndCheck(
         }
       }
       break;
+    }
 
     case 'Transform': // ignore error
       break;

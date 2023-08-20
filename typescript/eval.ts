@@ -1,137 +1,66 @@
+// @ts-nocheck
+// This file uses dynamic typing
+
 import { Binary, Error, Expr, ShouldNotGetHere, Value } from './header.ts';
 
 const log = console.log;
 
 export function evaluate(expr: Expr): Value {
+  let result;
+
   switch (expr.tag) {
     case 'Bool':
     case 'Num':
     case 'Str':
       return expr;
 
-      var left_num = -1, right_num = -1, num = -1;
-      var left_bool, right_bool, bool;
+    case 'Binary': {
+      let left = evaluate(expr.left);
+      let right = evaluate(expr.right);
 
-    case 'Binary':
-      {
-        let left = evaluate(expr.left);
-        let right = evaluate(expr.right);
+      // Uses DYNAMIC typing
 
-        switch (expr.op) {
-          // Int -> Int
-          case '+':
-          case '-':
-          case '*':
-          case '==':
+      // deno-fmt-ignore
+      switch (expr.op) {
+        // Int -> Int
+        case '+': result = left.value + right.value; break;
+        case '-': result = left.value - right.value; break;
+        case '*': result = left.value * right.value; break;
+        case '/': result = left.value / right.value; break;
 
-          // Int -> Bool
-          case '!=':
-          case '<':
-          case '>':
-          case '/':
-            left_num = left.value as number;
-            right_num = right.value as number;
-            break;
+        // Exact equality
+        case '==': result = left.value === right.value; break;
+        case '!=': result = left.value !== right.value; break;
+        case '<': result = left.value < right.value; break;
+        case '>': result = left.value > right.value; break;
 
-          case 'and':
-          case 'or':
-            left_bool = left.value as boolean;
-            right_bool = right.value as boolean;
-            break;
+        case 'and': result = left.value && right.value; break;
+        case 'or': result = left.value || right.value; break;
 
-          default:
-            throw ShouldNotGetHere;
-        }
-
-        switch (expr.op) {
-          // Int -> Int
-          case '+':
-            // @ts-ignore
-            num = left_num + right_num;
-            break;
-          case '-':
-            // @ts-ignore
-            num = left_num - right_num;
-            break;
-          case '*':
-            // @ts-ignore
-            num = left_num * right_num;
-            break;
-          case '/':
-            // @ts-ignore
-            if (right_num == 0) {
-              throw { message: 'Divide by zero', loc: expr.loc };
-            }
-
-            // @ts-ignore
-            num = left_num / right_num;
-
-            // @ts-ignore
-            // log(` divide ${left_num} / ${right_num} -> ${num}`);
-            break;
-
-          // Int -> Bool
-          case '==':
-            // @ts-ignore
-            bool = left_num == right_num;
-            // @ts-ignore
-            // log(` ${left_num} == ${right_num} -> ${bool}`);
-            break;
-          case '!=':
-            // @ts-ignore
-            bool = left_num != right_num;
-            break;
-          case '<':
-            // @ts-ignore
-            bool = left_num < right_num;
-            break;
-          case '>':
-            // @ts-ignore
-            bool = left_num > right_num;
-            break;
-
-          // Bool -> Bool
-          case 'and':
-            // @ts-ignore
-            bool = left_bool && right_bool;
-            break;
-            // @ts-ignore
-            //log(` ${left_bool} && ${right_bool} -> ${bool}`);
-          case 'or':
-            // @ts-ignore
-            bool = left_bool || right_bool;
-            break;
-
-          default:
-            throw ShouldNotGetHere;
-        }
-
-        switch (expr.op) {
-          // Int -> Int
-          case '+':
-          case '-':
-          case '*':
-          case '/':
-            // @ts-ignore
-            return { tag: 'Num', value: num, loc: expr.loc };
-
-          // Int -> Bool
-          case '==':
-          case '!=':
-          case '<':
-          case '>':
-
-          // Bool -> Bool
-          case 'and':
-          case 'or':
-            // @ts-ignore
-            return { tag: 'Bool', value: bool, loc: expr.loc };
-
-          default:
-            throw ShouldNotGetHere;
-        }
+        default: throw ShouldNotGetHere;
       }
-      break;
+
+      // Make result statically typed
+      switch (expr.op) {
+        // Int -> Int
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+          return { tag: 'Num', value: result, loc: expr.loc };
+
+        case '==':
+        case '!=':
+        case '<':
+        case '>':
+        case 'and':
+        case 'or':
+          return { tag: 'Bool', value: result, loc: expr.loc };
+
+        default:
+          throw ShouldNotGetHere;
+      }
+    }
 
     case 'If': {
       if (evaluate(expr.cond)) {

@@ -2,7 +2,7 @@ import { Error, Expr, Node, Token, Type, Value } from './header.ts';
 import { lex } from './lex.ts';
 import { parse } from './parse.ts';
 import { transform } from './transform.ts';
-import { inferAndCheck } from './check.ts';
+import { check } from './check.ts';
 import { evaluate } from './eval.ts';
 
 const log = console.log;
@@ -128,7 +128,7 @@ export function run(prog: string, trace: number): Value | undefined {
 
   let types: Map<Expr, Type> = new Map();
   let type_errors: Error[] = [];
-  inferAndCheck(expr, types, type_errors);
+  check(expr, types, type_errors);
 
   if (type_errors.length) {
     log('  TYPE ERRORS');

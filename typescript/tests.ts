@@ -15,8 +15,9 @@ import {
   assertEquals,
 } from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-var log = console.log;
+let log = console.log;
 
+// No errors in lexing, but BAD token causes Parse error
 Deno.test(function testLex() {
   let trace = TRACE_LEX;
 
@@ -31,6 +32,7 @@ Deno.test(function testLex() {
   assertEquals(42, actual.value);
 });
 
+// 5 different parse errors
 Deno.test(function testParse() {
   let trace = TRACE_PARSE;
 
@@ -43,7 +45,7 @@ Deno.test(function testParse() {
   // Unexpected ]
   run(']', trace);
 
-  // Expected string after )
+  // Expected Symbol after )
   run('( 42 )', trace);
 
   // Extra tokens
@@ -54,6 +56,7 @@ Deno.test(function testParse() {
   assertEquals(9, actual.value);
 });
 
+// 3 possible transform errors
 Deno.test(function testTransform() {
   let trace = TRACE_TRANSFORM;
 
@@ -66,6 +69,9 @@ Deno.test(function testTransform() {
   // + arity 2
   run('(+ 3)', trace);
 
+  // This transforms, but doesn't type check
+  run('(+ 3 a)', trace);
+
   // Success
   run('(if (== 1 1) 42 43)', trace);
 
@@ -74,6 +80,7 @@ Deno.test(function testTransform() {
   assertEquals(5, actual.value);
 });
 
+// 4 possible type errors
 Deno.test(function testTypeCheck() {
   let trace = TRACE_TYPE;
 
@@ -84,7 +91,7 @@ Deno.test(function testTypeCheck() {
   run('(if true 42 false)', trace);
 
   // operands don't match
-  run('(== 3 true)', trace);
+  run('(== 3 (== 1 1))', trace);
 
   // TODO: this is a bug
   run('(+ true true)', trace);
@@ -94,6 +101,7 @@ Deno.test(function testTypeCheck() {
   assertEquals(true, actual.value);
 });
 
+// 1 runtime error
 Deno.test(function testEval() {
   let trace = TRACE_EVAL;
 
@@ -108,17 +116,4 @@ Deno.test(function testEval() {
   actual = run('(or (== 3 4) (== 5 5))', trace);
   assert(actual !== undefined);
   assertEquals(true, actual.value);
-
-  return;
-
-  run('(if true 47 48)', trace);
-  run('(== 3 4)', trace);
-
-  run('(and true true)', trace);
-  run('(and false true)', trace);
-
-  run('(or false false)', trace);
-  run('(or false true)', trace);
-
-  run('(if 0 42 43)', trace);
 });
