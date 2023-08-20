@@ -6,7 +6,7 @@ function checkArity(node: List, expected: number, errors: Error[]) {
   let actual = node.children.length;
   if (actual !== expected) {
     let message = `${node.name} expected ${expected} children, got ${actual}`;
-    errors.push({ tag: 'Transform', message, loc: node.loc });
+    errors.push({ tag: 'Error', message, loc: node.loc });
     return false;
   }
   return true;
@@ -55,7 +55,7 @@ export function transform(node: Node, errors: Error[]): Expr {
 
         default: {
           let message = `Invalid node '${node.name}'`;
-          errors.push({ tag: 'Transform', message, loc: node.loc });
+          errors.push({ tag: 'Error', message, loc: node.loc });
           return errors[0];
         }
       }

@@ -9,8 +9,8 @@ Type Checking in TypeScript
 
 ## Slogans
 
-- Oils parsing, TAPL Typed Arithmetic (by way of matklad), Norvig's Lispy
-  (syntax and evaluator)
+- Oils lexing/parsing/errors , TAPL Typed Arithmetic (by way of matklad),
+  Norvig's Lispy (syntax and evaluator)
 
 ## Tiers to the Language
 
@@ -41,7 +41,8 @@ Type Checking in TypeScript
   set!), with Clojure [] sugar
 
 - Lexer in the style of Oils
-  - TODO: Lexer modes!  for \n \u{123456} \\
+  - TODO: Lexer modes!  for \n \u{123456} \\ 
+  - then even `\(fib 10)` string interpolation
 
 - Parser and error messages in the style of Oils 
   - Errors: unbalanced ()
@@ -82,11 +83,10 @@ Later components:
   Nerd Object Notation
   - See "Shape of Data" from Jamie Brandon
 
-- String interpolation!
-  - (echo "hello \(var) \(fib 10)")
-
 - Comptime evaluation?  And then bundle the whole thing into a single text file
   program?
+
+- Control flow dependent null checking (MyPy and Dart have this)
 
 ## Terminology and Core Types
 
@@ -100,75 +100,6 @@ Later components:
 - Type
 
 - Value
-
-## TODO
-
-- Add enough to run statically typed Fibonacci!
-  - bools and ints / conditions and arithmetic
-  - `(define ...)` to avoid confusing lambda binding
-  - `(begin ...)` so we define, then apply, more like JavaScript
-  - `(print ...)` since it's a side effect
-
-https://stackoverflow.com/questions/15057786/scheme-fibonacci-series-with-nested-lambda
-
-You would have to use the Y combinator, but maybe we can do without it:
-
-```lisp
-(begin
-  # Using syntax from book ?
-  (deftype fib (-> [number] number)
-
-  (define fib
-    (lambda [n]
-      (if (== n 0)
-        1
-        (+ (fib (- n 1)) (fib (- n 2))))))
-
-  # Is print polymorphic
-  (print (fib 10))
-```
-
-Types could be attached to set
-
-```lisp
-
-(set x 42)  # untyped
-
-(set (x Int) 42)  # typed
-
-(set IdType (-> [Int] Int))
-
-# -> is a specal form like lambda, since first arg isn't evaluated
-(set PlusType (-> [Int Int] Int))
-(set EqType (-> [Int Int] Bool))
-(set AndTYpe (-> [Bool Bool] Bool))
-
-(set
-  (x IdType) 
-  (lambda [x] x)
-```
-
-In JS 
-
-```javascript
-var fib = function(n: number): number {
-  if (n === 0) {
-    return 1
-  } else {
-    return fib(n - 1) + fib(n - 2)
-  }
-}
-
-print((fib(10))
-```
-
-- Turn it into simply typed lambda calculus
-  - "Abstraction" and "Application", aka Function Defs and Calls
-  - With var binding!
-
-- Turn it into a type CHECKED language, not type inferred
-
-- Port to Python 3 with pattern matching and MyPy, and see how long it is.
  
 ## Fiddly Things I learned from Oils
 
@@ -179,15 +110,6 @@ print((fib(10))
 
 General them is "exhaustive reasoning" -- languages have many conditionals, and
 it's important to tame them.
-
-
-## List of Errors
-
-- Lexing -- there are no errors
-- Reading -- matching `() []`, EOF, etc.
-- Transforming -- `if` and `+` have right arity
-- Inference / Type checking -- `+` has right args, etc.
-- Runtime -- 1/0
 
 ## Notes on Stages
 
@@ -202,58 +124,13 @@ it's important to tame them.
   - Matklad's type inference code operated on a heterogeneous
   - "Reader" will be useful for JSON
 
-## Notes on TypeScript
+### List of Errors
 
-- Printing JSON is really underated!
-  - I can see the tokens and the trees!
-  - color from Deno is nice
-  - Oils is going to be like this !!!
-
-- Inference of types from JSON-like object literals is fairly pleasant
-  - reminds me of Zig's type inference of anonymous struct literals
-
-- Minor: 'export' makes code very noisy
-
-- Structural types, and a string '(' or 'Bool' or '+' as a type is very
-  interesting
-
-- Dict punning {dict} is good
-  - Oils has it!
-
-## Notes on Deno
-
-Used all the tools:
-
-- deno check && deno run
-  - ended up with @ts-nocheck on evaluator, but it's very useful in general
-- deno fmt -- helpful 
-  - just 2 few deno-fmt-ignore, on the lexer Regex, and evaluator switch statement
-- Deno lint
-  - fairly useful, although I silence some warnings
-  - also @ts-nocheck lint rule conflicts with deno check
-- deno bundle -- says it's deprecated?
-  - didn't deploy it, but it seems useful
-- deno test -- good enough test framework!
-  - just Deno.test() -- that's it!
-  - assert, assertEquals
-    - List and map equality in Oils
-
-## Work Log
-
-- Friday:
-  - install Deno, copy code and fix typos, get it to run
-  - got help on inference,
-  - remove visitor, report multiple type errors.
-  - add test cases
-- Saturday:
-  - Write lexer and "reader", with precise location information.  Many tests.
-  - Wrote transformer -- straightforward.  Decided to let errors pass through
-  - Hooked up check.ts -- Map<> decision and undefined is a little awkward.
-    - code is shorter
-  - implemented evaluator with @ts-ignore
-- Sunday:
-  - evaluator uses dynamic JavaScript -- easier to read
-  - polish and test
+- Lexing -- there are no errors - but BAD uses
+- Reading -- matching `() []`, EOF, etc.
+- Transforming -- `if` and `+` have right arity
+- Inference / Type checking -- `+` has right args, etc.
+- Runtime -- 1/0
 
 ## Naming Ideas
 

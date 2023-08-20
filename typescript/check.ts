@@ -43,7 +43,7 @@ export function check(
       let r = types.get(expr.right);
       if (l != r) {
         errors.push({
-          tag: 'Type',
+          tag: 'Error',
           message:
             `binary expression operands have different types, got ${l} and ${r}`,
           loc: expr.loc,
@@ -70,7 +70,7 @@ export function check(
       let c = types.get(expr.cond);
       if (c !== 'Bool') {
         errors.push({
-          tag: 'Type',
+          tag: 'Error',
           message: `if condition should be a Bool, got ${c}`,
           loc: expr.cond.loc,
         });
@@ -81,7 +81,7 @@ export function check(
       let e = types.get(expr.else);
       if (t !== e) {
         errors.push({
-          tag: 'Type',
+          tag: 'Error',
           message: `if branches must have same type: got ${t} and ${e}`,
           loc: expr.loc,
         });
@@ -96,7 +96,7 @@ export function check(
       break;
     }
 
-    case 'Transform': // ignore error
+    case 'Error': // ignore error
       break;
 
     default:

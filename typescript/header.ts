@@ -2,14 +2,14 @@
 
 // Errors can be thrown (not checked by TypeScript), or put in an array
 export interface Error {
-  tag: 'Parse' | 'Transform' | 'Type' | 'Runtime';
+  tag: 'Error';
   message: string;
   loc: number;
 }
 
 export const ShouldNotGetHere = { tag: 'Assert' };
 
-// Lexer -> [Token] -> Parser
+// [String] -> Lexer -> [Token]
 
 export type Id =
   | 'BAD'
@@ -30,7 +30,7 @@ export interface Token {
   // Avoid string allocations unless we need them
 }
 
-// Parser -> [Node] -> Transformer
+// [Token] -> Parser -> [Node]
 
 export interface Bool {
   tag: 'Bool';
@@ -60,7 +60,7 @@ export interface List {
 
 export type Node = Bool | Num | Name | List;
 
-// Transformer -> [Expr] -> Type Checker
+// [Node] -> Transformer -> [Expr]
 
 export interface If {
   tag: 'If';
@@ -78,12 +78,16 @@ export interface Binary {
   right: Expr;
 }
 
+// It would be nice if Error wasn't a valid Expr, but transform() can report
+// multiple errors, and having the first one as the return value simplifies the
+// code.  The main run() function should not type check or eval with errors.
+
 export type Expr = Bool | Num | Name | If | Binary | Error;
 
-// Type Checker -> [Expr with Types] -> Evaluator
+// [Expr] -> Type Checker -> Map<Expr, Type>
 
-export type Type = 'Bool' | 'Num' | 'TypeError';
+export type Type = 'Bool' | 'Num';
 
-// Evaluator -> [Value]
+// [Expr] -> Evaluator -> [Value]
 
 export type Value = Bool | Num;

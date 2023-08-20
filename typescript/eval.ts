@@ -75,7 +75,7 @@ export function evaluate(expr: Expr): Value {
       }
     }
 
-    default:
+    default: // 'Error' or some other node
       throw ShouldNotGetHere;
   }
 }
