@@ -59,7 +59,7 @@ bool-int-andy-test() {
 }
 
 tests() {
-  check-run tests
+  deno test tests.ts "$@"
 }
 
 count() {

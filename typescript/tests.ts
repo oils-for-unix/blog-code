@@ -1,3 +1,4 @@
+// Run with ./run.sh tests --filter Lex ,etc.
 import { lex } from './lex.ts';
 import {
   run,
@@ -8,64 +9,110 @@ import {
   TRACE_TYPE,
 } from './main.ts';
 
-function testLex() {
-  if (0) {
-    console.log('-----------');
-    let t = lex('(+ 42 23 define true)');
-    console.log(t);
+// I kinda don't like this, but it's just for testing
+import {
+  assert,
+  assertEquals,
+} from 'https://deno.land/std@0.198.0/assert/mod.ts';
 
-    console.log('-----------');
-    t = lex('# comment\n hello\n #comment');
-    console.log(t);
-  }
+var log = console.log;
 
+Deno.test(function testLex() {
   let trace = TRACE_LEX;
+
+  // Bad characters
   run('~', trace);
-  run('42 ~ bob', trace);
+  run('42 ! bob', trace);
 
-  run('42', trace);
-  run('foo 43', trace);
-  run('(foo 43)', trace);
-}
+  // Success
+  let actual = run('42', trace);
 
-function testParse() {
+  assert(actual !== undefined);
+  assertEquals(42, actual.value);
+});
+
+Deno.test(function testParse() {
   let trace = TRACE_PARSE;
-  run('42', trace);
 
-  run('(* 42 (+ 99 1))', trace);
+  // Unexpected EOF
+  run('', trace);
 
-  run('(fib 11', trace);
-  run('(fib 22]', trace);
+  // Unexpected )
+  run('[ foo )', trace);
 
-  run('(42)', trace);
-}
+  // Unexpected ]
+  run(']', trace);
 
-function testTransform() {
+  // Expected string after )
+  run('( 42 )', trace);
+
+  // Extra tokens
+  run('42 43', trace);
+
+  let actual = run('(* 3 (+ 1 2))', trace);
+  assert(actual !== undefined);
+  assertEquals(9, actual.value);
+});
+
+Deno.test(function testTransform() {
   let trace = TRACE_TRANSFORM;
 
-  run('(if true 1 2)', trace);
-
+  // Invalid node
   run('(zz true 1 2)', trace);
-}
 
-function testTypeCheck() {
+  // If arity 3
+  run('(if true 1)', trace);
+
+  // + arity 2
+  run('(+ 3)', trace);
+
+  // Success
+  run('(if (== 1 1) 42 43)', trace);
+
+  let actual = run('(+ 2 3)', trace);
+  assert(actual !== undefined);
+  assertEquals(5, actual.value);
+});
+
+Deno.test(function testTypeCheck() {
   let trace = TRACE_TYPE;
 
-  run('(if true 1 2)', trace);
-  run('(== 3 4)', trace);
-  run('(== 5 (+ 2 3))', trace);
-
+  // If condition not boolean
   run('(if 0 42 43)', trace);
 
-  run('(+ true true)', trace);
-}
+  // If branches don't match
+  run('(if true 42 false)', trace);
 
-function testEval() {
+  // operands don't match
+  run('(== 3 true)', trace);
+
+  // TODO: this is a bug
+  run('(+ true true)', trace);
+
+  let actual = run('(if true true false)', trace);
+  assert(actual !== undefined);
+  assertEquals(true, actual.value);
+});
+
+Deno.test(function testEval() {
   let trace = TRACE_EVAL;
+
+  // divide by zero
+  run('(/ 42 0)', trace);
+
+  // Bug
+  let actual = run('(== 5 (+ 2 3))', trace);
+  assert(actual !== undefined);
+  assertEquals(true, actual.value);
+
+  actual = run('(or (== 3 4) (== 5 5))', trace);
+  assert(actual !== undefined);
+  assertEquals(true, actual.value);
+
+  return;
 
   run('(if true 47 48)', trace);
   run('(== 3 4)', trace);
-  run('(== 5 (+ 2 3))', trace);
 
   run('(and true true)', trace);
   run('(and false true)', trace);
@@ -74,60 +121,4 @@ function testEval() {
   run('(or false true)', trace);
 
   run('(if 0 42 43)', trace);
-
-
-  // divide by zero
-  run('(/ 42 0)', trace);
-}
-
-/*
-function runTests() {
-
-  run('define');
-  run('(define)');
-  run('42');
-  run('(+ 5 6)');
-  run('(== 11 (+ 5 6))');
-  run('(fn [x] (+ x 1))');
-  run('(not (> 1 2))');
-  run('(if true 42 (+ 99 1))');
-
-  // binary operand mismatch
-  run('(+ 42 true)');
-  // condition is wrong type
-  run('(if 0 true true)');
-  // then-else match
-  run('(if true false 42)');
-
-  return;
-
-  // Incomplete
-  run('(+ 42');
-
-  // Too many
-  run('(+ 42) oops');
-
-  run(']');
-
-  // String after (
-  run('( ] )');
-
-  // Unbalanced
-  run('(fn [x) )');
-
-  run(`
-  (define fib [x]
-    (+ x 42) ]
-  `);
-}
-*/
-
-/*
-testLex();
-testParse();
-testTransform();
-*/
-testTypeCheck();
-/*
-testEval();
-*/
+});

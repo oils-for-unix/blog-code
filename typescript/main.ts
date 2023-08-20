@@ -160,4 +160,6 @@ export function run(prog: string, trace: number): Value | undefined {
   if (trace & TRACE_EVAL) {
     log(val);
   }
+
+  return val;
 }

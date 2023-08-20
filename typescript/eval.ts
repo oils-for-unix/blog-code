@@ -9,8 +9,8 @@ export function evaluate(expr: Expr): Value {
     case 'Str':
       return expr;
 
-    var left_num = -1, right_num = -1, num = -1;
-    var left_bool, right_bool, bool;
+      var left_num = -1, right_num = -1, num = -1;
+      var left_bool, right_bool, bool;
 
     case 'Binary':
       {
@@ -60,7 +60,7 @@ export function evaluate(expr: Expr): Value {
           case '/':
             // @ts-ignore
             if (right_num == 0) {
-              throw {message: 'Divide by zero', loc: expr.loc};
+              throw { message: 'Divide by zero', loc: expr.loc };
             }
 
             // @ts-ignore
@@ -74,6 +74,8 @@ export function evaluate(expr: Expr): Value {
           case '==':
             // @ts-ignore
             bool = left_num == right_num;
+            // @ts-ignore
+            // log(` ${left_num} == ${right_num} -> ${bool}`);
             break;
           case '!=':
             // @ts-ignore
@@ -109,15 +111,15 @@ export function evaluate(expr: Expr): Value {
           case '+':
           case '-':
           case '*':
-          case '==':
+          case '/':
             // @ts-ignore
             return { tag: 'Num', value: num, loc: expr.loc };
 
           // Int -> Bool
+          case '==':
           case '!=':
           case '<':
           case '>':
-          case '/':
 
           // Bool -> Bool
           case 'and':

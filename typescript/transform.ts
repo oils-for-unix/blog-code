@@ -5,7 +5,7 @@ const log = console.log;
 function checkArity(node: List, expected: number, errors: Error[]) {
   let actual = node.children.length;
   if (actual !== expected) {
-    let message = `If expected ${expected} children, got ${actual}`;
+    let message = `${node.name} expected ${expected} children, got ${actual}`;
     errors.push({ tag: 'Transform', message, loc: node.loc });
     return false;
   }

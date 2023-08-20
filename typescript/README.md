@@ -143,6 +143,26 @@ You would have to use the Y combinator, but maybe we can do without it:
   (print (fib 10))
 ```
 
+Types could be attached to set
+
+```lisp
+
+(set x 42)  # untyped
+
+(set (x Int) 42)  # typed
+
+(set IdType (-> [Int] Int))
+
+# -> is a specal form like lambda, since first arg isn't evaluated
+(set PlusType (-> [Int Int] Int))
+(set EqType (-> [Int Int] Bool))
+(set AndTYpe (-> [Bool Bool] Bool))
+
+(set
+  (x IdType) 
+  (lambda [x] x)
+```
+
 In JS 
 
 ```javascript
@@ -176,6 +196,8 @@ reasoning, and gives precise error emssages.  Based on Oils.
 
 NONE of these are statically typed.
 
+- https://mukulrathi.com/create-your-own-programming-language/intro-to-type-checking/
+  - best one, it's in OCaml and longer.
 - Make-a-Lisp: Much bigger codebase to read
 - Norvig's Lispy -- both languages dynamically typed, s.split('(') etc.
 - ocamlscheme -- Uses ML lex and yacc
