@@ -57,6 +57,19 @@ Later components:
 - Comptime evaluation?  And then bundle the whole thing into a single text file
   program?
 
+## Terminology and Core Types
+
+- Id -- for tokens
+- Tag -- for nodes
+
+- Node - homogeneous -- rename to PNode?
+
+- Expr
+
+- Type
+
+- Value
+
 ## TODO
 
 - DONE Add a better syntax for testing

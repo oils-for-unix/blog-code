@@ -16,11 +16,11 @@ const MATCH = new RegExp(
   'y'); // sticky bit for exec()
 
 export function lex(s: string) {
-  var tokens: Token[] = [];
+  let tokens: Token[] = [];
 
-  var pos = 0;
+  let pos = 0;
   while (true) {
-    var m = MATCH.exec(s);
+    let m = MATCH.exec(s);
 
     if (m === null) {
       tokens.push({ id: 'eof', start: pos, len: 0, source: s });
@@ -29,8 +29,8 @@ export function lex(s: string) {
 
     pos = m.index;
 
-    var id: Id | null = null;
-    var len = -1;
+    let id: Id | null = null;
+    let len = -1;
 
     if (m[1] !== undefined) {
       // ignore whitespace

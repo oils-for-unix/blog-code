@@ -1,6 +1,6 @@
 import { Bool, Int, List, Node, Str, Token } from './header.ts';
 
-var log = console.log;
+let log = console.log;
 
 function tokenValue(tok: Token) {
   return tok.source.slice(tok.start, tok.start + tok.len);
@@ -46,20 +46,20 @@ export function parseNode(p: Parser): Node {
 
     case 'bool': {
       let value = p.current.source[p.current.start] === 't';
-      let b: Bool = { id: 'bool', value, loc: p.pos };
+      let b: Bool = { tag: 'Bool', value, loc: p.pos };
       next(p);
       return b;
     }
 
     case 'int': {
       let value = parseInt(tokenValue(p.current));
-      let i: Int = { id: 'int', value, loc: p.pos };
+      let i: Int = { tag: 'Int', value, loc: p.pos };
       next(p);
       return i;
     }
 
     case 'str': {
-      let s: Str = { id: 'str', value: tokenValue(p.current), loc: p.pos };
+      let s: Str = { tag: 'Str', value: tokenValue(p.current), loc: p.pos };
       next(p);
       return s;
     }
@@ -76,21 +76,26 @@ function parseList(p: Parser, end_id: string): List {
   if (p.current.id !== 'str') {
     throw { message: 'Expected string after (', pos: p.pos };
   }
-  var node: Node = { name: tokenValue(p.current), loc: p.pos, children: [] };
+  let list: List = {
+    tag: 'List',
+    name: tokenValue(p.current),
+    loc: p.pos,
+    children: [],
+  };
   next(p); // move past head
 
   while (p.current.id !== end_id) {
     //log('p.current.id ' + p.current.id);
-    node.children.push(parseNode(p));
+    list.children.push(parseNode(p));
   }
   next(p); // eat rparen / rbrack
 
-  return node;
+  return list;
 }
 
 export function parse(tokens: Token[]): Node {
-  var p = { tokens, pos: 0, current: tokens[0] };
-  var node = parseNode(p);
+  let p = { tokens, pos: 0, current: tokens[0] };
+  let node = parseNode(p);
 
   // We only parse one expression
   if (p.current.id !== 'eof') {
