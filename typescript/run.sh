@@ -39,7 +39,7 @@ lint() {
 }
 
 bundle() {
-  deno bundle main.ts bundle.js
+  deno bundle yaks.ts bundle.js
 }
 
 check-run() {
@@ -81,6 +81,10 @@ count() {
   # 187 lines
   echo 'Logic'
   wc -l check.ts eval.ts ops.ts
+  echo
+
+  echo 'Bundle'
+  wc -l bundle.js
   echo
 
   echo 'Docs'

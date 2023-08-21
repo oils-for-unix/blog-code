@@ -77,3 +77,24 @@ function parseList(p: Parser, end_id: string): List {
   return list;
 }
 ```
+
+
+### Yaksh -- The Yak Shell
+
+HTML literals for lexer modes
+
+    (echo <p>hello</p>)
+
+Maybe shell style literals in braces:
+
+    (defn foo [x]
+      { ls /tmp/$mydir | sort | wc -l > out }
+      (def x $( ls /tmp ))
+      )
+
+So I guess you wite a recursive descent parser
+
+I guess reuse the dynamic semantics of Yak for this?  Interpreted, without type checking
+
+This is the same as unifying mycpp and YSH -- Tea/Oils
+

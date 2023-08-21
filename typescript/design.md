@@ -1,15 +1,15 @@
-## NERD Could Have 3 Tiers
+## Yaks Could Have 3 Tiers
 
-- Nerd TAPL -- the arithmetic language 
+- Yaks TAPL -- the arithmetic language 
   - forms: if, unary and binary ops
   - types: Bool, Int
 
-- Nerd Mandelbrot -- 
+- Yaks Mandelbrot -- 
   - forms: lambda, apply, set!, begin, deftype
   - types: Bool, Float, Str
     - do you need List?  Well it might be good
 
-- Nerd Oils -- 
+- Yaks -> Yaksh -> like Oils -- 
   - Write a dynamically typed shell language ??
     - Shnerd ?  Sherd?
     - read(), eval(), apply()
@@ -20,6 +20,26 @@
     - I guess this is in Sherd, because Nerd is statically typed.
 
   - Explicit function level typing, with inference in the middle?
+
+## Tools
+
+- interpreter:
+  - lex -> parse -> transform -> evaluate - DYNAMIC checks
+
+- compiler:
+  - lex -> parse -> transform -> type check -> codegen to WASM
+
+- linter
+  - unused variable warning!
+
+- format
+  - set tab width option
+
+- IDE server with completion
+  - look at matklad posts
+  - the three loops?
+  - complete keywords/functions first
+    - but really you need objects like (obj.method 1 2 3)
 
 ## Components
 

@@ -3,8 +3,12 @@
 - Bundle it, embed in a web page
   - text box with button
   - dropdown for examples
+    - it would be nice if we can show ALL errors?
+    - maybe the test runner should register the case
+
   - maybe ui.ts with template literal
     - actually you can bundle it all
+    - or put it in a shell script
 
   - call run() I guess
     - show the output in another textarea

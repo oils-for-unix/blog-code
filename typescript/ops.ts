@@ -31,7 +31,7 @@ type NNB_func = (x: number, y: number) => boolean;
 type BBB_func = (x: boolean, y: boolean) => boolean;
 
 // (Num, Num) => Num
-const OPS_NNN: { [key: string]: NNN_func } = {
+export const OPS_NNN: { [key: string]: NNN_func } = {
   '+': (x, y) => x + y,
   '-': (x, y) => x - y,
   '*': (x, y) => x * y,
@@ -39,7 +39,7 @@ const OPS_NNN: { [key: string]: NNN_func } = {
 };
 
 // (Num, Num) => Bool
-const OPS_NNB: { [key: string]: NNB_func } = {
+export const OPS_NNB: { [key: string]: NNB_func } = {
   // Exact equality
   '==': (x, y) => x === y,
   '!=': (x, y) => x !== y,
@@ -48,7 +48,7 @@ const OPS_NNB: { [key: string]: NNB_func } = {
 };
 
 // (Bool, Bool) => Bool
-const OPS_BBB: { [key: string]: BBB_func } = {
+export const OPS_BBB: { [key: string]: BBB_func } = {
   'and': (x, y) => x && y,
   'or': (x, y) => x || y,
 };
