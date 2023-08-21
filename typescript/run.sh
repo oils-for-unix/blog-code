@@ -23,7 +23,7 @@ hi() {
   time deno run hi.ts
 }
 
-readonly NERD_FILES='header.ts lex.ts parse.ts transform.ts check.ts eval.ts main.ts'
+readonly NERD_FILES='header.ts lex.ts parse.ts transform.ts check.ts eval.ts ops.ts yaks.ts'
 
 fmt() {
   deno fmt --single-quote $NERD_FILES tests.ts
@@ -75,12 +75,12 @@ count() {
 
   # 410 lines!
   echo 'Lexing / Parsing / Errors'
-  wc -l lex.ts parse.ts transform.ts main.ts
+  wc -l lex.ts parse.ts transform.ts yaks.ts
   echo
 
   # 187 lines
   echo 'Logic'
-  wc -l check.ts eval.ts
+  wc -l check.ts eval.ts ops.ts
   echo
 
   echo 'Docs'

@@ -1,33 +1,7 @@
 import { Error, Expr, ShouldNotGetHere, Type, Value } from './header.ts';
+import { OPS_BBB, OPS_NNB, OPS_NNN } from './ops.ts';
 
 const log = console.log;
-
-type NNN_func = (x: number, y: number) => number;
-type NNB_func = (x: number, y: number) => boolean;
-type BBB_func = (x: boolean, y: boolean) => boolean;
-
-// (Num, Num) => Num
-const OPS_NNN: { [key: string]: NNN_func } = {
-  '+': (x, y) => x + y,
-  '-': (x, y) => x - y,
-  '*': (x, y) => x * y,
-  '/': (x, y) => x / y,
-};
-
-// (Num, Num) => Bool
-const OPS_NNB: { [key: string]: NNB_func } = {
-  // Exact equality
-  '==': (x, y) => x === y,
-  '!=': (x, y) => x !== y,
-  '<': (x, y) => x < y,
-  '>': (x, y) => x > y,
-};
-
-// (Bool, Bool) => Bool
-const OPS_BBB: { [key: string]: BBB_func } = {
-  'and': (x, y) => x && y,
-  'or': (x, y) => x || y,
-};
 
 function typeError(expr: Expr, t: Type, desc: string): Error | null {
   return {

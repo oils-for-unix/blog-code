@@ -1,10 +1,5 @@
-import {
-  Error,
-  Expr,
-  OP_SIGNATURES,
-  ShouldNotGetHere,
-  Type,
-} from './header.ts';
+import { Error, Expr, ShouldNotGetHere, Type } from './header.ts';
+import { OP_SIGNATURES } from './ops.ts';
 
 const log = console.log;
 
