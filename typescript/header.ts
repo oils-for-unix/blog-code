@@ -61,9 +61,10 @@ export interface Name {
 // (== 5 (+ 2 3))
 export interface List {
   tag: 'List';
-  name: string;
-  loc: number;
-  children: Node[];
+  name: string;  // TODO: should be Node, which can be Name with its own loc
+                 // ((fn [x] (+ x 1)) 42) => 43
+  loc: number;   // TODO: should be location of (
+  args: Node[];
 }
 
 export type Node = Bool | Num | Name | List;

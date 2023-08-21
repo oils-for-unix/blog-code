@@ -3,14 +3,14 @@ import { Error, Expr, List, Node, ShouldNotGetHere } from './header.ts';
 const log = console.log;
 
 function checkArity(node: List, expected: number, errors: Error[]) {
-  let actual = node.children.length;
+  let actual = node.args.length;
   if (actual !== expected) {
     let message = `${node.name} expected ${expected} args, got ${actual}`;
     errors.push({ tag: 'Error', message, loc: node.loc });
     return false;
   }
 
-  for (let child of node.children) {
+  for (let child of node.args) {
     switch (child.tag) {
       case 'Bool':
       case 'Num':
@@ -44,9 +44,9 @@ export function transform(node: Node, errors: Error[]): Expr {
           if (!checkArity(node, 3, errors)) {
             return errors[0];
           }
-          let cond = transform(node.children[0], errors);
-          let then = transform(node.children[1], errors);
-          let else_ = transform(node.children[2], errors);
+          let cond = transform(node.args[0], errors);
+          let then = transform(node.args[1], errors);
+          let else_ = transform(node.args[2], errors);
           return { tag: 'If', loc: node.loc, cond, then, else: else_ };
         }
 
@@ -67,8 +67,8 @@ export function transform(node: Node, errors: Error[]): Expr {
           if (!checkArity(node, 2, errors)) {
             return errors[0];
           }
-          let left = transform(node.children[0], errors);
-          let right = transform(node.children[1], errors);
+          let left = transform(node.args[0], errors);
+          let right = transform(node.args[1], errors);
           return { tag: 'Binary', op: node.name, loc: node.loc, left, right };
         }
 

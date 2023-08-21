@@ -155,6 +155,20 @@ Syntax quoting allows unquoting (evaluation)
 
 I think this was 'unquote' in Elixir
 
+### femtolisp Quoting
+
+- https://github.com/JeffBezanson/femtolisp/blob/master/tests/ast/rpasses.lsp
+
+Traditional syntax which I don't like
+
+```
+`(lambda ,(func-argnames n)
+  (r-block ,@(gen-default-inits (cadr n))
+    ,@(if (and (pair? (caddr n))
+```
+
+- It does use ,(f a b) not just ,a
+
 ### Macros
 
 Key idea: all macros can be written with list !!!
@@ -239,6 +253,15 @@ And also
 
 So `\` is quoting, and `\\` is quasi-quote
 
+MEH I want to reserve $ and @ for shell (and WebAssembly uses $ too)
+
+We could have just `\\()` for quasi-quoting and explicit splicing
+
+- And then maybe `~a` and `~~a` or `~@a` to be consistent
+- Or `*a` and `**a`, too much like Python
+
+
+
 ## Julia Syntax
 
     ex.head
@@ -275,9 +298,6 @@ Splicing is $(a...)
     :(f(1, x, y, z))
 
 Can also have multiple `$$` for nested quote blocks
-
-
- 
 
 
 ## Chat GPT Completely Wrong About Clojure and Macros

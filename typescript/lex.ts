@@ -12,7 +12,7 @@ const MATCH = new RegExp(
   + '|(\\])'               // rbrack
   + '|(true|false)'        // boolean
   + '|([0-9]+)'            // integer
-  + '|([-\\+a-z*/=<>]+)'   // string: define, + - * /  == != < >
+  + '|([-\\+a-z*/=<>]+)'   // name: define, + - * /  == != < >  TODO: add more
   + '|(.)',                // BAD
   'y'); // sticky bit for exec()
 

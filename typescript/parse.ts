@@ -35,6 +35,10 @@ function next(p: Parser) {
 //
 // Program ::= Node               # Top level
 
+// TODO:
+// - What is the () value?
+// (cons 1 (cons 2 ()) -> (1 2)
+
 export function parseNode(p: Parser): Node {
   switch (p.current.id) {
     case 'eof':
@@ -89,12 +93,12 @@ function parseList(p: Parser, end_id: string): List {
     name: tokenValue(p.current),
     // loc: paren_pos,
     loc: p.pos,
-    children: [],
+    args: [],
   };
   next(p); // move past head
 
   while (p.current.id !== end_id) {
-    list.children.push(parseNode(p));
+    list.args.push(parseNode(p));
   }
   next(p); // eat rparen / rbrack
 

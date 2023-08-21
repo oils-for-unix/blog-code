@@ -1,5 +1,9 @@
 ## TODO
 
+- 'name' lexer rule should be all printable chars but NOT
+  - `# ( ) [ ] { }`
+  - TODO: look at ascii table
+
 - Bundle it, embed in a web page
   - text box with button
   - dropdown for examples
