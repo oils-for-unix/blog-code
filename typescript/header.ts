@@ -1,3 +1,11 @@
+export interface Context {
+  // write string to stdout, no newline
+  write: (s: string) => void;
+
+  // like console.log();
+  log: (s: any) => void;
+}
+
 // Most stages can have errors
 
 // Errors can be thrown (not checked by TypeScript), or put in an array
@@ -91,3 +99,27 @@ export type Type = 'Bool' | 'Num';
 // [Expr] -> Evaluator -> [Value]
 
 export type Value = Bool | Num;
+
+// Signatures for static and dynamic type checking
+
+export type Sig = [Type, Type, Type];
+
+const NNN: Sig = ['Num', 'Num', 'Num'];
+const NNB: Sig = ['Num', 'Num', 'Bool'];
+const BBB: Sig = ['Bool', 'Bool', 'Bool'];
+
+// Weird syntax for dictionary type!
+export const OP_SIGNATURES: { [key: string]: Sig } = {
+  '+': NNN,
+  '-': NNN,
+  '*': NNN,
+  '/': NNN,
+
+  '==': NNB, // NOT polymorphic!  only for integers.
+  '!=': NNB,
+  '<': NNB,
+  '>': NNB,
+
+  'and': BBB,
+  'or': BBB,
+};

@@ -69,6 +69,8 @@ Used all the tools:
 - Sunday:
   - evaluator uses dynamic JavaScript -- easier to read
   - polish and test
+  - added op signatures to fix bug
+  - switched to Deno test framework -- seems good enough
 
 ## Lessons Learned
 

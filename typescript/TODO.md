@@ -1,9 +1,8 @@
 ## TODO
 
-- Fix typing bug, e.g. (+ true ture)
-  - Make sure Symbol is disallowed
+- Add dynamic checking to interpreter  -- using `OP_SIGNATURES`
+  - move that to the HEADER!
 
-- Maybe add dynamic checking to interpretr
   - so we can have real dynamic semantics, WITHOUT type checking
   - like mycpp / Tea
 
@@ -21,6 +20,14 @@
     - run(puts, console.log)
     - Those could be node.innerText or something
     - out.log(), out.write()
+
+- Compile to WASM
+  - Num -> f32 or f64
+  - Bool -> i32
+
+## Nerd Fibonacci / Tea
+
+See [tea.md](tea.md)
 
 - Add enough to run statically typed Fibonacci!
   - bools and ints / conditions and arithmetic
@@ -46,8 +53,6 @@ You would have to use the Y combinator, but maybe we can do without it:
 - Turn it into a type CHECKED language, not type inferred
 
 - Port to Python 3 with pattern matching and MyPy, and see how long it is.
-
-
 
 ## Research
 

@@ -30,8 +30,11 @@ fmt() {
 }
 
 lint() {
+  local more=',no-unused-vars'
+  more=''
+
   deno lint \
-    --rules-exclude='prefer-const,no-unreachable,no-unused-vars,no-fallthrough' \
+    --rules-exclude="prefer-const,no-unreachable,no-fallthrough$more" \
     $NERD_FILES tests.ts
 }
 

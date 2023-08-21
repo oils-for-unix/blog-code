@@ -1,24 +1,17 @@
-import { Error, Expr, Node, Token, Type, Value } from './header.ts';
+import { Context, Error, Expr, Node, Token, Type, Value } from './header.ts';
 import { lex } from './lex.ts';
 import { parse } from './parse.ts';
 import { transform } from './transform.ts';
 import { check } from './check.ts';
 import { evaluate } from './eval.ts';
 
-const log = console.log;
-
 function max(x: number, y: number): number {
   return x > y ? x : y;
 }
 
-function puts(s: string) {
-  let bytes = new TextEncoder().encode(s);
-  Deno.writeAllSync(Deno.stdout, bytes);
-}
-
-function repeatString(s: string, n: number) {
+function repeatString(ctx: Context, s: string, n: number) {
   let out = Array(n + 1).join(s);
-  puts(out);
+  ctx.write(out);
 }
 
 // Returns the position of the newline, or -1
@@ -42,7 +35,13 @@ function findStartOfLine(s: string, blame_pos: number): [number, number] {
   }
 }
 
-function printError(prog: string, tokens: Token[], kind: string, e: Error) {
+function printError(
+  ctx: Context,
+  prog: string,
+  tokens: Token[],
+  kind: string,
+  e: Error,
+) {
   let blame_tok = tokens[e.loc];
   let blame_start = blame_tok.start;
 
@@ -55,19 +54,22 @@ function printError(prog: string, tokens: Token[], kind: string, e: Error) {
   //log(`line_num ${line_num} begin ${line_start} end ${line_end}`);
 
   // Show snippet
-  log(prog.slice(line_start, line_end));
+  ctx.write(prog.slice(line_start, line_end));
+  ctx.write('\n');
 
   // Point to token
   let col = blame_start - line_start;
-  repeatString(' ', col);
+  repeatString(ctx, ' ', col);
 
   let n = max(blame_tok.len, 1); // EOF is zero in length
-  repeatString('^', n);
-
-  puts('\n');
+  repeatString(ctx, '^', n);
+  ctx.write('\n');
 
   // Columns are 1-based like lines
-  log(`${kind} error at line ${line_num}, column ${col + 1}: ${e.message}`);
+  ctx.write(
+    `${kind} error at line ${line_num}, column ${col + 1}: ${e.message}`,
+  );
+  ctx.write('\n');
 }
 
 // Control printing
@@ -77,7 +79,14 @@ export const TRACE_TRANSFORM = 1 << 3;
 export const TRACE_TYPE = 1 << 4;
 export const TRACE_EVAL = 1 << 5;
 
-export function run(prog: string, trace: number): Value | undefined {
+export function interpret(
+  ctx: Context,
+  prog: string,
+  trace: number,
+): Value | undefined {
+  let log = ctx.log;
+  let write = ctx.write;
+
   log('');
   log(`    PROGRAM ${prog}`);
 
@@ -99,7 +108,7 @@ export function run(prog: string, trace: number): Value | undefined {
     }
   } catch (e) {
     log('    PARSE ERROR');
-    printError(prog, tokens, 'Parse', e);
+    printError(ctx, prog, tokens, 'Parse', e);
     return;
   }
   if (tree === null) {
@@ -112,7 +121,7 @@ export function run(prog: string, trace: number): Value | undefined {
   if (tr_errors.length) {
     log('    TRANSFORM ERRORS');
     for (let e of tr_errors) {
-      printError(prog, tokens, 'Transform', e);
+      printError(ctx, prog, tokens, 'Transform', e);
     }
     return;
   }
@@ -128,7 +137,7 @@ export function run(prog: string, trace: number): Value | undefined {
   if (type_errors.length) {
     log('    TYPE ERRORS');
     for (let e of type_errors) {
-      printError(prog, tokens, 'Type', e);
+      printError(ctx, prog, tokens, 'Type', e);
     }
     return;
   }
@@ -142,15 +151,25 @@ export function run(prog: string, trace: number): Value | undefined {
     val = evaluate(expr);
   } catch (e) {
     log('    EVAL ERROR');
-    printError(prog, tokens, 'Runtime', e);
+    printError(ctx, prog, tokens, 'Runtime', e);
     return;
   }
 
   if (trace & TRACE_EVAL) {
     log('    EVAL');
-    puts('    --> ');
+    write('    --> ');
     log(val);
   }
 
   return val;
+}
+
+function write(s: string) {
+  let bytes = new TextEncoder().encode(s);
+  Deno.writeAllSync(Deno.stdout, bytes);
+}
+
+export function run(prog: string, trace: number): Value | undefined {
+  let ctx = { log: console.log, write: write };
+  return interpret(ctx, prog, trace);
 }

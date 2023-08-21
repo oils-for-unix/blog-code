@@ -1,28 +1,13 @@
-import { Binary, Error, Expr, ShouldNotGetHere, Type } from './header.ts';
+import {
+  Error,
+  Expr,
+  OP_SIGNATURES,
+  ShouldNotGetHere,
+  Sig,
+  Type,
+} from './header.ts';
 
 const log = console.log;
-
-type Sig = [Type, Type, Type];
-
-const NNN: Sig = ['Num', 'Num', 'Num'];
-const NNB: Sig = ['Num', 'Num', 'Bool'];
-const BBB: Sig = ['Bool', 'Bool', 'Bool'];
-
-// Weird syntax for dictionary type!
-const OP_SIGNATURES: { [key: string]: Sig } = {
-  '+': NNN,
-  '-': NNN,
-  '*': NNN,
-  '/': NNN,
-
-  '==': NNB, // NOT polymorphic!  only for integers.
-  '!=': NNB,
-  '<': NNB,
-  '>': NNB,
-
-  'and': BBB,
-  'or': BBB,
-};
 
 export function check(
   expr: Expr,
@@ -47,8 +32,8 @@ export function check(
       let r = types.get(expr.right);
 
       let sig = OP_SIGNATURES[expr.op];
-      var expected_left = sig[0];
-      var expected_right = sig[1];
+      let expected_left = sig[0];
+      let expected_right = sig[1];
 
       //log(`left ${l}`)
       //log(`ex ${expected_left}`)

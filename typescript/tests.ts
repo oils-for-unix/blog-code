@@ -1,5 +1,4 @@
 // Run with ./run.sh tests --filter Lex ,etc.
-import { lex } from './lex.ts';
 import {
   run,
   TRACE_EVAL,

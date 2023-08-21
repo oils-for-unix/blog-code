@@ -27,3 +27,10 @@ Type Checking in TypeScript
 
 - Yaks: Was also OK
 
+- Tydy -- Dynamically typed, and statically typed
+  - interpreted AND compiled
+  - Coudl be a
+
+- Shapes: Dyad, Knot, Coil
+
+

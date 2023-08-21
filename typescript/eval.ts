@@ -1,7 +1,7 @@
 // @ts-nocheck
 // This file uses dynamic typing
 
-import { Binary, Error, Expr, ShouldNotGetHere, Value } from './header.ts';
+import { Expr, ShouldNotGetHere, Value } from './header.ts';
 
 const log = console.log;
 

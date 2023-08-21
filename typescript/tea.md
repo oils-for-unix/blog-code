@@ -39,3 +39,10 @@ A language that's like our use of Python and mycpp:
       EmptyLine
       Eof
       [Node [cmd command]])
+
+## Comptime / Freezing
+
+- Dynamic semantics can give you JSON-like data literals?  That you include in
+  your SCRIPT!
+- Static semantics give you structs and arrays, using C++ literals syntax?
+
