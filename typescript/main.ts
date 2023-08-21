@@ -79,6 +79,8 @@ export const TRACE_TRANSFORM = 1 << 3;
 export const TRACE_TYPE = 1 << 4;
 export const TRACE_EVAL = 1 << 5;
 
+export const DYNAMIC = 1 << 6;
+
 export function interpret(
   ctx: Context,
   prog: string,
@@ -130,20 +132,22 @@ export function interpret(
     log(expr);
   }
 
-  let types: Map<Expr, Type> = new Map();
-  let type_errors: Error[] = [];
-  check(expr, types, type_errors);
+  if (!(trace & DYNAMIC)) {
+    let types: Map<Expr, Type> = new Map();
+    let type_errors: Error[] = [];
+    check(expr, types, type_errors);
 
-  if (type_errors.length) {
-    log('    TYPE ERRORS');
-    for (let e of type_errors) {
-      printError(ctx, prog, tokens, 'Type', e);
+    if (type_errors.length) {
+      log('    TYPE ERRORS');
+      for (let e of type_errors) {
+        printError(ctx, prog, tokens, 'Type', e);
+      }
+      return;
     }
-    return;
-  }
-  if (trace & TRACE_TYPE) {
-    log('    TOP LEVEL TYPE');
-    log(`    --> ${types.get(expr)}`);
+    if (trace & TRACE_TYPE) {
+      log('    TOP LEVEL TYPE');
+      log(`    --> ${types.get(expr)}`);
+    }
   }
 
   let val: Value | null = null;

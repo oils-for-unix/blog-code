@@ -1,5 +1,6 @@
 // Run with ./run.sh tests --filter Lex ,etc.
 import {
+  DYNAMIC,
   run,
   TRACE_EVAL,
   TRACE_LEX,
@@ -136,4 +137,14 @@ Deno.test(function testEval() {
   actual = run('(or (== 3 4) (== 5 5))', trace);
   assert(actual !== undefined);
   assertEquals(true, actual.value);
+});
+
+// TODO: Disable type checking and hit dynamic errors
+Deno.test(function testDynamic() {
+  let trace = DYNAMIC;
+  run('(+ true true)', trace);
+  run('(+ 42 (== 1 1))', trace);
+
+  run('(== true 42)', trace);
+  run('(and (== 3 3) 42)', trace);
 });

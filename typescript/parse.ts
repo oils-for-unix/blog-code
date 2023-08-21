@@ -77,6 +77,8 @@ export function parseNode(p: Parser): Node {
 }
 
 function parseList(p: Parser, end_id: string): List {
+  // Sometimes we want to point to (
+  // let paren_pos = p.pos;
   next(p); // eat (
 
   if (p.current.id !== 'name') {
@@ -85,6 +87,7 @@ function parseList(p: Parser, end_id: string): List {
   let list: List = {
     tag: 'List',
     name: tokenValue(p.current),
+    // loc: paren_pos,
     loc: p.pos,
     children: [],
   };

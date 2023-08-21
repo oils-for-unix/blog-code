@@ -1,7 +1,4 @@
-// @ts-nocheck
-// This file uses dynamic typing
-
-import { Expr, ShouldNotGetHere, Value } from './header.ts';
+import { Error, Expr, ShouldNotGetHere, Type, Value } from './header.ts';
 
 const log = console.log;
 
@@ -15,7 +12,7 @@ const OPS_NNN: {[key:string]: NNN} = {
   '+': (x, y) => x + y,
   '-': (x, y) => x - y,
   '*': (x, y) => x * y,
-  //'/': null,  // checked separately
+  '/': (x, y) => x / y,
 };
 
 // (Num, Num) => Bool
@@ -35,13 +32,23 @@ const OPS_BBB: {[key:string]: BBB} = {
   'or' : (x, y) => x || y,
 };
 
+function typeError(expr: Expr, t: Type, desc: string): Error | null {
+  return {
+    tag: 'Error',
+    message: `Expected ${desc} to be ${t}, got ${expr.tag}`,
+    loc: expr.loc,
+  };
+}
+
 export function evaluate(expr: Expr): Value {
   let result;
 
   switch (expr.tag) {
+    case 'Name':
+      throw ShouldNotGetHere;
+
     case 'Bool':
     case 'Num':
-    case 'Str':
       return expr;
 
     case 'If': {
@@ -53,34 +60,38 @@ export function evaluate(expr: Expr): Value {
     }
 
     case 'Binary': {
-      let left = evaluate(expr.left);
-      let right = evaluate(expr.right);
-
-      if (expr.op === '/') {
-        let x = left.value;
-        let y = right.value;
-        if (y === 0) {
-          throw { tag: 'Runtime', message: 'Divide by zero', loc: expr.loc };
-        }
-        return x / y;
-      }
+      let a = evaluate(expr.left);
+      let b = evaluate(expr.right);
+      let err;
 
       let func = OPS_NNN[expr.op];
       if (func !== undefined) {
-        let value = func(left.value, right.value);
+        if (a.tag !== 'Num') throw typeError(a, 'Num', 'left operand');
+        if (b.tag !== 'Num') throw typeError(b, 'Num', 'right operand');
+
+        if (expr.op === '/' && b.value === 0) {
+          throw { message: 'Divide by zero', loc: expr.loc };
+        }
+        let value = func(a.value, b.value);
         //log(value);
         return { tag: 'Num', value, loc: expr.loc };
       }
 
-      func = OPS_NNB[expr.op];
-      if (func !== undefined) {
-        let value = func(left.value, right.value);
+      let func2 = OPS_NNB[expr.op];
+      if (func2 !== undefined) {
+        if (a.tag !== 'Num') throw typeError(a, 'Num', 'left operand');
+        if (b.tag !== 'Num') throw typeError(b, 'Num', 'right operand');
+
+        let value = func2(a.value, b.value);
         return { tag: 'Bool', value, loc: expr.loc };
       }
 
-      func = OPS_BBB[expr.op];
-      if (func !== undefined) {
-        let value = func(left.value, right.value);
+      let func3 = OPS_BBB[expr.op];
+      if (func3 !== undefined) {
+        if (a.tag !== 'Bool') throw typeError(a, 'Bool', 'left operand');
+        if (b.tag !== 'Bool') throw typeError(b, 'Bool', 'right operand');
+
+        let value = func3(a.value, b.value);
         return { tag: 'Bool', value, loc: expr.loc };
       }
     }
