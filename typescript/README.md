@@ -15,8 +15,9 @@ Type Checking in TypeScript
 ## Docs
 
 - [TODO.md](TODO.md) - my working stuff
-- [design.md](design.md) - architecture of Nerd
-  - [syntax.md](syntax.md) - Ideas for Nerd syntax
+- [design.md](design.md) - architecture of Yaks
+  - [syntax.md](syntax.md) - Ideas for Yaks syntax
+  - [yaks.md](yaks.md) - More design
 - [lang-table.md](lang-table.md) - Related Work
 - [notes.md](notes.md) - What I might want to put on the blog
 

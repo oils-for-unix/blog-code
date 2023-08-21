@@ -1,5 +1,5 @@
-Tea
-===
+Yaks
+====
 
 A language that's like our use of Python and mycpp:
 
@@ -46,3 +46,34 @@ A language that's like our use of Python and mycpp:
   your SCRIPT!
 - Static semantics give you structs and arrays, using C++ literals syntax?
 
+## Example of Code that could work in both dynamic and static modes
+
+Maybe all this can work?
+
+I wrote it dynamically.  Seems like it can be static too.
+
+Use of strings for tags everywhere is interesting.
+
+```
+function parseList(p: Parser, end_id: string): List {
+  next(p); // eat (
+
+  if (p.current.id !== 'name') {
+    throw { message: 'Expected name after (', loc: p.pos };
+  }
+  let list: List = {
+    tag: 'List',
+    name: tokenValue(p.current),
+    loc: p.pos,
+    children: [],
+  };
+  next(p); // move past head
+
+  while (p.current.id !== end_id) {
+    list.children.push(parseNode(p));
+  }
+  next(p); // eat rparen / rbrack
+
+  return list;
+}
+```

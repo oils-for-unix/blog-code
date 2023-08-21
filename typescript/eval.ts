@@ -5,6 +5,36 @@ import { Expr, ShouldNotGetHere, Value } from './header.ts';
 
 const log = console.log;
 
+type NNN = (x: number, y: number) => number;
+type NNB = (x: number, y: number) => boolean;
+type BBB = (x: boolean, y: boolean) => boolean;
+
+// (Num, Num) => Num
+// deno-fmt-ignore
+const OPS_NNN: {[key:string]: NNN} = {
+  '+': (x, y) => x + y,
+  '-': (x, y) => x - y,
+  '*': (x, y) => x * y,
+  //'/': null,  // checked separately
+};
+
+// (Num, Num) => Bool
+// deno-fmt-ignore
+const OPS_NNB: {[key:string]: NNB} = {
+  // Exact equality
+  '==': (x, y) => x === y,
+  '!=': (x, y) => x !== y,
+  '<' : (x, y) => x < y,
+  '>' : (x, y) => x > y,
+};
+
+// (Bool, Bool) => Bool
+// deno-fmt-ignore
+const OPS_BBB: {[key:string]: BBB} = {
+  'and': (x, y) => x && y,
+  'or' : (x, y) => x || y,
+};
+
 export function evaluate(expr: Expr): Value {
   let result;
 
@@ -26,52 +56,32 @@ export function evaluate(expr: Expr): Value {
       let left = evaluate(expr.left);
       let right = evaluate(expr.right);
 
-      // Uses DYNAMIC typing
-
-      // deno-fmt-ignore
-      switch (expr.op) {
-        // Int -> Int
-        case '+': result = left.value + right.value; break;
-        case '-': result = left.value - right.value; break;
-        case '*': result = left.value * right.value; break;
-        case '/': {
-          if (right.value === 0) {
-            throw { tag: 'Runtime', message: 'Divide by zero', loc: expr.loc };
-          }
-          result = left.value / right.value; break;
+      if (expr.op === '/') {
+        let x = left.value;
+        let y = right.value;
+        if (y === 0) {
+          throw { tag: 'Runtime', message: 'Divide by zero', loc: expr.loc };
         }
-
-        // Exact equality
-        case '==': result = left.value === right.value; break;
-        case '!=': result = left.value !== right.value; break;
-        case '<': result = left.value < right.value; break;
-        case '>': result = left.value > right.value; break;
-
-        case 'and': result = left.value && right.value; break;
-        case 'or': result = left.value || right.value; break;
-
-        default: throw ShouldNotGetHere;
+        return x / y;
       }
 
-      // Make result statically typed
-      switch (expr.op) {
-        // Int -> Int
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-          return { tag: 'Num', value: result, loc: expr.loc };
+      let func = OPS_NNN[expr.op];
+      if (func !== undefined) {
+        let value = func(left.value, right.value);
+        //log(value);
+        return { tag: 'Num', value, loc: expr.loc };
+      }
 
-        case '==':
-        case '!=':
-        case '<':
-        case '>':
-        case 'and':
-        case 'or':
-          return { tag: 'Bool', value: result, loc: expr.loc };
+      func = OPS_NNB[expr.op];
+      if (func !== undefined) {
+        let value = func(left.value, right.value);
+        return { tag: 'Bool', value, loc: expr.loc };
+      }
 
-        default:
-          throw ShouldNotGetHere;
+      func = OPS_BBB[expr.op];
+      if (func !== undefined) {
+        let value = func(left.value, right.value);
+        return { tag: 'Bool', value, loc: expr.loc };
       }
     }
 

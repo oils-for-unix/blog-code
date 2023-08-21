@@ -91,7 +91,6 @@ function parseList(p: Parser, end_id: string): List {
   next(p); // move past head
 
   while (p.current.id !== end_id) {
-    //log('p.current.id ' + p.current.id);
     list.children.push(parseNode(p));
   }
   next(p); // eat rparen / rbrack
@@ -105,7 +104,6 @@ export function parse(tokens: Token[]): Node {
 
   // We only parse one expression
   if (p.current.id !== 'eof') {
-    //throw new Error('Extra token ' + p.current.id);
     throw {
       message: `Extra token ${p.current.id} at position ${p.pos}`,
       loc: p.pos,
