@@ -1,11 +1,5 @@
 ## TODO
 
-- Add dynamic checking to interpreter  -- using `OP_SIGNATURES`
-  - move that to the HEADER!
-
-  - so we can have real dynamic semantics, WITHOUT type checking
-  - like mycpp / Tea
-
 - Bundle it, embed in a web page
   - text box with button
   - dropdown for examples

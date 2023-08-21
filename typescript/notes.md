@@ -27,6 +27,13 @@ it's important to tame them.
 - Dict punning {dict} is good
   - Oils has it!
 
+- Interesting fact in eval.ts:
+  - when we add  if (...) throw typeError()
+  - then TypeScript is smart enough to narrow the type
+  - when we added DYNAMIC type checks to the evaluator, for yaks values
+    - the TYPESCRIPT code become statically typed (valid), and we didn't have
+      to use @ts-nocheck
+
 ## Notes on Deno
 
 Used all the tools:
@@ -71,6 +78,8 @@ Used all the tools:
   - polish and test
   - added op signatures to fix bug
   - switched to Deno test framework -- seems good enough
+  - made type checking optional by adding dynamic checks to evaluator
+    - so it's like Python / mycpp
 
 ## Lessons Learned
 

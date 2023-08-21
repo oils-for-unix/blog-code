@@ -2,13 +2,12 @@ import { Error, Expr, ShouldNotGetHere, Type, Value } from './header.ts';
 
 const log = console.log;
 
-type NNN = (x: number, y: number) => number;
-type NNB = (x: number, y: number) => boolean;
-type BBB = (x: boolean, y: boolean) => boolean;
+type NNN_func = (x: number, y: number) => number;
+type NNB_func = (x: number, y: number) => boolean;
+type BBB_func = (x: boolean, y: boolean) => boolean;
 
 // (Num, Num) => Num
-// deno-fmt-ignore
-const OPS_NNN: {[key:string]: NNN} = {
+const OPS_NNN: { [key: string]: NNN_func } = {
   '+': (x, y) => x + y,
   '-': (x, y) => x - y,
   '*': (x, y) => x * y,
@@ -16,20 +15,18 @@ const OPS_NNN: {[key:string]: NNN} = {
 };
 
 // (Num, Num) => Bool
-// deno-fmt-ignore
-const OPS_NNB: {[key:string]: NNB} = {
+const OPS_NNB: { [key: string]: NNB_func } = {
   // Exact equality
   '==': (x, y) => x === y,
   '!=': (x, y) => x !== y,
-  '<' : (x, y) => x < y,
-  '>' : (x, y) => x > y,
+  '<': (x, y) => x < y,
+  '>': (x, y) => x > y,
 };
 
 // (Bool, Bool) => Bool
-// deno-fmt-ignore
-const OPS_BBB: {[key:string]: BBB} = {
+const OPS_BBB: { [key: string]: BBB_func } = {
   'and': (x, y) => x && y,
-  'or' : (x, y) => x || y,
+  'or': (x, y) => x || y,
 };
 
 function typeError(expr: Expr, t: Type, desc: string): Error | null {

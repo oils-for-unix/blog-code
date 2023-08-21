@@ -67,9 +67,9 @@ function printError(
 
   // Columns are 1-based like lines
   ctx.write(
-    `${kind} error at line ${line_num}, column ${col + 1}: ${e.message}`,
+    `yaks:${line_num}:${col + 1}: ${kind} error: ${e.message}`,
   );
-  ctx.write('\n');
+  ctx.write('\n\n');
 }
 
 // Control printing
@@ -135,7 +135,7 @@ export function interpret(
   if (!(trace & DYNAMIC)) {
     let types: Map<Expr, Type> = new Map();
     let type_errors: Error[] = [];
-    check(expr, types, type_errors);
+    let typ = check(expr, types, type_errors);
 
     if (type_errors.length) {
       log('    TYPE ERRORS');
@@ -146,7 +146,7 @@ export function interpret(
     }
     if (trace & TRACE_TYPE) {
       log('    TOP LEVEL TYPE');
-      log(`    --> ${types.get(expr)}`);
+      log(`    --> ${typ}`);
     }
   }
 

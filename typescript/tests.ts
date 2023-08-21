@@ -113,6 +113,7 @@ Deno.test(function testTypeCheck() {
 
   actual = run('(if true true false)', trace);
   assert(actual !== undefined);
+  assert(actual !== null);
   assertEquals(true, actual.value);
 });
 
@@ -146,5 +147,13 @@ Deno.test(function testDynamic() {
   run('(+ 42 (== 1 1))', trace);
 
   run('(== true 42)', trace);
-  run('(and (== 3 3) 42)', trace);
+  run(
+    `
+    (and
+       (== 3 3)
+       42
+    )
+  `,
+    trace,
+  );
 });
