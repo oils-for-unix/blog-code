@@ -35,7 +35,7 @@ export function transform(node: Node, errors: Error[]): Expr {
     // Atom PNodes are also valid expressions
     case 'Bool':
     case 'Num':
-    case 'Name':
+    case 'Name':  // TODO: take it out and remove Name from Expr?
       return node;
 
     case 'List': {

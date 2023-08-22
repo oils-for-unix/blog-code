@@ -52,6 +52,7 @@ export interface Num {
   loc: number;
 }
 
+// TODO: Name -> Symbol
 export interface Name {
   tag: 'Name';
   value: string;

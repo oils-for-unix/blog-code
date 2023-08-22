@@ -11,6 +11,114 @@ A language that's like our use of Python and mycpp:
   - These can be frozen into a C++ binary as static data (zero runtime cost)
   - So it's like a comptime
 
+## Three Dialects of Yaks
+
+- Yaks TAPL -- the arithmetic language 
+  - forms: if, unary and binary ops
+  - types: Bool, Int
+
+- Yaks Mandelbrot -- 
+  - forms: fn, apply, def, do
+  - types: Bool, Num, Vec/Array
+  - Key point: it's NOT homoniconic
+    - so no macros
+    - no recursion / tail style!
+    - doseq?
+
+- Yaks to create Shak?
+  - this one could have macros
+  - And List is like a sum type?  It has a dynamic tag
+    - Type = Bool | Num | (Vec T) | List
+      - Use a [f32] representation
+
+  - does this need anything else?
+
+  - Write a dynamically typed shell language ??
+    - Shnerd ?  Sherd?
+    - read(), eval(), apply()
+    - Can you write Sherd with Nerd mandelbrot?
+      - Depends if you need List or not?
+
+  - Data Language with NON -- Nerd Object Notation
+    - I guess this is in Sherd, because Nerd is statically typed.
+
+  - Explicit function level typing, with inference in the middle?
+
+## Yaks like Oils C++
+
+Code
+
+- Top Level: class, func   (Class Fn Init Destroy)
+- including methods, inheritance
+- constructor and destructor for context manager
+- modules: import
+
+Within a function
+
+- var set
+  - not def?  Because (set [a i] 0) is different and useful
+  - I guess Yaks TAPL can use def
+- scope  : with - for scope { }
+- looping: foreach, while
+- cond   : if switch (tagswitch)
+- errors : try catch throw
+
+Data Types
+ 
+- Bool Int Float Str
+- (List T) (Dict K V)
+
+Basically I want to make an interpreter with the same semantics as mycpp
+We already have that -- it's Python
+
+But this is a static interpreter I guess
+
+## Bolt
+
+- Follow Bolt, an OO language implemented in OCaml
+  - TAPL doesn't seem to have an implementation
+  - <https://mukulrathi.com/create-your-own-programming-language/intro-to-type-checking/>
+  - Although he uses a repetitive AST style, not the map
+  - Also typing environment is a list, not a Dict !
+  - Dicts are missing from OCaml!
+
+- <https://github.com/mukul-rathi/bolt/blob/master/src/frontend/typing/type_classes.ml>
+  - 143 lines
+
+- Does Bolt have function types?  I think we need those
+  - or maybe we don't need first class ones?
+
+- <https://mukulrathi.com/create-your-own-programming-language/inheritance-method-overriding-vtable/>
+  - OK this is good, I want inheritance!
+  - Copy all this in TypeScript
+
+## PL Zoo
+
+- <https://plzoo.andrej.com/>
+  - "sub" language: eager, mutable records, statically typed, subtyping
+  - but syntax?
+  - examples don't have subtyping!!!  Bad
+
+## Differences from Lisp
+
+- We have the 'transform' stage
+  - it does special forms, at PARSE time, not runtime
+
+  - but does this make sense?
+    - ((fn [x] (+ x 1)) 42) is the issue
+    - you eval the first one
+
+- TODO: rename parse to read?   I like parse though because it's creating
+  recursive structure.  That's different than reading.
+  - Also Lisp has a bunch of syntax!
+
+## ocamlscheme
+
+- https://github.com/schani/ocamlscheme
+
+- "This is a very efficient interpreter for a small statically scoped subset of Scheme"
+- "Most importantly, no symbol lookup needs to happen during execution"
+
 ## Type Checker and Compiler for Yaks, in Yaks
 
 This makes sense!
@@ -55,34 +163,6 @@ This is what I was doing with Python
       - does `('+ a b)` 
       - does `((quote +) a b)`  ?
 
-## Language of Types
-
-    Bool  Int  Float   Str
-    (List T) e.g. (List Int), (List Str)
-    (Dict K V) e.g. (Dict Str Int)
-
-    (def Person (data
-      [name Str]
-      [age Int]))
-
-    (def word (enum
-      [Operator (typeref Token)]
-      [CompoundWord (typeref CompoundWord)]
-      [BracedTree [parts (List word_part)]
-      ))
-
-    (def-data ...) (def-enum ...)
-
-    or maybe capital letters for these macros
-
-    (Data Person
-      [name Str]
-      [age Int])
-
-    (Enum parse_result
-      EmptyLine
-      Eof
-      [Node [cmd command]])
 
 ## Comptime / Freezing
 
@@ -168,102 +248,4 @@ So I guess you wite a recursive descent parser
 I guess reuse the dynamic semantics of Yak for this?  Interpreted, without type checking
 
 This is the same as unifying mycpp and YSH -- Tea/Oils
-
-## Yaks: A Typed Language From Scratch, With All the Bells and Whistles (Blog)
-
-### Language
-
-- Traditional front end: Lexer, Parser to CST, Transformer to AST
-  - Concrete vs. Abstract Syntax Tree is Important (see below)
-- Type Checker
-- Compiler (to WASM) That Relies on Types (+)
-- Interpreter that does dynamic checks (for quick prototyping)
-
-- Data Types:
-  - Bool Num (is a float for mandelbrot)
-  - Str List `Vector[T]` (+)
-    - with UTF-8 support?  At least count the length
-
-- Code Types
-  - `(-> [Num Num] Bool)`
-
-#### Advanced features later (+)
-
-- String Interpolation `(echo "hello \(name)")`
-- Comptime like Zig,  (C++ constexpr/consteval), D has this too I think
-  - `(constexpr x (+ 2 3)`
-  - `(constexpr [x Int] (+ 2 3)`
-
-- Serialization with YON: Yaks Object Notation
-  - TODO: static vs. dynamic variant?
-
-- Reader macros?
-  - Quasi-quote with `\\(foo $unquote @splice)`
-  - Not sure if we need `$(a b) @(c d)`, maybe not
-    - I think those are just variables
-
-  - for shell `$(echo hi)` => `(cmd echo hi)` ?
-  - `$(echo "hello \(name)")` => `(cmd echo hi)` ?
-
-  - There's a conflict between string substitution $var $(echo hi) and macro 
-  - use case: `and` macro
-
-- Julia uses $
-- Elixir just uses unquote(x) and unquote do end?
-  - <https://elixir-lang.org/getting-started/meta/quote-and-unquote.html>
-  - just
-
-### Runtimes
-
-### node.js interpreter
-
-- just use process.stdout and process.stdin?
-  - for reading and writing YON
-
-### WebAssembly
-
-- console.log() binding I guess
-- maybe the `<canvas></canvas>` binding for Mandelbrot
-  - https://github.com/andychu/javascript-vs-c
-  - file:///home/andy/git/oilshell/javascript-vs-c/mandelbrot.html
-  - How do you do Math.log?
-
-- Exchange YON with browser?
-  - "" string literal syntax should be easy
-  - I guess you can send UTF-8 strings, but not everything
-
-### Unix - Plain C?
-
-- File I/O with `Int` FD
-- (fork) and (wait) concurreency?
-
-- What about garbage collection and signals?
-
-### Tools
-
-- Formatter
-  - indentation and whitespace
-  - maybe comments -- we don't have that right now -- I think Lisps
-    traditionally have some problems with this
-
-- Linter
-  - unused variables
-
-- Test framework?  Probably need it, could use macros for assert?
-
-- Bundler?  Probably not, we don't have modules?
-
-#### "IDE" from Scratch
-
-- textarea and input box
-- reprint the whole text with `<span class="error"></span>` when there's an
-  error
-
-### Applications
-
-- Mandelbrot (graphics)
-  - Num and `Vector[Num]`
-- Shak: Shell implemented in Yaks?
-  - can probably use Deno/node.js stdout, and possibly
-  - $(echo hi)
 

@@ -1,5 +1,11 @@
 ## TODO
 
+- List should be
+  - `{ tag: 'List', items: Node[], loc: number }` where loc is `(`
+  - parser should allow it
+  - transform.ts is for our special forms, and it only allows if and -
+    - there are no functions at all
+
 - 'name' lexer rule should be all printable chars but NOT
   - `# ( ) [ ] { }`
   - TODO: look at ascii table

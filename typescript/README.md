@@ -15,11 +15,35 @@ Type Checking in TypeScript
 ## Docs
 
 - [TODO.md](TODO.md) - my working stuff
-- [design.md](design.md) - architecture of Yaks
+- [yaks.md](yaks.md) - design
+  - [data-types.md](design.md) - Bool Num Vec Func, then List
   - [syntax.md](syntax.md) - Ideas for Yaks syntax
-  - [yaks.md](yaks.md) - More design
-- [lang-table.md](lang-table.md) - Related Work
-- [notes.md](notes.md) - What I might want to put on the blog
+  - [blog.md](blog.md) - What I might want to put on the blog
+- Blog
+  - [lang-table.md](lang-table.md) - Related Work
+  - [notes.md](notes.md) - Experiences with TypeScript etc.
+
+## Notes on Stages
+
+- Lexing: use regex for exhaustive reasoning.
+  - Weird JavaScript API, "sticky bit"
+- Reading: important to write out the grammar!
+  - Added [] synonym for (), allowing Clojure-like sugar
+- Why separate reading and parsing?
+  - CPython has parser and transformer
+    - homogeneous -> heterogeneous tree (untyped or "tagged" with dynamic type,
+      to TYPED)
+  - Matklad's type inference code operated on a heterogeneous
+  - "Reader" will be useful for JSON
+
+### List of Errors
+
+- Lexing -- there are no errors - but BAD uses
+- Reading -- matching `() []`, EOF, etc.
+- Transforming -- `if` and `+` have right arity
+- Inference / Type checking -- `+` has right args, etc.
+- Runtime -- 1/0
+
 
 ## Naming Ideas
 
@@ -33,5 +57,4 @@ Type Checking in TypeScript
   - Coudl be a
 
 - Shapes: Dyad, Knot, Coil
-
 

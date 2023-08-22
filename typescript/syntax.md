@@ -1,12 +1,13 @@
 ## Syntax Notes
 
+    [+ 1 [* 3 4]]  # This is allowed
+
 ### Clojure
 
 - `do` is `begin`
   - `lambda` and `let` have implicit `do`
 - `fn` is `lambda`
   - `defn` is `(def id (fn [x] x))`
-
 
 ### More
 
@@ -128,8 +129,12 @@ string: "(<char> | \n | \t | \\ | \' | \" | \<hex><hex> | \u{<hex>+})*"
   - is hex really "\ff" ?  Not \xff
 
 
-
 ## Clojure Quoting
+
+Make a lisp is inspired by Clojure
+
+- <https://github.com/kanaka/mal/blob/master/process/guide.md#step7>
+
 
 Quoting
 
