@@ -34,6 +34,11 @@ it's important to tame them.
     - the TYPESCRIPT code become statically typed (valid), and we didn't have
       to use @ts-nocheck
 
+- Typescript `interface Bool {}` vs `type Bool = ` is a confusing -- they are
+  ALMOST interchangeable, and it has changed between versions
+  - The language certainly works well, and is sophisticated, but it seems like
+    it was a bit cobbled together
+
 ## Notes on Deno
 
 Used all the tools:

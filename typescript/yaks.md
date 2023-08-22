@@ -11,38 +11,70 @@ A language that's like our use of Python and mycpp:
   - These can be frozen into a C++ binary as static data (zero runtime cost)
   - So it's like a comptime
 
+## Why work on this?
+
+- To learn to write type checking algorithms
+  - See lang-table.md -- there are surprisingly few static langauges
+    implemented in static languages.
+
+- To experiment with something like Zig's comptime, C++ constexpr/consteval
+  - Should replace a lot of code gen in Oils?
+
+- To experiment with an interpreter for a static language -- like a comptime
+  interpreter
+
+- To experiment with mixing dynamic and static styles --
+  - Python/mycpp pair 
+  - JavaScript/TypeScript pair -- matklad noted the visitor issue is more dynamic
+
+- LATER: experiment with module systems
+  - that's the main thing bad with mycpp
+    - fix the problems with default arguments in headers
+    - with inheritance across modules
+    - with hard-coded ordering
+  - Each directory is a module, and compiles to a single C++ translation unit and header
+  - dependencies are enforced to be acyclic
+
+Lower Priority
+
+- Experiment with unified Linter/formatter/translator
+  - and syntax highlighter?
+
 ## Three Dialects of Yaks
 
 - Yaks TAPL -- the arithmetic language 
   - forms: if, unary and binary ops
   - types: Bool, Int
 
-- Yaks Mandelbrot -- 
-  - forms: fn, apply, def, do
+- Yaks C -- 
+  - forms: fn, apply, var, set, do -- also if is IMPERATIVE
   - types: Bool, Num, Vec/Array
   - Key point: it's NOT homoniconic
     - so no macros
     - no recursion / tail style!
     - doseq?
 
-- Yaks to create Shak?
-  - this one could have macros
-  - And List is like a sum type?  It has a dynamic tag
-    - Type = Bool | Num | (Vec T) | List
-      - Use a [f32] representation
+- Yaks Zig
+  - `(comptime x (+ 2 3)`, which is like `var`
 
-  - does this need anything else?
+- Yaks for Oils -- mycpp/Python pair
+  - This is really an IR for compiling to C++ ?
 
-  - Write a dynamically typed shell language ??
-    - Shnerd ?  Sherd?
-    - read(), eval(), apply()
-    - Can you write Sherd with Nerd mandelbrot?
-      - Depends if you need List or not?
+These are all IMPERATIVE langauges, they are not Lispy!  They are not
+homoiconic.
 
-  - Data Language with NON -- Nerd Object Notation
-    - I guess this is in Sherd, because Nerd is statically typed.
+We just use the Lisp syntax since it's simple to parse.
 
-  - Explicit function level typing, with inference in the middle?
+- Later: Yaks Dynamic?
+  - rewrite dynamic semantics for Yaks in Yaks?
+
+- what about Shak: a Lisp with SON -- Shak Object Notation
+  - a shell?
+  - MACROS for Shak
+    - ASDL generating Yaks type definitions
+    - well does comptime change that?  You can generate types on the fly?
+    - what about the lexer?
+      - would you write a mini re2c?
 
 ## Yaks like Oils C++
 
@@ -51,7 +83,7 @@ Code
 - Top Level: class, func   (Class Fn Init Destroy)
 - including methods, inheritance
 - constructor and destructor for context manager
-- modules: import
+- modules: import   (Import ?)
 
 Within a function
 
@@ -63,6 +95,17 @@ Within a function
 - cond   : if switch (tagswitch)
 - errors : try catch throw
 
+Infix Expressions?
+
+I think these are the interesting ones:
+
+- `(myfunc obj.field)`
+- `(obj.method arg1 arg2)`
+- Probably `(+ 1 2)` is OK -- this is a rough IR
+  - Also I wonder about formatting
+    - that could be `\()` or something?  But sometimes you want dynamic
+      formats?  So printf can be OK
+
 Data Types
  
 - Bool Int Float Str
@@ -72,6 +115,24 @@ Basically I want to make an interpreter with the same semantics as mycpp
 We already have that -- it's Python
 
 But this is a static interpreter I guess
+
+### ASDL
+
+- Enum Data - desguaring to classes
+  - are these macros that generate (Class)  or (def x Class) ?
+  - would make sense
+  - And this is where you need quoting like \\()
+
+- or are these constexpr?
+
+- Honestly I think textual code generation has some benefits -- you can read
+  the code
+  - well you can read the Yaks IR - these can be separate Unix-processes, or
+    they can communicate YON to avoid lexing and parsing
+  just like you can read
+
+- Infix
+
 
 ## Bolt
 

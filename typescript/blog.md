@@ -75,6 +75,8 @@
 - Linter
   - unused variables
 
+- Syntax highlighter in Treesitter?  I want to at least try it
+
 - Test framework?  Probably need it, could use macros for assert?
 
 - Bundler?  Probably not, we don't have modules?
