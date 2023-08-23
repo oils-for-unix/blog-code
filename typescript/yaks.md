@@ -26,6 +26,18 @@ A language that's like our use of Python and mycpp:
 - To experiment with mixing dynamic and static styles --
   - Python/mycpp pair 
   - JavaScript/TypeScript pair -- matklad noted the visitor issue is more dynamic
+  - Similar pie in the sky wishes: 
+    - "TypeScript as fast as Rust" - https://news.ycombinator.com/item?id=30947680
+    - Wants a hybrid of level 2 (Java Go) and level 3 (MyPy TypeScript), giving
+      "RustScript"
+      https://gist.github.com/xixixao/8e363dbd3663b6729cd5b6d74dbbf9d4
+      - well mycpp is compiled, so it's more like Java/Go.  And it's also
+        interpreted, all the way up to level 4.
+    - I think these ideas aren't fleshed out in terms of interop and semantics
+      -- they're very concerned with syntax -- but it seems like the desire is
+      real
+    - "The best part is that all three languages share pretty much the same syntax, and they are built so that calling from higher level to lower level variant is effortless. This gives us the ability to use the rich Rust ecosystem from a level 2/3 or even level 4 language."
+      - there is a problem with mixed stacks, and composition
 
 - LATER: experiment with module systems
   - that's the main thing bad with mycpp
