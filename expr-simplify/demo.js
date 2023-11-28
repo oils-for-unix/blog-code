@@ -31,12 +31,12 @@ const Times = (left, right) => ({
 function simplify(node) {
     switch (node.type) {
         case "plus": {
-            const left = simplify(node.left);
-            const right = simplify(node.right);
+            var left = simplify(node.left);
+            var right = simplify(node.right);
 
             // Commute variables to the left.
             if (left.type !== "variable" && right.type === "variable") {
-                return Plus(right, left)
+                [left, right] = [right, left];
             }
 
             // Fold 0 + x => x.
