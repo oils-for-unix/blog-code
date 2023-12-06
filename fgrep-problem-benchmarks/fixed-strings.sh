@@ -31,9 +31,10 @@ banner() {
   echo
 }
 
-re2c() {
-  ~/git/oilshell/oil/_deps/re2c-1.0.3/re2c "$@"
-}
+# Disabled - use the one in $PATH
+# re2c() {
+#  ~/git/oilshell/oil/_deps/re2c-1.0.3/re2c "$@"
+# }
 
 publish-data() {
   local name=$1
@@ -305,12 +306,16 @@ viz() {
   re2c --emit-dot -o $dot $name.re2c.cc
   re2c -o _gen/$name.cc $name.re2c.cc
   dot -T png -o _gen/$name.png $dot
+
 }
 
 viz-all() {
   viz trie
   viz do-done
   viz else-elif
+  viz synthetic-rsc
+
+  ls -l _gen
 }
 
 edited() {

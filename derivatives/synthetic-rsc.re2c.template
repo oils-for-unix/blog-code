@@ -1,0 +1,10 @@
+/*!re2c
+
+  "__REGEX_HERE__" {
+    printf("yes\n");
+  }
+  * {
+    printf("no\n");
+  }
+
+*/

@@ -68,6 +68,29 @@ rsc-demo() {
   rsc-no 3
 }
 
+make-re2c() {
+  local pat
+
+  mkdir -p _gen
+
+  for n in 10 11 12; do
+    pat=$(rsc-pat $n)
+    echo $pat
+    local re2c_cc=_gen/synthetic-rsc-$n.re2c.cc
+    local cc=_gen/synthetic-rsc-$n.cc
+    local dot=_gen/synthetic-rsc-$n.dot
+    local png=_gen/synthetic-rsc-$n.png
+
+    sed "s/__REGEX_HERE__/$pat/g" synthetic-rsc.re2c.template > $re2c_cc
+
+    time re2c -o $cc $re2c_cc
+    re2c --emit-dot -o $dot $re2c_cc
+    dot -T png -o $png $dot
+  done
+
+  ls -l _gen
+}
+
 #
 # fgrep-problem workload
 #
