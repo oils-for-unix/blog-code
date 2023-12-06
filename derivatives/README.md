@@ -87,4 +87,12 @@ Commands to run in the `andychu/epsilon` repo, which tests the `refactor/` dir:
 
 ## TODO:
 
-- Do these tests in re2c
+- Create test harness for the two problems
+  - a?a?a? ... aaa ...
+  - aaa|bbb|ccc|...
+    - move this one out of unit tests
+
+- Do these tests against NFA implementation
+- Do these tests against re2c?
+- Then ask to plug in in say OCaml impls
+  - add start and end params
