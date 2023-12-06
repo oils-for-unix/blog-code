@@ -160,6 +160,8 @@ py-nfa() {
 with-re2c() {
   local pat=$1
   local text=$2
+
+  echo TODO
 }
 
 matchers-demo() {
@@ -176,6 +178,54 @@ matchers-demo() {
 all-matchers-demo() {
   matchers-demo epsilon
   matchers-demo py-nfa
+}
+
+#
+# Benchmarks
+#
+
+run-syn-fgrep() {
+  local cmd=$1
+  local n=$2
+
+  local pat text
+  pat=$(fgrep-pat $n)
+  text=$(fgrep-yes $n)
+
+  echo
+  echo "    n=$n $cmd $pat $text"
+  echo
+
+  time $cmd $pat $text
+}
+
+run-syn-rsc() {
+  local cmd=$1
+  local n=$2
+
+  local pat text
+  pat=$(rsc-pat $n)
+  text=$(rsc-yes $n)
+
+  echo
+  echo "    n=$n $cmd $pat $text"
+  echo
+  time $cmd $pat $text
+}
+
+all-benchmarks() {
+  for cmd in epsilon py-nfa; do
+    # Oh this is alternations, not the regular vector!  The problem doesn't
+    # show up there
+
+    run-syn-fgrep $cmd 20
+    run-syn-fgrep $cmd 21
+    run-syn-fgrep $cmd 22
+
+    run-syn-rsc $cmd 9
+    run-syn-rsc $cmd 10
+    run-syn-rsc $cmd 21
+  done
 }
 
 "$@"
