@@ -27,7 +27,10 @@ Regex Derivatives Experiments
   - I refactored the code to a functional style, made it pass the tests from
     the BurntSushi repo.
     - See the `refactor/` directory
-  - Got non-linear blowup on the "Russ Cox regex", and "the fgrep problem".
+  - Got non-linear blowup on the "Russ Cox regex", and the "regular vector".
+    - Originally I thought it blow up on alternation, the "fgrep problem", but
+      it's only the regular vector.  That's the mechanism that allows the
+      caller to know which arm matched, as in a lexer generator.
   - I referred to the links in my own 2020 blog post:
     <http://www.oilshell.org/blog/2020/07/ideas-questions.html#regular-expression-derivatives-papers-and-code>
 
