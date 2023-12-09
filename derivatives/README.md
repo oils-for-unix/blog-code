@@ -77,7 +77,14 @@ Computational complexity, "bad experiences" noted on from lobste.rs.
 
 Use re2c as a baseline.
 
-## Demos of Blowups in Epsilon
+## Demo of Blowups in Epsilon
+
+    ./blowup-test.sh all-benchmarks
+
+(Right it only tests synthetic-rsc, because fgrep problem isn't slow in
+epsilon)
+    
+### Old Demos (I consolidated these)
 
 Commands to run in the `andychu/epsilon` repo, which tests the `refactor/` dir:
 
@@ -87,12 +94,7 @@ Commands to run in the `andychu/epsilon` repo, which tests the `refactor/` dir:
 
 ## TODO:
 
-- Create test harness for the two problems
-  - a?a?a? ... aaa ...
-  - aaa|bbb|ccc|...
-    - move this one out of unit tests
+- Can we plug in OCaml impls?
+  - Interface: $cmd $regex $str -> print $str if it matches
+  - where $cmd can be a shell function that wraps another command
 
-- Do these tests against NFA implementation
-- Do these tests against re2c?
-- Then ask to plug in in say OCaml impls
-  - add start and end params

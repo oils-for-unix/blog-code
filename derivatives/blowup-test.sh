@@ -165,6 +165,8 @@ epsilon() {
   local text=$2
 
   pushd $REPO_DIR/epsilon > /dev/null
+
+  # HACK for laptop: . py3-hack.sh before
   python3 -m refactor.tool match "$@"
   popd > /dev/null
 }
@@ -215,7 +217,7 @@ run-syn-fgrep() {
   pat=$(fgrep-pat $n)
   text=$(fgrep-yes $n)
 
-  echo
+  echo '---'
   echo "    n=$n $cmd $pat $text"
   echo
 
@@ -230,7 +232,7 @@ run-syn-rsc() {
   pat=$(rsc-pat $n)
   text=$(rsc-yes $n)
 
-  echo
+  echo '---'
   echo "    n=$n $cmd $pat $text"
   echo
   time $cmd $pat $text
@@ -240,14 +242,13 @@ all-benchmarks() {
   for cmd in epsilon py-nfa; do
     # Oh this is alternations, not the regular vector!  The problem doesn't
     # show up there
+    #run-syn-fgrep $cmd 20
+    #run-syn-fgrep $cmd 21
+    #run-syn-fgrep $cmd 22
 
-    run-syn-fgrep $cmd 20
-    run-syn-fgrep $cmd 21
-    run-syn-fgrep $cmd 22
-
-    run-syn-rsc $cmd 9
-    run-syn-rsc $cmd 10
-    run-syn-rsc $cmd 21
+    run-syn-rsc $cmd 14
+    run-syn-rsc $cmd 16
+    run-syn-rsc $cmd 18
   done
 }
 

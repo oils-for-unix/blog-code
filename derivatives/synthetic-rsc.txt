@@ -1,0 +1,42 @@
+---
+    n=14 epsilon a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaa aaaaaaaaaaaaaa
+
+	0.00140 Parsed
+	0.34180 DFA
+	0.34180 Matched
+aaaaaaaaaaaaaa
+    *** process user mode secs = 0.382
+---
+    n=16 epsilon a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaa
+
+	0.00211 Parsed
+	0.63654 DFA
+	0.63654 Matched
+aaaaaaaaaaaaaaaa
+    *** process user mode secs = 0.675
+---
+    n=18 epsilon a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaa
+
+	0.00247 Parsed
+	1.07160 DFA
+	1.07160 Matched
+aaaaaaaaaaaaaaaaaa
+    *** process user mode secs = 1.104
+---
+    n=14 py-nfa a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaa aaaaaaaaaaaaaa
+
+Matching 'aaaaaaaaaaaaaa'
+aaaaaaaaaaaaaa
+    *** process user mode secs = 0.044
+---
+    n=16 py-nfa a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaa
+
+Matching 'aaaaaaaaaaaaaaaa'
+aaaaaaaaaaaaaaaa
+    *** process user mode secs = 0.040
+---
+    n=18 py-nfa a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?a?aaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaa
+
+Matching 'aaaaaaaaaaaaaaaaaa'
+aaaaaaaaaaaaaaaaaa
+    *** process user mode secs = 0.043
