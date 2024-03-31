@@ -18,7 +18,8 @@ make-dir() {
 
   echo "dir = $dir"
 
-  mkdir -p "$dir"
+  rm -r -f -v hidden/
+  mkdir -v -p "$dir"
   touch "$dir/file.txt"
 }
 
