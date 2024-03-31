@@ -10,13 +10,12 @@ set -o errexit
 what-is-wrong-with-this-rust-code() {
   rm -v -f PWNED
 
-  #rm -r -f -v hidden/
-  #./setup.sh make-dir
+  rm -r -f -v hidden/
+  ./setup.sh make-dir
 
   ~/.cargo/bin/rustc main.rs
 
-  # Run the program on a subtree
-  ./main hidden/
+  ./main
 }
 
 reveal() {

@@ -43,20 +43,23 @@ fn load_shell_environment(dir: &Path) -> Result<(), Box<dyn Error>> {
 }
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    let root_dir = Path::new(&args[1]);
+    if let Ok(current_dir) = env::current_dir() {
+        println!("Current working directory: {}", current_dir.display());
 
-    let mut deepest_directory: Option<PathBuf> = None;
-    find_deepest_directory(&root_dir, &mut deepest_directory);
+        let mut deepest_dir: Option<PathBuf> = None;
+        find_deepest_directory(&current_dir, &mut deepest_dir);
 
-    match deepest_directory {
-        Some(path) => {
-        println!("Deepest directory: {}", path.display());
-            let _ = load_shell_environment(Path::new(&path));
-            println!("");
-            println!("I printed your environ, from your interactive shell.  What else did I do?");
+        match deepest_dir {
+            Some(path) => {
+            println!("Deepest directory: {}", path.display());
+                let _ = load_shell_environment(Path::new(&path));
+                println!("");
+                println!("I printed your environ, from your interactive shell.  What else did I do?");
+            }
+            None => println!("No directory found"),
         }
-        None => println!("No directory found"),
+    } else {
+        println!("Failed to get the current working directory");
     }
 }
 
