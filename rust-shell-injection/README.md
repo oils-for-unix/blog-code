@@ -1,7 +1,14 @@
 Shell Injection Demo in Rust
 ============================
 
-Context:
+## What's wrong with this code?
+
+    rustc main.rs
+    ./main.rs
+
+Why does the file `PWNED` appear in the current directory?
+
+## Context
 
 - Discussion of blog post with shell injection in Rust:
   <https://lobste.rs/s/hru0ib/how_lose_control_your_shell#c_jamktx>
