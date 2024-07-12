@@ -1,6 +1,32 @@
 Notes
 =====
 
+## Missing in the Oils Runtime
+
+- Embeddable pure interpreter
+  - e.g. for Hay-like "remote evaluation"
+
+- Small String Optimization - immediate values
+
+- Reflection on YSH source code within YSH
+  - exporting tht AST
+
+- Event loop!   ASYNC RUNTIME FOR SHELL!
+  - Maybe this is where I prototype it?
+
+---
+
+- OK I want to make a small C++ version
+  - and test it
+
+### Missing in catbrain
+
+- Interactive parsing
+  - this creates ownership issues?
+  - Or does it?
+  - I'm thinking of the "backing lines" problem
+- GC
+
 ## Links    
 
 - https://learnxinyminutes.com/docs/factor/
@@ -9,8 +35,135 @@ Notes
 
 I think Tcl is closer to what we want - it's shell and Lisp like.
 
-    
-## DraftS
+
+## Using Stack for chaining programs
+
+    const foo.o
+    ex cc -o $1 foo.c
+ 
+    const bar.o
+    ex cc -o $2 foo.c
+ 
+    # now link them?
+    # the problem is that this isn't parallel
+    ex ld
+
+Maybe you can also do
+
+    const a b c  # push all of these
+    for {
+      const $pop.o
+      ex cc -o $pop foo.c
+    }
+
+Yeah you kind of need $pop and ${pop}
+And I think $1 $2 $3 $4 makes sense
+
+And also @1 @2 if it's an array?
+
+This is useful for constructing command lines
+
+
+## ARrays
+
+- gather - turn the whole stack into a list
+- spread - append the top of the stack
+- array - build up a new array imperatively!  This is like Hay!
+
+
+
+- REFLECTION on nested structure?
+
+## JSON Structure
+
+    Command:
+    ["w", ["arg1", "arg2"]]
+
+
+    Block:
+    [ ["w", []], ["w", []] ]
+
+That is a bit ugly I guess
+
+Another structure is
+
+    ["w", "arg1", "arg2"]
+
+    [["w"],
+     ["w"]]
+
+Or
+
+    {"w": ["arg1", "arg2"]}
+    {"w": []}
+
+    [{"w": []},
+     {"w": []}]
+
+But dicts aren't native.
+
+TODO:
+
+- I want to reflect on source code
+  - I want precise error info
+  - So I wonder if you just get a tuple of (tree, tokens array)
+  - and then you index into those positions
+
+## NIL8
+
+  (Command w (arg1 arg2))
+
+  (Program (Command w) (Command w))
+
+What about location info?
+
+  (Command w (arg1 arg2) |48 49 50|)
+
+  (Program (Command w |49 50|) (Command w |50 51|) |50 90|)
+
+
+## More Arrays
+
+    extern ls /tmp
+ 
+    const :| ls /tmp |  # array of words
+    extern 
+
+
+## Positional Args
+
+    $1 $2 .. $9   #  are these right ot left?
+                  # or maybe it's $_ is the top, and $1 $2 $3 are offsets from
+                  # the top
+
+    Not going to implement ${1} or $x or ${x}
+
+    $-  # this can be POP?
+    $!  # side effect
+
+    $$  # pop, conflicts with PID?
+    $_
+
+    $<>  # not taken in shell?
+
+    ${}
+
+
+    const foo.c
+    const bar.c
+    const :| foo.c bar.c |
+
+How to make a pipeline:
+
+    array {
+      const :| ls /tmp |
+      const :| wc -l |
+    }
+    # array of arrays?
+    pipeline
+
+
+## Drafts
 
 cat program:
 

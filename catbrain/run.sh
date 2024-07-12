@@ -208,6 +208,98 @@ write2 eggs spam
 '
 }
 
+test-eval() {
+  ./catbrain.py -c '
+eval {
+  w-line a
+  w-line b
+}
+'
+}
+
+test-pp() {
+  # I'm not sure if pp $1 is valid
+  ./catbrain.py -c '
+const foo
+const bar
+
+pp
+pp
+'
+}
+
+test-array() {
+  ./catbrain.py -c '
+const mystr
+array {
+  const foo
+  const bar
+}
+# pretty print the top value, no matter what it is
+pp
+
+pp
+
+# error, because there is no way to pass array
+#pp mystr
+'
+
+# there is no syntax to pass an array IMMEDIATE?   You have to build it on the
+# stack first and then pass it/
+
+# each "def" takes an array of args, each of which is EITHER a string or array?
+# yeah it is a nested heap
+
+# extern ls /tmp  # This one interprets it as an array though!
+# extern
+
+}
+
+test-bad-args() {
+  local status stdout
+
+  nq-capture status stdout \
+    ./catbrain.py -c 'eval foo'
+  nq-assert 1 = "$status"
+
+  return
+  nq-capture status stdout \
+    ./catbrain.py -c 'extern { w-line hi } '
+  nq-assert 1 = "$status"
+
+}
+
+test-extern() {
+
+  # TODO: add / to valid tokens
+  ./catbrain.py -c 'extern ls _tmp'
+
+  return
+
+  ./catbrain.py -c '
+const early
+
+#{     # does this mean
+
+eval {
+  const ls 
+  const _tmp
+  extern
+}
+
+w-line
+
+'
+
+  ./catbrain.py -c '
+const ls  
+ch space
+const _tmp
+join
+sh
+'
+}
+
 byo-maybe-run
 
 "$@"  

@@ -1,43 +1,28 @@
 TODO
 ====
 
-- feed
-- def f { }
-  - f x y  # is short for pushing the args on the stack!
-  - or is it pushing
-
-  - I guess f { x } { y } also makes sense, but it's not YSH
-
 
 - Do NESTED structure
   - `{ }` in code can mirror data
   - I guess you can push the DATA stack
   - `frame { }`
-
-- REFLECTION on nested structure?
-
+- try
+  - bind to error codes from shell!
 
 - I think you can have a netstring dict format
   - 3:key,4:value,
   - and then you can search for the key value
-
-- capture feed are probably useful for that
+  - capture feed are probably useful for that
+  - this can be a def
 
 - Check signatures of commands more tightly
+  - `_DataArg`, `_OneArg`, etc.
 
 - errors
   - syscall errors
   - arg conversion errors
   - op errors
 - control flow without exceptions  
-
-- Consider LINEAR TIME
-  - DATA ORIENTED - for argv and env
-  - abandon 'loop break' for something LESS GENERAL
-
-  - EOF condition, empty stack condition, etc.
-    - eof is a flag set by r-line?
-
 
 ## Build
 

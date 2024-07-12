@@ -73,14 +73,18 @@ Comparisons:
   - pid
   - no memory allocation - fixed
 
-- `sh-brain` - arbitrary I/O and syscalls
-  - regcomp()
-  - regexec()
-  - fork
-  - can start threads, e.g. so you can inspect them
+- `sh-brain` - everything a shell has?
+   - arbitrary I/O and syscalls
   - exec
+  - wait
+
+  - unfortunately we can't share the runtime?  Because we have SmallStr?
+  - it would be nice
+
+- workbrain - workloads
+  - can start threads, e.g. so you can inspect them
+  - fork
   - malloc
-  - can call system() on shell, or probably forkwait { }
 
 - `bad-brain`
   - I don't know all of these

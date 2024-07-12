@@ -11,6 +11,7 @@ import json
 import optparse
 import os
 import re
+import subprocess
 import sys
 import time
 
@@ -268,6 +269,23 @@ class ctx_Input(object):
         self.vm.stdin = self.old_stdin
 
 
+class ctx_TopArray(object):
+    def __init__(self, vm):
+        self.vm = vm
+
+        new_array = []
+        self.old_stack = vm.stack
+        self.old_stack.append(new_array)
+
+        vm.stack = new_array
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
+        self.vm.stack = self.old_stack
+
+
 class CatBrain(object):
     def __init__(self, argv, env):
         self.step = 0  # iteration counter
@@ -293,7 +311,7 @@ class CatBrain(object):
             raise RuntimeError('Command %r expected block arg, got %s' % (name, arg))
         return arg
 
-    def _DataArg(self, name, args):
+    def _OneArg(self, name, args):
         n = len(args)
         if n == 0:
             arg = self.stack.pop()
@@ -301,6 +319,52 @@ class CatBrain(object):
             arg = args[0]
         else:
             raise RuntimeError('Command %r got too many args %s' % (name, args))
+
+        return arg
+
+    def _DataArg(self, name, args):
+        """
+        We have two styles:
+
+            w          # take arg from the stack
+            w foo      # take arg from immediate
+
+        This is a runtime error
+
+           w foo bar  # BAD
+        """
+        arg = self._OneArg(name, args)
+        if not isinstance(arg, str):
+            raise RuntimeError('Expected str, got %s' % arg)
+        return arg
+
+    def _ArgArray(self, name, args):
+        """
+        Styles:
+             # take array of args from immediate
+             extern ls _tmp
+
+             # Does this take 1 arg?
+             # or maybe you can mark the stack?
+
+             mark         # is this a NULL word?
+             const ls 
+             const _tmp
+             extern  # executes ls _tmp
+
+             # the top entry becomes a new frame
+             const-array {
+               # initialize it
+               const ls 
+               const _tmp
+             } 
+             const-array
+
+             extern  # executes ls _tmp
+        """
+        arg = self._OneArg(name, args)
+        if not isinstance(arg, list):
+            raise RuntimeError('Expected list, got %s' % arg)
         return arg
 
     def Command(self, cmd):
@@ -368,6 +432,16 @@ class CatBrain(object):
             with ctx_Output(self):
                 self.Sequence(block)
 
+        elif name == 'array':
+            block = self._BlockArg(name, args)
+
+            with ctx_TopArray(self):
+                self.Sequence(block)
+
+        elif name == 'eval':
+            block = self._BlockArg(name, args)
+            self.Sequence(block)
+
         # MANIPULATE STACK
         elif name == 'const':  # push constant
             s = args[0]
@@ -426,6 +500,10 @@ class CatBrain(object):
             #
             # TODO: could add time?
             self.stderr.write('  [%d]  #%d  %s\n' % (self.pid, self.step, s))
+
+        elif name == 'pp':
+            value = self.stack.pop()
+            self.stderr.write('  #%d  top = %r\n' % (self.step, value))
 
         # STDOUT
         elif name == 'w':
@@ -514,6 +592,20 @@ class CatBrain(object):
         elif name == 'msleep':
             s = self._DataArg(name, args)
             time.sleep(int(s) / 1000.0)  # milliseconds
+
+        elif name == 'extern':
+            arg_array = self._ArgArray(name, args)
+
+            log('EX %s', arg_array)
+
+            # Hm, we should get these from the STACK too!
+            status = subprocess.call(arg_array)
+            return status
+
+        elif name == 'sh':
+            arg = self._DataArg(name, args)
+            status = subprocess.call(['sh', '-c', arg])
+            return status
 
         else:
             raise AssertionError('Invalid command %r' % name)
