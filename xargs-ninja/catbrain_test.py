@@ -60,6 +60,11 @@ class CatbrainTest(unittest.TestCase):
         _ParseError('echo ; ;')
         _ParseError('echo hi }')
 
+        # Hm should disallow this, like YSH does
+        # I guess we need to understand spaces better?
+        # This is similar to a "YSH that's easy to lex" ?
+        #_ParseError("echo joined'words'")
+
         #_ParseError('a')
 
         # Empty program is valid

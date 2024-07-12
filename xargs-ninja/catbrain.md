@@ -24,15 +24,18 @@ Cat-Brain: A Small Language for Generating Unix Process Workloads, With 4 Runtim
 
 ## Flavors
 
-- POSIX shell
-- Brainfuck
-- YSH, Tcl
-- Lisp, Forth
-- jq, awk
+- POSIX shell - words
+- YSH for the { } syntax
+- Tcl - shell + Lisp
+- jq - because it has  an implicit "this" or satck
+- Forth because it has a stack
+- Brainfuck - do we still need this?
 
 ## Syntax
 
 ### Lexer
+
+Tokens:
 
     # includes { } because we want spaces, like YSH
     UNQUOTED = / [a-z A-Z 0-9 '_{}']+ /
@@ -41,25 +44,36 @@ Cat-Brain: A Small Language for Generating Unix Process Workloads, With 4 Runtim
     
     SPACE = / ' '+ /
 
-    END = / [';' \n] /
+    NEWLINE = / \n /
+    SEMI = / ';' /
 
     # These are ignored by the lexer
     COMMENT = / SPACE '#' ![\n]* /
 
+Lexer translations
+
+    UNQUOTED / SQ -> Word
+    UNQUOTED { } -> Word
+
+TODO: Do this more elegantly!
+
 ### Grammar
 
-    program = cmd (END cmd)* END?
+    program = Eof | seq Eof
 
-    block = '{' program '}'
+    terminator = semi | newline+
 
-    word = UNQUOTED | SQ
+    seq = NEWLINE* cmd (terminator cmd)* terminator?
+
+    block = '{' seq '}'
 
     arg = word | block
 
-    cmd = SPACE? word (SPACE arg)*  # Flexible, uniform syntax:
+    # Flexible, uniform syntax:
+    cmd = word arg*  
 
 YSH RULES
-    cmd = SPACE? word (SPACE word)* block?  # like YSH, one optional block
+    cmd = word+ block?  # like YSH, one optional block
 
 Enforce these OUTSIDE the grammar:
 
@@ -69,6 +83,28 @@ Enforce these OUTSIDE the grammar:
     1 word arg and 1 block arg: - if eof { break }
 
 Slogans;
+
+## TODO
+
+- errors
+  - syscall errors
+  - arg conversion errors
+  - op errors
+- control flow without exceptions  
+
+- Consider LINEAR TIME
+  - DATA ORIENTED - for argv and env
+  - abandon 'loop break' for something LESS GENERAL
+
+  - EOF condition, empty stack condition, etc.
+    - eof is a flag set by r-line?
+
+- Consider NESTED structure
+  - `{ }` in code can mirror data
+
+  - I guess you can push the DATA stack
+  - `frame { }`
+
 
 ## C Implementation
 
@@ -96,8 +132,7 @@ Slogans;
 - I know how to implement cat-brain and sh-brain
 - I don't know how to implement null-brain and (all of) bad-brain!
 
-
-## Programs I want to run
+## Programs It can Run
 
 - cat
 - CGI hello
@@ -142,20 +177,24 @@ Question: `def` is like a macro?
 
 ### Process
 
-- push-argv
-- push-env
+- state
+  - argv
+  - now
+  - pid
+  - env
 - exit
 - msleep
-- now
-- pid
 
 ### Transform
 
-- `from-netstr to-netstr`
-- `from-j8 to-j8`
-- `from-json to-json`
-  - this signals an error
-  - are errors recoverable?  For now, no
+- decode
+  - json string
+  - j8 string
+  - netstr
+- encode
+  - json string
+  - j8 string
+  - netstr
 
 ## Links    
 

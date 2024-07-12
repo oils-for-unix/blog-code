@@ -233,8 +233,7 @@ class Parser(object):
 
     def Program(self):
         """
-        top = Eof
-            | sequence Eof
+        program = Eof | seq Eof
         """
         if self.tok_id == Id.Eof:
             return []
@@ -249,7 +248,7 @@ class Parser(object):
         """
         A non-empty sequence of commands.
 
-        sequence = NEWLINE* cmd (END cmd)* END?
+        seq = NEWLINE* cmd (terminator cmd)* terminator?
         """
         while self.tok_id == Id.Newline:
             self._Next()
@@ -266,7 +265,7 @@ class Parser(object):
 
     def End(self):
         """
-        end = semi | newline+
+        terminator = semi | newline+
         """
         if self.tok_id == Id.Semi:
             self._Next()
@@ -279,7 +278,7 @@ class Parser(object):
 
     def Block(self):
         """
-        block = '{' sequence '}'
+        block = '{' seq '}'
         """
         self._Eat(Id.LBrace)
         result = self.Sequence()
@@ -300,7 +299,8 @@ class Parser(object):
 
     def Command(self):
         """
-        cmd = WORD arg*  # Flexible, uniform syntax
+        # Flexible, uniform syntax
+        cmd = WORD arg*
         """
         name = self._Eat(Id.Word)
         args = []
@@ -312,10 +312,6 @@ class Parser(object):
 
 
 class Break(RuntimeError):
-    pass
-
-
-class Eof(RuntimeError):
     pass
 
 
@@ -333,7 +329,7 @@ class CatBrain(object):
         self.argv = argv
         self.env = env
 
-    def _OneArg(self, name, args):
+    def _DataArg(self, name, args):
         n = len(args)
         if n == 0:
             arg = self.stack.pop()
@@ -346,8 +342,21 @@ class CatBrain(object):
     def Command(self, cmd):
         name, args = cmd
 
+        # CONTROL FLOW
         if name == 'if':
-            pass
+            # if empty { w-line hi }
+            # could also be:
+            # if predicate a b { w-line hi }
+            pred_name = args[0]
+            block = args[1]
+
+            pred_cmd = (pred_name, [])
+
+            # Does every command have an integer status?
+            status = self.Command(pred_cmd)
+            if status == 0:
+                self.Sequence(block)
+
         elif name == 'loop':
             block = args[0]
             while True:
@@ -363,9 +372,59 @@ class CatBrain(object):
             s = args[0]
             print(s)
 
+        # MANIPULATE STACK
+        elif name == 'const':  # push constant
+            s = args[0]
+            self.stack.append(s)
+
+        elif name == 'dup':
+            top = self.stack[-1]
+            self.stack.append(top)
+
+        elif name == 'empty-stack':
+            # Result is empty?
+            if len(self.stack) == 0:
+                return 0
+            else:
+                return 1
+
+        elif name == 'empty-string':
+            top = self.stack[-1]
+            if len(top) == 0:
+                return 0
+            else:
+                return 1
+
+        elif name == 'is-zero':
+            top = self.stack[-1]
+            if top == '0':
+                return 0
+            else:
+                return 1
+
+        elif name == 'join':
+            # TODO: arg could be the end index or something?
+
+            # Collapse stack into one entry
+            s = ''.join(self.stack)
+            self.stack = [s]
+
+        elif name == 'ch':   # ignore arg?
+            what = args[0]
+            if what == 'space':
+                ch = ' '
+            elif what == 'tab':
+                ch = '\t'
+            elif what == 'newline':
+                ch = '\n'
+            else:
+                raise AssertionError()
+
+            self.stack.append(ch)
+
         # STDERR
         elif name == 'log':
-            s = self._OneArg(name, args)
+            s = self._DataArg(name, args)
 
             # output to stderr
             #
@@ -374,78 +433,99 @@ class CatBrain(object):
 
         # STDOUT
         elif name == 'w':
-            s = self._OneArg(name, args)
+            s = self._DataArg(name, args)
             self.stdout.write(s)
 
         elif name == 'w-line':
-            s = self._OneArg(name, args)
+            s = self._DataArg(name, args)
             self.stdout.write(s)
             self.stdout.write('\n')
 
-        elif name == 'rotate':
-            s = arg or state['str']
-            # write rotation based on counter
-            r = state['counter'] % len(arg)
-            rotated = s[r:] + s[:r]
-            stdout.write(rotated)
-
-        elif name == 'space':   # ignore arg?
-            stdout.write(' ')
-        elif name == 'tab':
-            stdout.write('\t')
-        elif name == 'newline':
-            stdout.write('\n')
         elif name == 'flush':
-            stdout.flush()
+            self.stdout.flush()
 
         ## STDIN
         elif name == 'r-line':
             s = self.stdin.readline()
-            #log('s %r', s)
-            if len(s) == 0:
-                raise Eof()
             self.stack.append(s)
 
-        # State
-        elif name == 'counter':
-            s = str(state['counter'])
-            stdout.write(s)
+        # STATE
+        elif name == 'state':
+            what = self._DataArg(name, args)
+            if what == 'argv':
+                self.stack.extend(self.argv)
+            elif what == 'env':
+                strs = ['%s=%s' % (k, v) for k, v in os.environ.items()]
+                self.stack.extend(strs)
+            elif what == 'counter':
+                s = str(self.step)
+                self.stack.append(s)
+            elif what == 'now':
+                # integer seconds
+                s = str(int(time.time()))
+                self.stack.append(s)
+            elif what == 'pid':
+                s = str(self.pid)
+                self.stack.append(s)
+            else:
+                raise AssertionError(what)
 
-        # PROCESS
-        elif name == 'argv':
-            s = json.dumps(state['argv'])
-            stdout.write(s)
-            stdout.write('\n')
-        elif name == 'env':
-            # Replaces CGI echo?
-            # FOO=j'' string might be a better thign
-            s = json.dumps(state['env'])
-            stdout.write(s)
-            stdout.write('\n')
-        elif name == 'now':
-            # integer seconds
-            s = str(int(time.time()))
-            stdout.write(s)
-        elif name == 'pid':
-            s = str(state['pid'])
-            stdout.write(s)
+        # COMPUTE
+
+        # TODO:
+        # - bf
+        # - fib
+        elif name == 'op':
+            how = args[0]
+            s = self.stack.pop()
+            if how == 'rotate':
+                # write rotation based on counter
+                r = self.step % len(s)
+                rotated = s[r:] + s[:r]
+                self.stack.append(rotated)
+            elif how == 'dec':
+                m = str(int(s) - 1)
+                self.stack.append(m)
+            else:
+                raise AssertionError(how)
+
+        # FORMATS
+        elif name == 'to-json':
+            s = self._DataArg(name, args)
+            self.stack.append(json.dumps(s))
+
+        elif name == 'from-json':
+            s = self._DataArg(name, args)
+            self.stack.append(json.loads(s))
+
+        elif name == 'to-netstr':
+            raise NotImplementedError()
+
+        elif name == 'from-netstr':
+            raise NotImplementedError()
+
         elif name == 'exit':
-            code = int(arg)
+            s = self._DataArg(name, args)
+            code = int(s)
             sys.exit(code)
 
         # I/O
         elif name == 'msleep':
-            time.sleep(int(arg) / 1000.0)  # milliseconds
+            s = self._DataArg(name, args)
+            time.sleep(int(s) / 1000.0)  # milliseconds
 
         else:
             raise AssertionError('Invalid command %r' % name)
 
         self.step += 1
 
+        return 0
+
     def Sequence(self, commands):
         for cmd in commands:
-            self.Command(cmd)
-
+            status = self.Command(cmd)
+            if status != 0:
+                raise RuntimeError('Command failed with status %d' % status)
 
 
 def main(argv):
@@ -465,43 +545,19 @@ def main(argv):
 
     opts, argv = p.parse_args(argv[1:])
 
-    if 1:
-        s = opts.command
-        tokens = Lex(s)
-        p = Parser(s, tokens)
-        prog = p.Program()
+    s = opts.command
+    tokens = Lex(s)
+    p = Parser(s, tokens)
+    prog = p.Program()
 
-        if 0:
-            from pprint import pprint
-            pprint(prog)
+    if 0:
+        from pprint import pprint
+        pprint(prog)
 
-        vm = CatBrain(argv, dict(os.environ))
+    vm = CatBrain(argv, dict(os.environ))
 
-        # TODO: errors without exceptions?
-        try:
-            vm.Sequence(prog)
-        except Eof:
-            # EOF - status is still 0
-            pass
-
-        return 0
-
-    prog = Parse(opts.command)
-    if opts.n:
-        log('%s', prog)
-        return
-
-    pid = os.getpid()
-
-    state = {
-            'pid': pid, 'counter': 0, 'str': opts.str, 'argv': argv, 'env':
-            dict(os.environ)}
-
-    try:
-        Run(prog, state, opts.trace)
-    except Eof:
-        # EOF - status is still 0
-        pass
+    # TODO: errors without exceptions?
+    vm.Sequence(prog)
 
     return 0
 
