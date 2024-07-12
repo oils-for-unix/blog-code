@@ -58,6 +58,7 @@ class CatbrainTest(unittest.TestCase):
         _ParseError('loop { ')
         _ParseError('loop { }')
         _ParseError('echo ; ;')
+        _ParseError('echo hi }')
 
         #_ParseError('a')
 
@@ -65,6 +66,7 @@ class CatbrainTest(unittest.TestCase):
         _Parse('')
         _Parse('echo')
         _Parse(' echo;')
+        _Parse('\n leading newline # ha')
 
         _Parse('echo 1 # comment \n \n blank line ok')
 

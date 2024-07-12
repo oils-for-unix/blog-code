@@ -63,9 +63,18 @@ State:
 """
 
 import json
+import optparse
 import os
 import re
+import sys
 import time
+
+
+def log(msg, *args):
+    if args:
+        msg = msg % args
+    print(msg, file=sys.stderr)
+
 
 # Syntax is a subset of POSIX shell.
 # The program may only have spaces and newlines.
@@ -117,20 +126,8 @@ import time
 # 
 # ./catbrain-test.sh case-foo
 
-GRAMMAR = re.compile(r'''
-    [ ]*                           # leading space OK
-    ([a-z-]+)                      # command
-    (?:
-      [ ]+                         # at least one space
-                                   # TODO: printable chars, including utf-8, but NOT space, newline
-                                   # NOTE any shell chars
-      ([a-zA-Z0-9_ /:=<>\[\].,+-]+)  # optional arg: \w chars and bf chars
-    )?                             
-    ([;\n]?)                       # terminator - if none terminator, we stop processing
-''', re.VERBOSE)
-
 # See catbrain.md
-UNQUOTED = r'[a-zA-Z0-9_{}]+'
+UNQUOTED = r'[a-zA-Z0-9_{}-]+'
 SQ = r"'[^']*'"
 SEMI = r';'
 NEWLINE = r'[\n]'
@@ -252,8 +249,11 @@ class Parser(object):
         """
         A non-empty sequence of commands.
 
-        sequence = cmd (END cmd)* END?
+        sequence = NEWLINE* cmd (END cmd)* END?
         """
+        while self.tok_id == Id.Newline:
+            self._Next()
+
         result = []
         result.append(self.Command())
         while self.tok_id in (Id.Semi, Id.Newline):
@@ -310,301 +310,141 @@ class Parser(object):
 
         return name, args
 
-"""
-CATBRAIN
 
-stderr:
-    log foo    # stderr message - maybe output the R too
-
-stdout:
-    flush      # flush() stdout
-
-    w ARG         # write(R) as raw bytes
-    rotate ARG    # output rotated version of string
-    w-line ARG    # writeline(R)
-    w-net
-
-    space
-    tab
-    newline
-
-    # maybe: w-j8  # j8 string, not JSON
-
-stdin:
-    r 3
-    r-line
-    r-net
-
-    # maybe: w-j8  # j8 string, not JSON
-
-Let other processes use the CPU:
-
-    msleep     # sleep(50 milliseconds)
-               # error: not an integer
-
-Heat up the CPU:
-
-    fib        # compute fib(R) and put ASCII representation on the tape
-               # error: it's not an integer - print to stderr
-    bf <>      # run arbitrary bf program
-               # we don't need commands ., but it might be useful for copying
-               # and pasting?
-
-I/O
-    
-    now        # print current time?
-    pid        # load PID into register
-    signal 12  # send a signal to yourself, or maybe the PID in the register
-
-Encoding:
-
-    to-net     # R = encode(R)
-    from-net   # R = decode(R)
-
-GOODBRAIN
-
-    w-file out.txt  # write register to file
-    r-file in.txt   # read from file to register
-
-Use memory:
-
-    malloc          # copy the whole tape to a register
-    callstack       # use the C call stack (may blow the call stack)
-
-BADBRAIN
-
-    - ubsan - integer behavior
-    - asan - overflow
-    - syscalls?
-
-Examples:
-
-    # like cat - -f means "forever" or "filter"
-    catbrain -f -c 'r 1024;  w'
-
-    # cat, but line-wise
-    catbrain -f -c 'r-line;  w-line'
-
-    # repeat 10 times and exit
-    catbrain -n 10 -c 'sleep 50; fib 99;  w-line'
-
-    # netstring cat
-    catbrain -f -c 'r-line;  to-net;  w-line'
-
-    # throttled
-    catbrain -f -c 'r-line; to-net; sleep.100;  w-line'
-
-    # like echo foo
-    catbrain -n 1 -c 'const foo;  w-line'
-
-Growth:
-
-    # like seq 3 - write bigger integers
-    catbrain -n 3 -c 'add 1;  w-line'
-
-    # writing bigger and bigger lines
-
-    # do we need a 64-bit register for this?
-    catbrain -n 3 -c 'const 0; repeat zz; w-line; add 1'
-
-    catbrain -n 3 -c 'const 0; msleep; add 1'
-
-    catbrain -n 3 -c 'const 0; fib; w-line; add 1'
-
-TODO:
-    Make sure w-*, r-* don't have Python 3 encoding crap.  I guess use the
-    underlying buffer of stdin/stdout.
-"""
-
-import optparse
-import os
-import sys
-import subprocess
-
-
-def log(msg, *args):
-    if args:
-        msg = msg % args
-    print(msg, file=sys.stderr)
+class Break(RuntimeError):
+    pass
 
 
 class Eof(RuntimeError):
     pass
 
 
-def Run(prog, state, trace):
-    stdin = sys.stdin
-    stdout = sys.stdout
-    stderr = sys.stderr
+class CatBrain(object):
+    def __init__(self, argv, env):
+        self.step = 0  # iteration counter
+        self.stack = []  # argv can be pushed here
 
-    n = len(prog)
+        self.pid = os.getpid()
 
-    # catbrain can take the place of:
-    #
-    # spec/bin
-    #   argv.py
-    #   stdout_stderr
-    #   printenv.py
-    #
-    # CGI echo
-    #   take it over
-    #
-    # I want to print the env in a readable way?
+        self.stderr = sys.stderr
+        self.stdout = sys.stdout
+        self.stdin = sys.stdin
 
-    for i in range(n):
-        command, arg = prog[i]
+        self.argv = argv
+        self.env = env
 
-        # CONDITION
-        if command == 'bf':
-            prog = arg
+    def _OneArg(self, name, args):
+        n = len(args)
+        if n == 0:
+            arg = self.stack.pop()
+        elif n == 1:
+            arg = args[0]
+        else:
+            raise RuntimeError('Command %r got too many args %s' % (name, args))
+        return arg
 
-            # TODO:
-            # Keep (pointer, register) pair
-            # . maps to input from register
-            # , maps to output
+    def Command(self, cmd):
+        name, args = cmd
 
-        elif command == 'fib':
+        if name == 'if':
             pass
+        elif name == 'loop':
+            block = args[0]
+            while True:
+                try:
+                    self.Sequence(block)
+                except Break:
+                    break
+
+        elif name == 'break':
+            raise Break()
+
+        elif name == 'echo':
+            s = args[0]
+            print(s)
 
         # STDERR
-        elif command == 'log':
-            # TODO: expect arg?
-            s = arg or '?'
+        elif name == 'log':
+            s = self._OneArg(name, args)
 
             # output to stderr
             #
             # TODO: could add time?
-            stderr.write('  [%d]  #%d  %s\n' % (state['pid'], state['counter'], s))
+            self.stderr.write('  [%d]  #%d  %s\n' % (self.pid, self.step, s))
 
         # STDOUT
-        elif command == 'w':
-            s = arg or state['str']
-            stdout.write(s)
-        elif command == 'w-line':
-            s = arg or state['str']
-            stdout.write(s)
-            stdout.write('\n')
+        elif name == 'w':
+            s = self._OneArg(name, args)
+            self.stdout.write(s)
 
-        elif command == 'rotate':
+        elif name == 'w-line':
+            s = self._OneArg(name, args)
+            self.stdout.write(s)
+            self.stdout.write('\n')
+
+        elif name == 'rotate':
             s = arg or state['str']
             # write rotation based on counter
             r = state['counter'] % len(arg)
             rotated = s[r:] + s[:r]
             stdout.write(rotated)
 
-        elif command == 'space':   # ignore arg?
+        elif name == 'space':   # ignore arg?
             stdout.write(' ')
-        elif command == 'tab':
+        elif name == 'tab':
             stdout.write('\t')
-        elif command == 'newline':
+        elif name == 'newline':
             stdout.write('\n')
-        elif command == 'flush':
+        elif name == 'flush':
             stdout.flush()
 
         ## STDIN
-        elif command == 'r-line':
-            s = stdin.readline()
+        elif name == 'r-line':
+            s = self.stdin.readline()
             #log('s %r', s)
             if len(s) == 0:
                 raise Eof()
-            state['str'] = s
+            self.stack.append(s)
 
         # State
-        elif command == 'counter':
+        elif name == 'counter':
             s = str(state['counter'])
             stdout.write(s)
 
         # PROCESS
-        elif command == 'argv':
+        elif name == 'argv':
             s = json.dumps(state['argv'])
             stdout.write(s)
             stdout.write('\n')
-        elif command == 'env':
+        elif name == 'env':
             # Replaces CGI echo?
             # FOO=j'' string might be a better thign
             s = json.dumps(state['env'])
             stdout.write(s)
             stdout.write('\n')
-        elif command == 'now':
+        elif name == 'now':
             # integer seconds
             s = str(int(time.time()))
             stdout.write(s)
-        elif command == 'pid':
+        elif name == 'pid':
             s = str(state['pid'])
             stdout.write(s)
-        elif command == 'exit':
+        elif name == 'exit':
             code = int(arg)
             sys.exit(code)
 
         # I/O
-        elif command == 'msleep':
+        elif name == 'msleep':
             time.sleep(int(arg) / 1000.0)  # milliseconds
 
-        # Loop
-        elif command == 'forever':
-
-            body = prog[i+1:]
-            while True:
-                # Run the rest of the program
-                Run(body, state, trace)
-
-        elif command == 'repeat':
-            # string to integer conversion is annoying
-            iters = int(arg)
-            body = prog[i+1:]
-            for j in range(iters):
-                # Run the rest of the program
-                Run(body, state, trace)
-            break
-
-        # CONDITION
-        elif command == 'cond':
-            n = int(arg)
-
-            # If (counter % n == 0), then execute the block
-            pass
-
         else:
-            raise RuntimeError('Invalid command %r' % command)
+            raise AssertionError('Invalid command %r' % name)
 
-    # Repetitions
-    state['counter'] += 1
+        self.step += 1
 
-
-def Parse(code_str):
-    pos = 0
-    prog = []
-
-    length = len(code_str)
-    while True:
-        m = GRAMMAR.match(code_str, pos)
-        if not m:
-            if pos == length:
-                # no more commands
-                break
-            else:
-                raise RuntimeError('Syntax error at %d: %r' % (pos, code_str[pos:]))
-
-        #log('%r', m.groups())
-        command, arg, _ = m.groups()
-        prog.append((command, arg))
-
-        pos = m.end()
-
-    return prog
-
-
-class CatBrain(object):
-    def __init__(self, argv, env):
-        self.step = 0  # iteration counter
-        self.str_stack = []  # argv can be pushed here
-        self.int_stack = []  # control - loop - conditional to test this?
-
-        self.argv = argv
-        self.env = env
-
-    def Run(self, prog):
-        pass
+    def Sequence(self, commands):
+        for cmd in commands:
+            self.Command(cmd)
 
 
 
@@ -624,6 +464,27 @@ def main(argv):
       help='Set string register value')
 
     opts, argv = p.parse_args(argv[1:])
+
+    if 1:
+        s = opts.command
+        tokens = Lex(s)
+        p = Parser(s, tokens)
+        prog = p.Program()
+
+        if 0:
+            from pprint import pprint
+            pprint(prog)
+
+        vm = CatBrain(argv, dict(os.environ))
+
+        # TODO: errors without exceptions?
+        try:
+            vm.Sequence(prog)
+        except Eof:
+            # EOF - status is still 0
+            pass
+
+        return 0
 
     prog = Parse(opts.command)
     if opts.n:

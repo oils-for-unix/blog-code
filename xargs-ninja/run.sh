@@ -48,24 +48,31 @@ test-hello() {
   ./catbrain.py -c 'w-line hi'
 }
 
+test-seq() {
+  ./catbrain.py -c '
+  push-argv
+  loop {
+    w-line
+    dec
+    if zero {
+      break
+    }
+  }
+  '
+}
+
 test-cat() {
-  seq 3 | ./catbrain.py -c 'forever; r-line; w'
+  seq 3 | ./catbrain.py -c 'loop { r-line; w } '
 }
 
 test-log() {
-  seq 3 | ./catbrain.py -c 'forever; log; r-line; w'
+  seq 3 | ./catbrain.py -c 'loop { log x; r-line; w } '
 }
 
 test-cgi() {
-  ./catbrain.py -c 'w-line Status: 200; w-line Content-Type: text/html'
-
-  # TODO: ; is a problem
-  # I think you should have 'semi' or something?  
-  # char semi; w;
-  # char space; w
-  # char tab; w
-
-  #./catbrain.py -c 'w-line Status: 200; w-line Content-Type: text/html;charset=utf-8'
+  ./catbrain.py -c \
+    "w-line 'Status: 200'
+     w-line 'Content-Type: text/html; charset=utf-8'"
 }
 
 "$@"  
