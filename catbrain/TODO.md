@@ -1,12 +1,7 @@
 TODO
 ====
 
-
-- Do NESTED structure
-  - `{ }` in code can mirror data
-  - I guess you can push the DATA stack
-  - `frame { }`
-- try
+- try { }
   - bind to error codes from shell!
 
 - I think you can have a netstring dict format
@@ -18,11 +13,18 @@ TODO
 - Check signatures of commands more tightly
   - `_DataArg`, `_OneArg`, etc.
 
+
 - errors
   - syscall errors
   - arg conversion errors
   - op errors
+
 - control flow without exceptions  
+  - break
+  - early return from def
+
+- location info for error messages
+
 
 ## Build
 

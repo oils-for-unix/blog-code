@@ -28,7 +28,7 @@ test-seq() {
   # I think we can only GENERATE fixed sizes from seq!
 
   ./catbrain.py -c '
-  state argv
+  load argv
   loop {
     dup
     w-line
@@ -72,37 +72,41 @@ loop {
 test-argv-env() {
   # TODO: how to print json and commas?
   ./catbrain.py -c '
-state argv
-loop {
-  to-json
-  w-line
-  if empty-stack {
-    break
+def json-lines {
+  loop {
+    encode json
+    w-line
+    if empty-stack {
+      break
+    }
   }
 }
 
+def sep {
+  ch newline
+  w
+}
+
+load argv
+json-lines
+
+sep
 w-line --
+sep
 
-state env
+load env
+json-lines
 
-loop {
-  to-json
-  w-line
-  if empty-stack {
-    break
-  }
-}
-
-' 'foo bar' baz 
+' 'foo bar' baz $(seq 9)
 }
 
 test-gen-tsv() {
   ./catbrain.py -c '
 const size; ch tab; const path; join; w-line
 loop {
-  state counter; w; ch tab; const foo; join; w-line
+  load counter; w; ch tab; const foo; join; w-line
   msleep 400
-  state pid; w; ch tab; state now; join; w-line
+  load pid; w; ch tab; load now; join; w-line
   msleep 200
 
   # For testing
@@ -223,9 +227,36 @@ test-pp() {
 const foo
 const bar
 
-pp
-pp
+pp top
+pp top
 '
+}
+
+test-nesting() {
+  ./catbrain.py -c '
+const extern
+const-array ls /tmp
+
+pp stack
+
+gather
+pp stack
+
+const-array aa bb
+pp stack
+
+spread
+pp stack
+
+pop 2
+
+spread
+pp stack
+
+encode json
+pp top
+'
+
 }
 
 test-array() {
@@ -236,9 +267,9 @@ array {
   const bar
 }
 # pretty print the top value, no matter what it is
-pp
+pp top
 
-pp
+pp top
 
 # error, because there is no way to pass array
 #pp mystr
@@ -271,31 +302,27 @@ test-bad-args() {
 
 test-extern() {
 
-  # TODO: add / to valid tokens
-  ./catbrain.py -c 'extern ls _tmp'
+  ./catbrain.py -c '
+  array {
+    const ls
+    const /
+  }
+  pp top
+  extern 
+  '
 
-  return
+  ./catbrain.py -c 'extern ls /'
 
   ./catbrain.py -c '
-const early
-
-#{     # does this mean
-
-eval {
-  const ls 
-  const _tmp
-  extern
-}
-
-w-line
-
+const-array ls /
+extern
 '
 
   ./catbrain.py -c '
 const ls  
 ch space
 const _tmp
-join
+join  
 sh
 '
 }

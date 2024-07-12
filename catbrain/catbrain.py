@@ -27,7 +27,7 @@ class ParseError(RuntimeError):
 
 
 # See README.md
-UNQUOTED = r'[a-zA-Z0-9_-]+'
+UNQUOTED = r'[a-zA-Z0-9_/.-]+'  # /. for filenames
 LBRACE = r'{'
 RBRACE = r'}'
 SQ = r"'[^']*'"
@@ -341,31 +341,20 @@ class CatBrain(object):
     def _ArgArray(self, name, args):
         """
         Styles:
-             # take array of args from immediate
-             extern ls _tmp
+          # take array of args from immediate
+          extern ls _tmp
 
-             # Does this take 1 arg?
-             # or maybe you can mark the stack?
-
-             mark         # is this a NULL word?
-             const ls 
-             const _tmp
-             extern  # executes ls _tmp
-
-             # the top entry becomes a new frame
-             const-array {
-               # initialize it
-               const ls 
-               const _tmp
-             } 
-             const-array
-
-             extern  # executes ls _tmp
+          const-array ls /tmp
+          extern
         """
-        arg = self._OneArg(name, args)
-        if not isinstance(arg, list):
-            raise RuntimeError('Expected list, got %s' % arg)
-        return arg
+        n = len(args)
+        if n == 0:
+            array = self.stack.pop()
+        else:
+            array = args
+        if not isinstance(array, list):
+            raise RuntimeError('Expected list, got %s' % array)
+        return array
 
     def Command(self, cmd):
         name, args = cmd
@@ -447,9 +436,27 @@ class CatBrain(object):
             s = args[0]
             self.stack.append(s)
 
+        elif name == 'const-array':  # push constant
+            self.stack.append(args)
+
+        elif name == 'gather':
+            # replace the stack with an array
+            self.stack = [self.stack]
+
+        elif name == 'spread':  # spread the top array out
+            top = self.stack.pop()
+            if not isinstance(top, list):
+                raise RuntimeError('spread expects a list, got %r' % top)
+            self.stack.extend(top)
+
         elif name == 'dup':
             top = self.stack[-1]
             self.stack.append(top)
+
+        elif name == 'pop':
+            n = int(args[0])
+            for i in range(n):
+                self.stack.pop()
 
         elif name == 'empty-stack':
             # Result is empty?
@@ -502,8 +509,14 @@ class CatBrain(object):
             self.stderr.write('  [%d]  #%d  %s\n' % (self.pid, self.step, s))
 
         elif name == 'pp':
-            value = self.stack.pop()
-            self.stderr.write('  #%d  top = %r\n' % (self.step, value))
+            what = args[0]
+            if what == 'top':
+                value = self.stack[-1]
+                self.stderr.write('  #%d  top = %r\n' % (self.step, value))
+            elif what == 'stack':
+                self.stderr.write('  #%d  stack = %r\n' % (self.step, self.stack))
+            else:
+                raise AssertionError(what)
 
         # STDOUT
         elif name == 'w':
@@ -529,7 +542,7 @@ class CatBrain(object):
             self.stack.append(s)
 
         # STATE
-        elif name == 'state':
+        elif name == 'load':
             what = self._DataArg(name, args)
             if what == 'argv':
                 self.stack.extend(self.argv)
@@ -569,19 +582,29 @@ class CatBrain(object):
                 raise AssertionError(how)
 
         # FORMATS
-        elif name == 'to-json':
-            s = self._DataArg(name, args)
-            self.stack.append(json.dumps(s))
+        elif name == 'encode':
+            fmt = args[0]
+            if fmt == 'json':
+                s = self.stack.pop()
+                self.stack.append(json.dumps(s))
+            elif fmt == 'j8':  # must be string I think
+                raise NotImplementedError()
+            elif fmt == 'netstr':
+                raise NotImplementedError()
+            else:
+                raise NotImplementedError()
 
-        elif name == 'from-json':
-            s = self._DataArg(name, args)
-            self.stack.append(json.loads(s))
-
-        elif name == 'to-netstr':
-            raise NotImplementedError()
-
-        elif name == 'from-netstr':
-            raise NotImplementedError()
+        elif name == 'decode':
+            fmt = args[0]
+            if fmt == 'json':
+                s = self.stack.pop()
+                self.stack.append(json.loads(s))
+            elif fmt == 'j8':
+                raise NotImplementedError()
+            elif fmt == 'netstr':
+                raise NotImplementedError()
+            else:
+                raise NotImplementedError()
 
         elif name == 'exit':
             s = self._DataArg(name, args)
