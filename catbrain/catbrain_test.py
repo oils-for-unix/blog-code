@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-catbrain_test.py: Tests for py_fanos.py
+catbrain_test.py
 """
 import sys
 import unittest
@@ -92,6 +92,13 @@ class CatbrainTest(unittest.TestCase):
         # This is allowed in catbrain, but not in YSH
         # I guess the default options have no use for it?
         _Parse('my-if { echo yes } { echo no }')
+        _Parse('''
+        my-if {
+          echo multiline
+        } {
+          echo block
+        }
+        ''')
 
         return
 

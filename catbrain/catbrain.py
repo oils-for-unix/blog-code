@@ -2,8 +2,11 @@
 from __future__ import print_function
 """
 catbrain - Embedded language like shell, Tcl, Forth, jq
+
+See README.md
 """
 
+import io
 import json
 import optparse
 import os
@@ -236,6 +239,35 @@ class Break(RuntimeError):
     pass
 
 
+class ctx_Output(object):
+    def __init__(self, vm):
+        self.vm = vm
+        self.old_stdout = vm.stdout
+        vm.stdout = io.StringIO()
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
+        # String
+        self.vm.stack.append(self.vm.stdout.getvalue())
+        self.vm.stdout = self.old_stdout
+
+
+class ctx_Input(object):
+    def __init__(self, vm):
+        self.vm = vm
+        self.old_stdin = vm.stdin
+        top = self.vm.stack.pop()
+        vm.stdin = io.StringIO(top)
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type, value, traceback):
+        self.vm.stdin = self.old_stdin
+
+
 class CatBrain(object):
     def __init__(self, argv, env):
         self.step = 0  # iteration counter
@@ -250,6 +282,17 @@ class CatBrain(object):
         self.argv = argv
         self.env = env
 
+        self.defs = {}
+
+    def _BlockArg(self, name, args):
+        n = len(args)
+        if n != 1:
+            raise RuntimeError('Command %r expected one arg, got %d' % (name, n))
+        arg = args[0]
+        if not isinstance(arg, list):
+            raise RuntimeError('Command %r expected block arg, got %s' % (name, arg))
+        return arg
+
     def _DataArg(self, name, args):
         n = len(args)
         if n == 0:
@@ -263,8 +306,24 @@ class CatBrain(object):
     def Command(self, cmd):
         name, args = cmd
 
+        # Everything can be redefined?  Even if and def?
+        body = self.defs.get(name)
+        if body is not None:
+            # Push args!
+            self.stack.extend(args)
+
+            # TODO: what's the status?
+            self.Sequence(body)
+            return 0
+
         # CONTROL FLOW
-        if name == 'if':
+        if name == 'def':
+            name = args[0]
+            body = args[1]
+
+            self.defs[name] = body
+
+        elif name == 'if':
             # if empty { w-line hi }
             # could also be:
             # if predicate a b { w-line hi }
@@ -278,7 +337,7 @@ class CatBrain(object):
             if status == 0:
                 self.Sequence(block)
 
-        elif name == 'loop':
+        elif name == 'loop':  # not in catbrain, only nullbrain and shbrain
             block = args[0]
             while True:
                 try:
@@ -289,9 +348,25 @@ class CatBrain(object):
         elif name == 'break':
             raise Break()
 
-        elif name == 'echo':
-            s = args[0]
-            print(s)
+        elif name == 'for':
+            # Assume the TOS is list, and iterate over it
+            raise NotImplementedError()
+
+        elif name == 'for-line':
+            # cat-like loop of: r-line w
+            raise NotImplementedError()
+
+        elif name == 'feed':
+            block = self._BlockArg(name, args)
+
+            with ctx_Input(self):
+                self.Sequence(block)
+
+        elif name == 'capture':
+            block = self._BlockArg(name, args)
+
+            with ctx_Output(self):
+                self.Sequence(block)
 
         # MANIPULATE STACK
         elif name == 'const':  # push constant
@@ -366,6 +441,11 @@ class CatBrain(object):
             self.stdout.flush()
 
         ## STDIN
+        elif name == 'r':
+            n = int(args[0])
+            s = self.stdin.read(n)
+            self.stack.append(s)
+
         elif name == 'r-line':
             s = self.stdin.readline()
             self.stack.append(s)

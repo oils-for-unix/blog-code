@@ -4,7 +4,23 @@ catbrain
 Slogans:
 
 - A readable language that must be driven by data
-- A Small Language for Generating Workloads, With 4 Runtimes
+- A language for STREAMING j8 notation!
+  - and working with pure text
+  - Oils table.ysh is row-wise or column-wise
+  - although stream.ysh does work column-wise, with more computation!
+- A Language for Generating Workloads, With 4 Runtimes
+  - heating up the CPU, forknig threads, switching, etc.
+
+
+This language has some reminders of Hay too
+
+    foo { echo hi }   
+
+v Oils:
+    - no types
+    - no expressions
+    - no string interpolation
+    - no variables
 
 Features:
 
@@ -27,9 +43,24 @@ Flavors of:
 - YSH for the { } syntax
 - Tcl - shell + Lisp
   - also has [] and {} evaluation model
-- jq - because it has  an implicit "this" or satck
+- jq 
+  - because it has  an implicit "this" or satck
+  - it has not variables!  (jq has variables, but you do most things without
+    them)
 - Forth because it has a stack
 - Brainfuck - do we still need this?
+
+Comparisons:
+
+- Forth: catbrain has a stack, but it's block-structured like ALGOL
+- Shell: looks similar - based on "words", but it has a stack like forth
+- YSH: has block args, but uses them for EVRYTHING, including control flow
+- Tcl: it's based more on arrays of strings rather than strings
+- jq: it's command-based, rather than expression based (and doesn't have cross
+  product / "PEG semantics")
+- brainfuck: it's also minimal, with a "basic input and output" model `. ,`
+  - but catbrain programs are not "obfuscated"
+  - it's designed to be very readable, within the constraints model
 
 ## Runtimes
 

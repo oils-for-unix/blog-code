@@ -1,14 +1,29 @@
 TODO
 ====
 
+- feed
+- def f { }
+  - f x y  # is short for pushing the args on the stack!
+  - or is it pushing
+
+  - I guess f { x } { y } also makes sense, but it's not YSH
+
+
+- Do NESTED structure
+  - `{ }` in code can mirror data
+  - I guess you can push the DATA stack
+  - `frame { }`
+
+- REFLECTION on nested structure?
+
+
 - I think you can have a netstring dict format
   - 3:key,4:value,
   - and then you can search for the key value
 
 - capture feed are probably useful for that
 
-- Check signatures more tightly
-- Check syntax?
+- Check signatures of commands more tightly
 
 - errors
   - syscall errors
@@ -23,11 +38,6 @@ TODO
   - EOF condition, empty stack condition, etc.
     - eof is a flag set by r-line?
 
-- Consider NESTED structure
-  - `{ }` in code can mirror data
-
-  - I guess you can push the DATA stack
-  - `frame { }`
 
 ## Build
 
@@ -59,6 +69,15 @@ argv and env can be printed the same way
 
 ## C Implementation
 
+- Hm should have immediate string / small string optimization
+  - everything is either Str or List[str] - following shell
+
+- if you really wanted to be ambitious, you could do a Cheney collector
+  - revive the old one
+  - however I think it's better to start with the global vars
+
+Notes:
+
     struct VM {
       Pair* stack;
       Pair* top;
@@ -76,6 +95,12 @@ argv and env can be printed the same way
       Str* head;
       Pair* next;
     };
+
+### ERRORS in C implementation
+
+- Out of stack space - well this is realy a heap
+  - make it as long as argv?
+- Code is too big - maybe make it 4096 bytes or something?
 
 ## Naming
 
