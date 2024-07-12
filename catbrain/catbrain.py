@@ -1,65 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import print_function
 """
-cat-brain - A language for Unix test workloads
-
-- cat-brain: 
-  - attached to a runtime that can implement simple Unix filters like 'cat',
-  - dump argv env etc.
-
-- sh-brain
-  - can call system() on shell
-  - can fork
-  - can start threads, e.g. so you can inspect them
-  - malloc - to use more memory - copy the whole tape
-
-- null-brain
-  - WASM
-
-- bad-brain: does all sorts of bad things, is written in C
-  - seg faults
-    - dereference null
-    - divide by zero
-  - ubsan - integer behavior
-  - asan - overflow
-  - syscalls?
-  - blowing the C call stack
-    - how?
-    - I think you just create a malicious stack
-
-
-Language constructs:
-  iteration: forever { } , repeat { }
-  condition
-  arbitrary computation: bf
-
-  todo: are there subroutines?
-    like def f x { }
-    I think we can take one arg, which is either literal, or the register
-
-Formats
-  J8 strings only - what about JSON8 and TSV8?  It's a building block
-  Netstrings
-
-Protocols:
-  FANOS with Unix domain sockets
-
-Syscalls:
-  time()
-  getpid()
-  exit()
-
-  signal() - including kill USR1 etc.
-
-  fork()
-  create pthread
-
-State:
-  int counter, for iteration
-  string register
-  argv
-  env
-
+catbrain - Embedded language like shell, Tcl, Forth, jq
 """
 
 import json
@@ -76,79 +18,40 @@ def log(msg, *args):
     print(msg, file=sys.stderr)
 
 
-# Syntax is a subset of POSIX shell.
-# The program may only have spaces and newlines.
-# There is no quoting - instead use commands like 'catbrain -c "space; tab;"'
-# There is no ambiguity about whitespace.
-#
-#
-# That's it 5 kinds of token
-#
-# - 5 tokens
-# - 3 control flow
-#   - repeat 3
-#   - forever
-#   - cond
-# - 1 sublanguage: brainfuck
-#
-# - 3 registers
-#   - s = working string
-#   - argv
-#   - env is a dict or what?
-#     - I guess this is a KEY=value thing in C, so we should be powerful enough
-#     to escape the value?
-#     - we need a split operation
-#
-# - 2 concurrency constructs
-#   - forking
-#   - threading
-#
-# - all in ~1000 lines?
-#
-# Two kinds of sandboxing:
-#   - secomp
-#   - WASI - test if it works?
-#
-# wasm-brain - pure computation - . , is what?
-# bad-brain
-#   - it can dump raw structs from memory, like  
-#
-# Would also be nice to test if it boots QEMU
+class ParseError(RuntimeError):
+    pass
 
-# BUILD
-# - static linking
-# - dynamic linking
-#
-# It's a script for testing I/O
 
-# Testing:
-# - BYO protocol
-# 
-# ./catbrain-test.sh case-foo
-
-# See catbrain.md
-UNQUOTED = r'[a-zA-Z0-9_{}-]+'
+# See README.md
+UNQUOTED = r'[a-zA-Z0-9_-]+'
+LBRACE = r'{'
+RBRACE = r'}'
 SQ = r"'[^']*'"
 SEMI = r';'
 NEWLINE = r'[\n]'
+
+# Ignored tokens
 SPACE = r'[ ]'
-COMMENT = SPACE + r'#[^\n]*'
+COMMENT = r'#[^\n]*'
 
 # Comment must come before space
-TOKENS = [UNQUOTED, SQ, SEMI, NEWLINE, COMMENT, SPACE]
+TOKENS = [UNQUOTED, LBRACE, RBRACE, SQ, SEMI, NEWLINE, COMMENT, SPACE]
 
 LEXER_RE = re.compile('|'.join('(%s)' % pat for pat in TOKENS))
 
 
 class Id:
     Word = 'w'
-    Space = 's'
     Semi = ';'
     Newline = 'n'
     LBrace = '{'
     RBrace = '}'
 
     Eof = ''  # For parser
+
+    # Not seen by the parser
+    Comment = '#'
+    Space = 's'
 
 
 def Lex(code_str):
@@ -157,51 +60,69 @@ def Lex(code_str):
     pos = 0
     n = len(code_str)
 
+    # Enforce shell-like rule:
+    #
+    # - Semi and Newline are "operator tokens"
+    # - Word, LBrace, RBrace are "word tokens"
+    #   - they must be followed by: space, newline, eof
+    #   - equivalently: they must be preceded by: space, newline, semi, BEGINNING
+    #     of file
+    # - comments must also be preceded by separator
+    saw_separator = True
+
     while pos != n:
         m = LEXER_RE.match(code_str, pos)
         if not m:
-            raise RuntimeError('Syntax error %r' % code_str[pos:pos+10])
-        unquoted, sq, semi, newline, comment, space = m.groups()
+            raise ParseError('Invalid token at %r' % code_str[pos:pos+10])
+        unquoted, lbrace, rbrace, sq, semi, newline, comment, space = m.groups()
         #print(m.groups())
 
         token = None
         if unquoted is not None:
-            # Like YSH - this is the same as an unquoted word
-            # We don't want it to be a separate token
-            if unquoted == '{':
-                token = (Id.LBrace, None)
-            elif unquoted == '}':
-                token = (Id.RBrace, None)
-            else:
-                if '{' in unquoted or '}' in unquoted:
-                    raise RuntimeError("Word can't have unquoted { or }")
-                token = (Id.Word, unquoted)
+            token = (Id.Word, unquoted)
+
+        elif lbrace is not None:
+            token = (Id.LBrace, None)
+
+        elif rbrace is not None:
+            token = (Id.RBrace, None)
+
         elif sq is not None:
             token = (Id.Word, sq[1:-1])
+
         elif semi is not None:
             token = (Id.Semi, semi)
+
         elif newline is not None:
             token = (Id.Newline, newline)
+
         elif space is not None:
-            pass  # skip spaces
+            token = (Id.Space, None)
+
         elif comment is not None:
-            pass
+            token = (Id.Comment, None)
+
         else:
             raise AssertionError()
 
-        if token is not None:
+        tok_id, tok_val = token
+
+        if tok_id in (Id.Word, Id.LBrace, Id.RBrace, Id.Comment):
+            if not saw_separator:
+                raise ParseError('Expected separator before token %r %r'
+                                 % (token, code_str[pos:pos+10]))
+
+        # Update it for next iteration
+        saw_separator = tok_id in (Id.Space, Id.Newline, Id.Semi)
+
+        if tok_id not in (Id.Space, Id.Comment):
             token_len = len(m.group(0))
-            tok_id, tok_val = token
             tokens.append((tok_id, tok_val, pos, token_len))
 
         pos = m.end()
 
     tokens.append((Id.Eof, None, pos, 0))
     return tokens
-
-
-class ParseError(RuntimeError):
-    pass
 
 
 class Parser(object):

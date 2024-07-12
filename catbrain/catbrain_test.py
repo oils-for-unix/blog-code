@@ -54,6 +54,13 @@ class CatbrainTest(unittest.TestCase):
         _ParseError(';')
         _ParseError('{')
         _ParseError('}')
+
+        _ParseError('{spaces-required}')
+        _ParseError('a {spaces-required}')
+        _ParseError('a spaces-required}')
+        _ParseError('<unquoted>')
+        _ParseError('space#not comment')
+
         _ParseError('loop {')
         _ParseError('loop { ')
         _ParseError('loop { }')
@@ -81,6 +88,10 @@ class CatbrainTest(unittest.TestCase):
         _Parse("echo 'line1'\n echo line2")
 
         _Parse('if eof { echo yes no }; echo two')
+
+        # This is allowed in catbrain, but not in YSH
+        # I guess the default options have no use for it?
+        _Parse('my-if { echo yes } { echo no }')
 
         return
 
