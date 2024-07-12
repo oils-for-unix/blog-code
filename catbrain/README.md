@@ -1,5 +1,34 @@
-Cat-Brain: A Small Language for Generating Unix Process Workloads, With 4 Runtimes
+catbrain
 =====
+
+Slogans:
+
+- A readable language that must be driven by data
+- A Small Language for Generating Workloads, With 4 Runtimes
+
+Features:
+
+- Restricted language
+  - Output size is limited to a constant function of (input size, program size)
+  - No variables
+  - no infinite loops
+- Syntax is a subset of YSH
+  - Well specified grammar
+- Embeddable - can safetly execute it within your programs
+  - it does zero memory allocation
+- Extendable
+  - provide your own functions - you can provide the user with arbitrary
+    computation and I/O
+- TODO: comes with 4 runtimes
+
+Flavors of:
+
+- POSIX shell - words
+- YSH for the { } syntax
+- Tcl - shell + Lisp
+- jq - because it has  an implicit "this" or satck
+- Forth because it has a stack
+- Brainfuck - do we still need this?
 
 ## Runtimes
 
@@ -21,15 +50,6 @@ Cat-Brain: A Small Language for Generating Unix Process Workloads, With 4 Runtim
 
 - `bad-brain`
   - I don't know all of these
-
-## Flavors
-
-- POSIX shell - words
-- YSH for the { } syntax
-- Tcl - shell + Lisp
-- jq - because it has  an implicit "this" or satck
-- Forth because it has a stack
-- Brainfuck - do we still need this?
 
 ## Syntax
 
