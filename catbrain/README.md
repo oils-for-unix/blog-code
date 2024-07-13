@@ -11,7 +11,6 @@ Slogans:
 - A Language for Generating Workloads, With 4 Runtimes
   - heating up the CPU, forknig threads, switching, etc.
 
-
 This language has some reminders of Hay too
 
     foo { echo hi }   
@@ -144,6 +143,17 @@ Enforce these OUTSIDE the grammar:
 
 Slogans;
 
+### YSH Subset Issue
+
+This is valid catbrain, but not YSH
+
+    foo { echo arg1 } arg1
+    foo { echo arg1 } {
+        echo arg2
+    }
+
+We can disallow it statically in catbrain if there is always a rewrite
+
 ## Help Wanted
 
 - I know how to implement cat-brain and sh-brain
@@ -221,3 +231,10 @@ Question: `def` is like a macro?
   - json string
   - j8 string
   - netstr
+
+### Protocols
+
+- FANOS
+  - todo: hook up py_fanos?
+
+

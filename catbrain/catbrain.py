@@ -449,13 +449,25 @@ class CatBrain(object):
                 raise RuntimeError('spread expects a list, got %r' % top)
             self.stack.extend(top)
 
+        elif name == 'join':
+            # this is a bit 'spread'
+            top = self.stack.pop()
+            self.stack.append(''.join(top))
+
         elif name == 'dup':
             top = self.stack[-1]
             self.stack.append(top)
 
         elif name == 'pop':
-            n = int(args[0])
-            for i in range(n):
+            n = len(args)
+            if n == 0:
+                p = 1
+            elif n == 1:
+                p = int(args[0])
+            else:
+                raise RuntimeError('Pop expected 1 arg, got %s' % n)
+
+            for i in range(p):
                 self.stack.pop()
 
         elif name == 'empty-stack':
@@ -478,13 +490,6 @@ class CatBrain(object):
                 return 0
             else:
                 return 1
-
-        elif name == 'join':
-            # TODO: arg could be the end index or something?
-
-            # Collapse stack into one entry
-            s = ''.join(self.stack)
-            self.stack = [s]
 
         elif name == 'ch':   # ignore arg?
             what = args[0]

@@ -1,7 +1,33 @@
 TODO
 ====
 
-- try { }
+- Get rid of YSH keywords
+  - .if .for .try
+  - x or .extern
+  - const -> .const or val, lit
+  - lit
+
+- x should leave the status on the stack
+
+- nq-capture status stdout \
+  foo
+
+- async runtime!
+  - think about pipeline { } { }
+
+- serializing code from YSH
+  catbrain { could be a keyword } or YSH reflection
+
+- REPL for catbrain?
+  - I think the lexer should support the REPL
+  - now that I've figured out the word issue
+
+- Refactor code for dialects?
+  - nullbrain - add BF interpreter?
+  - catbrain
+  - shbrain - I already have some of this
+
+- .try { }
   - bind to error codes from shell!
 
 - I think you can have a netstring dict format
@@ -25,6 +51,19 @@ TODO
 
 - location info for error messages
 
+## async xargs -P in catbrain?
+
+- expose self-pipe trick
+- poll() loop I guess
+  - poll for process exit
+  - when you get that, start a new one
+
+- poll line events?
+  - I guess when you get a chunk, it's not too hard to split it up by lines
+  - can have a splitlines primitive ...
+  - but you preserve the boundaries, so you can join with other chunks
+  - you can keep track of incomplete lines
+  - do the last 5 lines
 
 ## Build
 
@@ -36,23 +75,6 @@ Testing:
 
 - BYO protocol
   - ./catbrain-test.sh case-foo
-
-## Functions / macros
-
-argv and env can be printed the same way
-
-   # does it take an argument?  There are no vars, so that doesn't make sense?
-   # Or you could create one var $x
-   # $_ - just that single var, hm
-   # Or maybe just $1 $2 $3
-
-   def dump { 
-     w-line yo
-   }
-   state argv
-   dump
-   state env
-   dump
 
 ## C Implementation
 

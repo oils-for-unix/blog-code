@@ -100,13 +100,38 @@ json-lines
 ' 'foo bar' baz $(seq 9)
 }
 
+test-join() {
+  ./catbrain.py -c '
+array {
+  const foo
+  ch tab
+  const bar
+}
+join
+
+array {
+  const 42
+  ch tab
+  const 43
+}
+join
+
+pp stack
+
+w-line
+w-line
+'
+}
+
 test-gen-tsv() {
   ./catbrain.py -c '
 const size; ch tab; const path; join; w-line
 loop {
-  load counter; w; ch tab; const foo; join; w-line
+  array { load counter; w; ch tab; const foo }
+  join; w-line
   msleep 400
-  load pid; w; ch tab; load now; join; w-line
+  array { load pid; w; ch tab; load now; }
+  join; w-line
   msleep 200
 
   # For testing
@@ -301,7 +326,6 @@ test-bad-args() {
 }
 
 test-extern() {
-
   ./catbrain.py -c '
   array {
     const ls
@@ -324,6 +348,23 @@ ch space
 const _tmp
 join  
 sh
+'
+}
+
+test-async() {
+  # TODO: make this work with an EVENT LOOP, not a waitpid(-1) ?
+  #
+  # SIGCHLD will send a byte to a pipe, to wake up the loop
+
+  # TODO: look at "waker" in Python
+
+  # Lib/asyncio/unix_events.py has signal.set_wakeup_fd
+
+  ./catbrain.py -c '
+fork { sleep 0.1 }
+fork { sleep 0.2 }
+wait
+wait
 '
 }
 

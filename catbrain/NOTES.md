@@ -8,6 +8,8 @@ Notes
 
 - Small String Optimization - immediate values
 
+- zero allocation
+
 - Reflection on YSH source code within YSH
   - exporting tht AST
 
@@ -26,6 +28,11 @@ Notes
   - Or does it?
   - I'm thinking of the "backing lines" problem
 - GC
+- O(1) list and dict
+  - I think the array type could be a linked list, like bash?
+  - then you don't have to worry about growing?
+    - stack append is always just bumping pointers
+
 
 ## Links    
 
@@ -63,18 +70,7 @@ And also @1 @2 if it's an array?
 
 This is useful for constructing command lines
 
-
-## ARrays
-
-- gather - turn the whole stack into a list
-- spread - append the top of the stack
-- array - build up a new array imperatively!  This is like Hay!
-
-
-
-- REFLECTION on nested structure?
-
-## JSON Structure
+## Reflecting on code - JSON Structure
 
     Command:
     ["w", ["arg1", "arg2"]]
@@ -128,7 +124,6 @@ What about location info?
  
     const :| ls /tmp |  # array of words
     extern 
-
 
 ## Positional Args
 
@@ -329,5 +324,4 @@ capture:
     
     loop {
       r-line  # EOF is ''
-    
     }
