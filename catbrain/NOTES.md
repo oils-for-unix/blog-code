@@ -33,6 +33,29 @@ Notes
   - then you don't have to worry about growing?
     - stack append is always just bumping pointers
 
+### async
+
+    fork sleep 0.1
+    fork sleep 0.2
+    time wait  # 200 ms, because it waits for all
+
+    fork sleep 0.1
+    fork sleep 0.2
+    time wait -n  # 100 ms
+    time wait -n  # another 100 ms
+
+Now how do you implement call backs
+
+    # Main issue: does it get a NEW STACK or not?
+    # I think you copy it
+
+    # This is the stack for the callback for fork?
+    # It pops it and then saves it for later?
+
+    const-array foo bar
+    fork sleep 0.1 {
+      echo done
+    }
 
 ## Links    
 
@@ -107,16 +130,15 @@ TODO:
 
 ## NIL8
 
-  (Command w (arg1 arg2))
+    (Command w (arg1 arg2))
 
-  (Program (Command w) (Command w))
+    (Program (Command w) (Command w))
 
 What about location info?
 
-  (Command w (arg1 arg2) |48 49 50|)
+    (Command w (arg1 arg2) |48 49 50|)
 
-  (Program (Command w |49 50|) (Command w |50 51|) |50 90|)
-
+    (Program (Command w |49 50|) (Command w |50 51|) |50 90|)
 
 ## More Arrays
 

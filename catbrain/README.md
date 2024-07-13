@@ -47,6 +47,8 @@ Flavors of:
   - it has not variables!  (jq has variables, but you do most things without
     them)
 - Forth because it has a stack
+- node.js - if we have an event loop with the self-pipe trick for process
+  completion?
 - Brainfuck - do we still need this?
 
 Comparisons:
@@ -61,6 +63,17 @@ Comparisons:
   - but catbrain programs are not "obfuscated"
   - it's designed to be very readable, within the constraints model
 
+## Where did catbrain come from?
+
+- protobuf tools - I always wanted to have something you could "append code to"
+- "shell has a forth-like quality"
+  - can we preserve "bernstein chaining" in an actual stack-based language?
+- jq in jq thread - streaming language with no vars
+- generating testdata for xargs -P
+- realizing that shell could have an async-style runtime (event loop), not a
+  synchronous style
+  - need that for the "Ninja problem" (which make -j doesn't do)
+
 ## Runtimes
 
 - `null-brain` - a language with no input or output
@@ -72,7 +85,7 @@ Comparisons:
   - pid
   - no memory allocation - fixed
 
-- `sh-brain` - everything a shell has?
+- `sh-brain` - everything a shell has?  or `ybrain` -- ysh
    - arbitrary I/O and syscalls
   - exec
   - wait
@@ -153,6 +166,27 @@ This is valid catbrain, but not YSH
     }
 
 We can disallow it statically in catbrain if there is always a rewrite
+
+### Keyword/Builtin Conflicts
+
+- Get rid of YSH keywords
+  - .if .for .try
+  - x or .extern
+  - const -> .const or val, lit
+  - fork forkwait builtin
+    - TBH I like using the same name
+    - as long as they do SIMILAR things, not identical, it could be OK
+    - I think the YSH convention could be to add it
+
+   if empty-stack {
+     break
+   }
+
+YSH
+
+   .if empty-stack {
+     .break
+   }
 
 ## Help Wanted
 

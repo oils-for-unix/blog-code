@@ -1,16 +1,30 @@
 TODO
 ====
 
-- Get rid of YSH keywords
-  - .if .for .try
-  - x or .extern
-  - const -> .const or val, lit
-  - lit
 
-- x should leave the status on the stack
+    x ls /tmp  # leaves status on stack
+    extern ls /tmp  # alias
+
+    capture ls /tmp  # leaves status and then stdout
+
+
+    try x ls tmp  # it tests for non-zero?
+
+Then vars:
+
+    capture ls /tmp
+    assign status stdout
+
+    echo $status $stdout
+
+
 
 - nq-capture status stdout \
   foo
+
+
+
+
 
 - async runtime!
   - think about pipeline { } { }
