@@ -13,8 +13,7 @@ OILS_REPO=~/git/oilshell/oil
 
 : ${LIB_OSH=$OILS_REPO/stdlib/osh}
 
-# should this be task-five?
-source $LIB_OSH/byo-server.sh
+source $LIB_OSH/task-five.sh
 source $LIB_OSH/no-quotes.sh
 
 test-hello() {
@@ -372,6 +371,9 @@ wait
 '
 }
 
-byo-maybe-run
+all() {
+  ~/git/oilshell/oil/bin/osh \
+    ~/git/oilshell/oil/devtools/byo.sh test ./run.sh
+}
 
-"$@"  
+task-five "$@"  

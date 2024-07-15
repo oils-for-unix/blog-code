@@ -1,8 +1,20 @@
 catbrain
-=====
+========
 
 Slogans:
 
+- A {Tcl, Lisp, Forth } that can express
+    { Shell, Awk, Make, find, xargs } and
+    { Python, JavaScript and node.js event loop, R data frames } and
+    { YAML, Dockerfiles, HTML Templates, ...}  and
+    {JSON, TSV, S-expressions, ...} ?
+
+    All with Ruby-like blocks
+  
+  - "A shell you can't use at work"
+  - But derived from existing practice
+
+- A mix of **practicality** and **purity**, honed over 8+ years
 - A readable language that must be driven by data
 - A language for STREAMING j8 notation!
   - and working with pure text
@@ -76,29 +88,29 @@ Comparisons:
 
 ## Runtimes
 
-- `null-brain` - a language with no input or output
+- `nullcat` - a language with no input or output
   - WASM runtime 
   - no memory allocation - globals
 
-- `cat-brain` - stdin/stdout/argv/env/status - Unix filter
+- `kcat` - stdin/stdout/argv/env/status - Unix filter like awk
   - basic Unix cat/tac/echo
   - pid
   - no memory allocation - fixed
 
-- `sh-brain` - everything a shell has?  or `ybrain` -- ysh
-   - arbitrary I/O and syscalls
+- `ycat` - everything a shell has?
+  - arbitrary I/O and syscalls
   - exec
   - wait
 
   - unfortunately we can't share the runtime?  Because we have SmallStr?
   - it would be nice
 
-- workbrain - workloads
+- `workcat` - workloads
   - can start threads, e.g. so you can inspect them
   - fork
   - malloc
 
-- `bad-brain`
+- `badcat`
   - I don't know all of these
   - seg faults
     - dereference null
@@ -223,6 +235,7 @@ Question: `def` is like a macro?
 ### Stack
 
 - `const'
+- `getvar'
 - 'dup`
 - TODO: `pop`, `clear`
 - `empty-stack`
@@ -248,7 +261,7 @@ Question: `def` is like a macro?
 
 - exit
 - msleep
-- state
+- load
   - argv
   - now
   - pid
@@ -270,5 +283,3 @@ Question: `def` is like a macro?
 
 - FANOS
   - todo: hook up py_fanos?
-
-
