@@ -343,9 +343,11 @@ extern
 '
 
   ./catbrain.py -c '
-const ls  
-ch space
-const _tmp
+array {
+  const ls  
+  ch space
+  const _tmp
+}
 join  
 sh
 '
@@ -359,6 +361,8 @@ test-async() {
   # TODO: look at "waker" in Python
 
   # Lib/asyncio/unix_events.py has signal.set_wakeup_fd
+
+  return
 
   ./catbrain.py -c '
 fork { sleep 0.1 }

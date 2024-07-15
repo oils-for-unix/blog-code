@@ -16,6 +16,20 @@ Notes
 - Event loop!   ASYNC RUNTIME FOR SHELL!
   - Maybe this is where I prototype it?
 
+- Compiling `return` to control flow, not exceptions!
+
+Example:
+
+    def f {
+      const-array a b
+      foreach {  # iterates over the container on TOS
+        if x test $_ = b {  # $_ is the top
+          return            # should be control flow
+        }
+        w-line
+      }
+    }
+
 ---
 
 - OK I want to make a small C++ version
@@ -23,7 +37,7 @@ Notes
 
 ### Missing in catbrain
 
-- Interactive parsing
+- Interactive parsing - TODO: I want to do this
   - this creates ownership issues?
   - Or does it?
   - I'm thinking of the "backing lines" problem
@@ -32,6 +46,7 @@ Notes
   - I think the array type could be a linked list, like bash?
   - then you don't have to worry about growing?
     - stack append is always just bumping pointers
+- expressions and types
 
 ### async
 

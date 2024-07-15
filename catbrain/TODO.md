@@ -7,7 +7,6 @@ TODO
 
     capture ls /tmp  # leaves status and then stdout
 
-
     try x ls tmp  # it tests for non-zero?
 
 Then vars:
@@ -17,14 +16,19 @@ Then vars:
 
     echo $status $stdout
 
+I think we want this rule
 
+    x env FOO=$x BAR=$x
+    x my-server --port=$port
 
-- nq-capture status stdout \
-  foo
+Capturing
 
+    nq-capture {
+      x printf hi
+    }
+    assign status stdout
 
-
-
+    # hm yeah that's not bad
 
 - async runtime!
   - think about pipeline { } { }
@@ -37,9 +41,9 @@ Then vars:
   - now that I've figured out the word issue
 
 - Refactor code for dialects?
-  - nullbrain - add BF interpreter?
-  - catbrain
-  - shbrain - I already have some of this
+  - nullcat - add BF interpreter?
+  - kcat
+  - ycat - I already have some of this
 
 - .try { }
   - bind to error codes from shell!
@@ -52,7 +56,6 @@ Then vars:
 
 - Check signatures of commands more tightly
   - `_DataArg`, `_OneArg`, etc.
-
 
 - errors
   - syscall errors
