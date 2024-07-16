@@ -1,6 +1,24 @@
 TODO
 ====
 
+- error handling
+  - leaving null on stack?
+- try { }
+  - bind to error codes from shell!
+
+- syntax
+  - `$[_]` `@[_]` - do we want `$_` too?  That's more grammar
+    - top of stack
+    - it's not a var name?
+  - `$[array[0]]` `@[array]`
+  - pipeline - ls | wc -l desugars to 'pipeline'
+
+- runtime
+  - var stack - named vars
+  - dicts and mappings
+
+More:
+
 
     x ls /tmp  # leaves status on stack
     extern ls /tmp  # alias
@@ -11,7 +29,7 @@ TODO
 
 Then vars:
 
-    capture ls /tmp
+    nq-capture ls /tmp
     assign status stdout
 
     echo $status $stdout
@@ -44,9 +62,6 @@ Capturing
   - nullcat - add BF interpreter?
   - kcat
   - ycat - I already have some of this
-
-- .try { }
-  - bind to error codes from shell!
 
 - I think you can have a netstring dict format
   - 3:key,4:value,
@@ -127,14 +142,3 @@ Notes:
 - Out of stack space - well this is realy a heap
   - make it as long as argv?
 - Code is too big - maybe make it 4096 bytes or something?
-
-## Naming
-
-- By default it doesn't need bf
-  - nullbrain can have it, but catbrain shouldn't
-
-- Abbreviations:
-  - cabr
-  - nubr - since it can't read data, it can do arbitrary computation?
-  - shbr
-  - bad-brain - make this stand out
