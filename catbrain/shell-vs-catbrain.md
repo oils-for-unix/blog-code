@@ -427,7 +427,47 @@ External?
 
 Could offer binding to regexec() regcomp().
 
+### Unevaluated blocks (quotations)
+
+    ysh$ cd /tmp { echo hi }
+    ysh$ var b = ^(echo hi)
+
+
+    cb$ cd /tmp { echo hi }
+    cb$ block { echo hi }  # leave it on the stack
+    cb$ cd /tmp $_         # does this make sense?
+                           
+Or maybe
+
+    cb cd /tmp %_          # the current thing
+
+
+### Unevaluated Expressions (quotations)
+
+    ysh$  var ex = ^[2 + 3]
+    ysh$  var result = evalExpr(ex)
+
+
+    cb$   const-array expr 2 '+' 3 
+    cb$   command-sub { @_ }  
+    cb$   assign result
+
+Problem: what if there is nested structure?  Does @_ still work?
+
 ## Libraries
+
+### load
+
+We explicitly load state into the VM:
+
+    load argv
+    load env
+    load pid
+    load counter
+
+TODO:
+
+    load rand
 
 ### Encoding and Decoding
 
