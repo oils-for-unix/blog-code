@@ -7,10 +7,12 @@ TODO
   - bind to error codes from shell!
 
 - syntax
+  - this requires "Word parser"
   - `$[_]` `@[_]` - do we want `$_` too?  That's more grammar
     - top of stack
     - it's not a var name?
   - `$[array[0]]` `@[array]`
+
   - pipeline - ls | wc -l desugars to 'pipeline'
 
 - runtime
@@ -102,6 +104,8 @@ Capturing
 BUILD
 - static linking
 - dynamic linking
+- fast enough for shell script!  No incremental build
+  - should be at least 10x smaller than Oils
 
 Testing:
 

@@ -113,6 +113,13 @@ Lisp style:
 
 (This is bernstein chaining with block vars!)
 
+### Destructured Assignment
+
+    ysh$ var x, y = foo()
+
+    cb$  foo
+    cb$  assign x y
+
 ## Words
 
 ### Var Interpolation
@@ -435,6 +442,27 @@ Could offer binding to regexec() regcomp().
 ### JSON8 and TSV8
 
 These are builtin pure catbrain?
+
+## Useful External Commands
+
+### `test` for booleans
+
+    cb$  try { x test a = b }; echo $_
+    1
+
+    cb$  if x test a = a { echo yes }
+    yes
+
+### `expr` for expressions
+
+    cb$  x expr 1 + 2
+    3
+
+### printf for formatting
+
+    cb$  x printf '%03d\n' 42
+    042
+  
 
 ## Can catbrain help us with YSH features?
 
