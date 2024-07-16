@@ -23,7 +23,29 @@ Lexer modes:
 - **Stack** model, like Forth
   - `jq` has a similar "point-free" style
 
-Example:
+- data
+  - `value.Str`
+  - `value.Array` - sequence of strs or arrays
+    - note there is no value.Dict - it is an array of length-2-arrays (pairs)
+- code:
+  - `value.Command` - first word, then args are words or blocks
+    - do you even need this, if you have block?
+  - `value.Block` - sequence of commands
+
+What about:
+
+- `value.Word`?  That's an unevaluated expression
+  - a word can be reduced to blocks
+
+  - so maybe it is?  Maybe it is a value.Command that produces output?
+    - a wrapper?
+
+  - maybe there is no reflection on words?
+
+## Motivating Examples
+
+See forth-style.md
+
 
     cb$  w-line zz  # immediate arg, stack not used
     zz
@@ -112,6 +134,13 @@ Lisp style:
     cb$    setvar a array { const x; const y; }
 
 (This is bernstein chaining with block vars!)
+
+### Destructured Assignment
+
+    ysh$ var x, y = foo()
+
+    cb$  foo
+    cb$  assign x y
 
 ## Words
 
@@ -280,13 +309,27 @@ Shelling Out:
 
 TODO:
 
-    if x test $x = foo {
+    if boolstatus test $x = foo {
       echo foo
-    } elif x test $x = bar {
+    } elif boolstatus test $x = bar {
       echo bar
     } else {
       echo other
     }
+
+Important: `boolstatus` is different than `x`  !  It does something different
+with the exit code of the process.
+
+- `boolstatus`
+  - `0` is on the stack if the command exited 0
+  - `1` is on the stack if the command exited 1
+  - else it leaves `null` on the stack with the  status!
+
+- `x` leaves nothing on the stack if the command succeeds (code 0)
+  - if the command fails, it leaves `null` on the stack, AND the exit code
+
+- `try x ls` leaves the exit code no matter what, so you can test it
+
 
 ## Case
 
@@ -420,7 +463,50 @@ External?
 
 Could offer binding to regexec() regcomp().
 
+### Unevaluated blocks (quotations)
+
+    ysh$ cd /tmp { echo hi }
+    ysh$ var b = ^(echo hi)
+
+
+    cb$ cd /tmp { echo hi }
+    cb$ block { echo hi }  # leave it on the stack
+    cb$ cd /tmp $_         # does this make sense?
+                           
+Or maybe
+
+    cb$ cd /tmp %_          # the current thing
+
+
+Is there such thing as an unevaluated command?  Or just an array or block, like
+YSH
+
+### Unevaluated Expressions (quotations)
+
+    ysh$  var ex = ^[2 + 3]
+    ysh$  var result = evalExpr(ex)
+
+
+    cb$   const-array expr 2 '+' 3 
+    cb$   command-sub { @_ }  
+    cb$   assign result
+
+Problem: what if there is nested structure?  Does @_ still work?
+
 ## Libraries
+
+### load
+
+We explicitly load state into the VM:
+
+    load argv
+    load env
+    load pid
+    load counter
+
+TODO:
+
+    load rand
 
 ### Encoding and Decoding
 
@@ -435,6 +521,27 @@ Could offer binding to regexec() regcomp().
 ### JSON8 and TSV8
 
 These are builtin pure catbrain?
+
+## Useful External Commands
+
+### `test` for booleans
+
+    cb$  try { x test a = b }; echo $_
+    1
+
+    cb$  if x test a = a { echo yes }
+    yes
+
+### `expr` for expressions
+
+    cb$  x expr 1 + 2
+    3
+
+### printf for formatting
+
+    cb$  x printf '%03d\n' 42
+    042
+  
 
 ## Can catbrain help us with YSH features?
 

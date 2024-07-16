@@ -55,6 +55,68 @@ Example:
     - stack append is always just bumping pointers
 - expressions and types
 
+
+### Bernstein chaining / composable blocks
+
+
+NOPE
+
+    setvar s string { const foo; ch newline }
+    setvar a array { const foo; getvar a; const bar }
+
+
+I think it would need to be:
+
+    setvar s (string { const foo; ch newline })
+    setvar a (array { const foo; getvar a; const bar })
+
+() means run the thing and then pop the top value?
+
+() could always be the top ...  or `(_)` or `$[_]`
+
+
+It's
+
+    string { const foo; ch newline }    
+    assign s
+
+    string { const foo; ch newline }    
+    assign s
+
+Therei s
+
+    # immediate
+    setvar mystr s  # only a string, not an array
+
+    const-array a b
+    assign myarr
+
+    const foo
+    const-array a b
+    assign myarr mystr
+
+
+I think it's
+
+    cd /tmp
+
+    block { echo hi }
+    cd-with-block /tmp  # pops the stack if it doesn't get a literal
+
+
+    block { echo hi }
+    assign b
+    pop
+
+    getvar b           # puts the block on the stack
+    cd-with-block /tmp
+
+OK good!  Now we don't need special syntax
+
+---
+
+Tcl has `{*}` for splicing - weird syntax
+
 ### async
 
     fork sleep 0.1
