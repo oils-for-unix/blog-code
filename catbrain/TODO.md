@@ -19,6 +19,36 @@ TODO
   - var stack - named vars
   - dicts and mappings
 
+
+Desugaring
+
+    pipeline
+ 
+`x=$x` could be desugared as:
+ 
+    string {
+      const 'x='
+      getvar x
+    }
+ 
+    @a means
+ 
+    getvar a
+    assert is-array
+ 
+ 
+    # also
+    assert is-string
+
+I guess that's word evaluation
+
+
+    block { echo 1; echo 2; }
+    eval  # run it!
+
+    string 'echo 1; echo 2'
+    eval-str
+
 More:
 
 
