@@ -1,6 +1,85 @@
 Shell vs. Catbrain
 ==================
 
+## Comparisons
+
+<!-- TODO: render this table with ul-table
+
+- maybe build it into oils-for-unix?
+  - might need to remove comments and so forth
+
+-->
+
+<table>
+<caption> Shell vs. YSH vs. Catbrain</caption>
+
+- thead
+  - Aspect
+  - POSIX Shell
+  - YSH
+  - Catbrain
+- tr
+  - Syntax
+  - Odd, but Standard
+  - Like Python or JavaScript - a language that your teammates will find familiar
+  - Minimal / esoteric shell / forth / Tcl (but arguably more familiar than
+    Forth and Tcl, and even Lisp)
+- tr
+  - Primitive Data Types
+  - Strings
+  - Strings, Bool, Int, Float, ...
+  - Strings
+- tr
+  - Compound Data Types
+  - A single array `"$@"`
+  - `List` and `Dict`
+  - `List` - values can be string or List, List of pairs can be treated like a
+    Dict
+- tr
+  - Runtime model / syscalls
+  - waitpid(-1)
+  - waitpid(-1)
+  - Idea: make it fully general?  Can express fork() poll()?
+- tr
+  - Serialization
+  - very limited
+  - JSON / J8 Notation
+  - Lisp-like printer/reader?  But we can express graphs like Pickle?
+
+</table>
+
+
+<table>
+
+<caption>
+Oils vs. catbrain VM
+</caption>
+
+- thead
+  - Aspect
+  - Oils
+  - Catbrain
+- tr
+  - C API
+  - Not yet - needs to integrate with GC
+  - Not yet - but could involve coroutines?
+- tr
+  - Garbage Collected?
+  - Yes
+  - Could be?  We could cheat with a single mutable `$_line` register?
+    Better idea: we can COPY arbitrary values from one VM to another!  You
+    spawn a whole catbrain VM for each line!  And copy it!
+- tr
+  - Subinterpreters
+  - No (or not yet)
+  - Yes, we should have it!
+- tr
+  - Shared Library Interface
+  - No (or not yet)
+  - Yes, we should have it!
+
+</table>
+
 ## Catbrain Language Intro
 
 ### Syntax
