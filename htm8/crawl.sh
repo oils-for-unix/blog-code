@@ -52,8 +52,10 @@ json() {
 
 validate() {
   r=../../oils
-  #echo $PWD/page.html | PYTHONPATH=$r:$r/vendor $r/data_lang/htm8_util.py  parse-htm8
   cat $PWD/page.html | PYTHONPATH=$r:$r/vendor $r/data_lang/htm8_util.py  tokens
+
+  # LexError - //
+  echo $PWD/page.html | PYTHONPATH=$r:$r/vendor $r/data_lang/htm8_util.py  parse-htm8
 }
 
 
