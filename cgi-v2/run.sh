@@ -19,7 +19,8 @@ test-post() {
 
 serve-go() {
   # from Claude AI
-  ~/install/go/bin/go run file-upload-handler.go
+  ~/install/go/bin/go build file-upload-handler.go
+  ./file-upload-handler
 }
 
 # Wow, gccgo is super easy!
@@ -56,5 +57,40 @@ build-c() {
 fib-gc() {
   ~/install/go/bin/go run main.go
 }
+
+#
+# Startup time
+#
+
+hello-gc() {
+  ~/install/go/bin/go build hello.go
+
+  # 1 ms startup time
+  time ./hello
+  echo
+
+  # 114 rt_sigaction calls
+  strace -c ./hello
+  echo
+
+  # 1.8 MB
+  ls -l hello
+}
+
+hello-gccgo() {
+  gccgo -o hello_gccgo hello.go
+
+  # 123 ms startup time!  wtf!  Bad!
+  time ./hello_gccgo
+  echo
+
+  # 112 rt_sigaction calls
+  strace -c ./hello_gccgo
+  echo
+
+  # 59 KB
+  ls -l hello_gccgo
+}
+
 
 "$@"
