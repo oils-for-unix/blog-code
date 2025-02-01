@@ -6,7 +6,7 @@ set -o errexit
 
 foo() {
         set +o errexit
-        if command time -f true > /dev/null;
+        if command time -f '%e' true > /dev/null;
         then
                 echo 'inside'
         fi
