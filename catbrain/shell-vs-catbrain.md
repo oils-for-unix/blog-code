@@ -60,6 +60,14 @@ Oils vs. catbrain VM
   - Oils
   - Catbrain
 - tr
+  - C++ exceptions
+  - Yes
+  - No (Eval() should return an integer code Break, Continue, Return?)
+- tr
+  - Stackless?
+  - No, uses call stack for function calls
+  - Needed for Lua-like coroutines
+- tr
   - C API
   - Not yet - needs to integrate with GC
   - Not yet - but could involve coroutines?
@@ -79,6 +87,15 @@ Oils vs. catbrain VM
   - Yes, we should have it!
 
 </table>
+
+## vs. Ribbit Scheme 
+
+Maybe all of these things can be represented by the same structure:
+
+- data
+- code
+  - problem: line number info.  Look at what Clojure and Racket do.
+- stack (stack frames, and maybe closures)
 
 ## Catbrain Language Intro
 

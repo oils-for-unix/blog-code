@@ -21,7 +21,6 @@ Notes
   - command args
 
 - **code pretty printer** with comment placement issue
-  - 
 
 - Compiling `return` to control flow, not exceptions!
 
@@ -49,6 +48,8 @@ Example:
   - Or does it?
   - I'm thinking of the "backing lines" problem
 - GC
+  - an idea is to allow copying between VMs, rather than GC
+  - rooting is still annoying
 - O(1) list and dict
   - I think the array type could be a linked list, like bash?
   - then you don't have to worry about growing?
