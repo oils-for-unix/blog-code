@@ -1,6 +1,8 @@
 #!/bin/bash
 # From Claude AI
 
+set -e
+
 # Test script to demonstrate command builtin behavior in Bash 3.2
 # This shows how 'command' can exit prematurely in certain conditions
 
