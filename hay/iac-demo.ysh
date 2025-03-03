@@ -1,0 +1,133 @@
+#!/usr/bin/env ysh
+
+# Example of Terraform from:
+# https://xeiaso.net/blog/2025/yoke-k8s/
+
+if (false) {
+  echo '''
+  # ORIGINAL
+  data "aws_route53_zone" "cetacean_club" {
+    name = "cetacean.club."
+  }
+
+  resource "aws_route53_record" "A" {
+    zone_id = data.aws_route53_zone.cetacean_club.zone_id
+    name    = "ingressd.${data.aws_route53_zone.cetacean_club.name}"
+    type    = "A"
+    ttl     = "300"
+    records = [resource.vultr_instance.my_instance.main_ip]
+  }
+  '''
+  # "This is not code. This is configuration. Sure you manage the configuration
+  # with the same tools you use to manage code, you can lint it like it is code,
+  # but it's not code."
+}
+
+# Hay (Hay Ain't YAML) is a style of using YSH (a shell).  You use the syntax
+# of the shell to express DATA.
+#
+# But that also means you can interleave CODE.
+#
+# https://oils.pub/release/0.27.0/doc/hay.html
+# 
+# https://lobste.rs/s/phqsxk/hay_ain_t_yaml_custom_languages_for_unix
+
+# Global dict
+var data = {}
+
+# Procedure that sets an attribute on the dict
+proc Data (resource_type, resource_name; ; ; block) {
+  var attrs = io->evalToDict(block)
+  setvar attrs.zone_id = 'ZZ'
+
+  # HCL has the syntax data.resource_type.resource_name.attribute
+  setglobal data[resource_type] = {[resource_name]: attrs}
+}
+
+Data aws_route53_zone cetacean_club {  # Call the proc, with 2 strings and a block
+  name = 'cetacean.club.'
+}
+
+# How you pretty print
+echo 'data:'
+= data
+echo
+
+hay define Resource 
+
+Resource aws_route53_record A {
+  # there is no 'data' variable defined; that is a difference
+  zone_id = data.aws_route53_zone.cetacean_club.zone_id
+  name    = "ingressd.$[data.aws_route53_zone.cetacean_club.name]"
+  type    = 'A'
+  ttl     = "300"
+
+  # Not sure where this comes from
+  #records = [resource.vultr_instance.my_instance.main_ip]
+}
+
+# All the config we've built up
+var config = _hay()
+
+var r = config.children[0]
+
+# Pretty print
+= r
+
+# Serialize
+json write (r)
+echo
+
+
+#
+# Now Demonstrate that it's code
+#
+
+var ttl_list = [456, 789]
+
+#
+# For loop
+#
+
+for my_ttl in (ttl_list) {
+  Resource aws_route53_record A {
+    # there is no 'data' variable defined; that is a difference
+    zone_id = data.aws_route53_zone.cetacean_club.zone_id
+    name    = "ingressd.$[data.aws_route53_zone.cetacean_club.name]"
+    type    = 'A'
+    ttl     = my_ttl
+
+    # Not sure where this comes from
+    #records = [resource.vultr_instance.my_instance.main_ip]
+  }
+}
+
+= _hay()
+echo
+
+#
+# Abstract with "proc"
+#
+
+
+proc make-resource (; my_ttl) {
+  Resource aws_route53_record A {
+    # there is no 'data' variable defined; that is a difference
+    zone_id = data.aws_route53_zone.cetacean_club.zone_id
+    name    = "ingressd.$[data.aws_route53_zone.cetacean_club.name]"
+    type    = 'A'
+    ttl     = my_ttl
+  }
+}
+
+
+make-resource (12)
+make-resource (34)
+
+# Conditional
+if (true) {
+  make-resource (500)
+}
+
+= _hay()
+echo

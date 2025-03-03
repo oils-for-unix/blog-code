@@ -1,0 +1,144 @@
+data:
+(Dict)
+{aws_route53_zone: {cetacean_club: {name: 'cetacean.club.', zone_id: 'ZZ'}}}
+
+(Dict)
+{
+    type: 'Resource',
+    args: ['aws_route53_record', 'A'],
+    children: [],
+    attrs: {
+        zone_id: 'ZZ',
+        name: 'ingressd.cetacean.club.',
+        type: 'A',
+        ttl: '300'
+    }
+}
+{
+  "type": "Resource",
+  "args": [
+    "aws_route53_record",
+    "A"
+  ],
+  "children": [],
+  "attrs": {
+    "zone_id": "ZZ",
+    "name": "ingressd.cetacean.club.",
+    "type": "A",
+    "ttl": "300"
+  }
+}
+
+(Dict)
+{
+    source: null,
+    children: [
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: '300'
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 456
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 789
+            }
+        }
+    ]
+}
+
+(Dict)
+{
+    source: null,
+    children: [
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: '300'
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 456
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 789
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 12
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 34
+            }
+        },
+        {
+            type: 'Resource',
+            args: ['aws_route53_record', 'A'],
+            children: [],
+            attrs: {
+                zone_id: 'ZZ',
+                name: 'ingressd.cetacean.club.',
+                type: 'A',
+                ttl: 500
+            }
+        }
+    ]
+}
+
