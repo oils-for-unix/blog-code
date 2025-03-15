@@ -7,6 +7,7 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
+# Note: MariaDB agrees with Postgres and sqlite
 null-sql() {
   echo '
 DROP TABLE IF EXISTS test_null;
@@ -19,13 +20,14 @@ CREATE TABLE test_null (
 INSERT INTO test_null VALUES (1, NULL, 0);
 
 -- This is to test that there is actually output
-SELECT * FROM test_null;
-SELECT "---";
+-- SELECT * FROM test_null;
+-- SELECT "---";
 
 SELECT * FROM test_null WHERE val1 = val2;
 '
 }
 
+# Note: MariaDB still disagrees
 string-case-sql() {
   echo "
 DROP TABLE IF EXISTS test_string_case;
@@ -45,11 +47,20 @@ SELECT * FROM test_string_case WHERE status = 'active';
 }
 
 compat() {
+  local user=$1
+  local pass=$2
+  local db=$3
+
   for test in null string-case; do
     echo "*** $test"
 
     echo '    sqlite3'
     ${test}-sql | sqlite3
+    echo
+
+    echo '    mysql'
+    ${test}-sql | mysql -h localhost -u $user -p$pass $db
+    echo
   done
 
   # TODO: Test on mysql and postgres
