@@ -49,7 +49,8 @@ SELECT * FROM test_string_case WHERE status = 'active';
 compat() {
   local user=$1
   local pass=$2
-  local db=$3
+  local db_maria=$3
+  local db_postgres=$4
 
   for test in null string-case; do
     echo "*** $test"
@@ -59,7 +60,11 @@ compat() {
     echo
 
     echo '    mysql'
-    ${test}-sql | mysql -h localhost -u $user -p$pass $db
+    ${test}-sql | mysql -h localhost -u $user -p$pass $db_maria
+    echo
+
+    echo '    postgres'
+    ${test}-sql | PGPASSWORD=$pass psql -h localhost -U $db_postgres
     echo
   done
 
