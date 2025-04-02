@@ -105,11 +105,11 @@ Maybe all of these things can be represented by the same structure:
 - blocks are made of commmands
 - pipelines desugar to commands
 
-Lexer modes:
+    # expresssion has value.  But is this different thana list?
+    my-command --foo=%[a 1]
 
-    my-command --foo=$[a[1]]
-
-    echo ${x|html}
+    # does this make sense?
+    echo %{x | html}
 
     echo $[a[0] => html()]   # proc vs. func distinction?
 
@@ -191,6 +191,8 @@ These are designed to be identical to shell.
     sh$  ls --color /tmp
 
     cb$  x ls --color /tmp
+         extern ls  # long way of writing it
+         
 
 ### User-defined Commands (procs)
 
@@ -209,16 +211,16 @@ These are designed to be identical to shell.
     ysh$   var a = :| x y z |
     ysh$   var a = ['x', 'y', 'z']
 
-    cb$    setvar s mystr
+    cb$    assign s mystr
 
 Forth style:
 
     cb$    const mystr
-    cb$    setvar s     # pops top value and assigns to it
+    cb$    assign s     # pops top value and assigns to it
 
 Array in forth:
 
-    cb$    array {
+    cb$    list {
              const x
              const y
              const z
@@ -249,6 +251,11 @@ Lisp style:
 
 Forth style:
 
+    # I guess %{} runs all the commands, and then concatenates the stack?
+    # It makes a marker for the stack?
+
+    cb$ echo %{c 'hi '; getvar x}
+
     cb$  getvar x   
     cb$  echo
 
@@ -265,7 +272,7 @@ Array
 
     ysh$   echo @a
 
-    cb$    echo @a  # special syntax
+    cb$    echo %%a 
 
 ### Backslash Escapes
 
@@ -274,6 +281,12 @@ Array
     bash$  echo $'one\ttwo'
 
     cb$    string { const 'one'; ch tab; echo two }
+    cb$    w-line
+
+    cb$    w-line %{ c 'one'; ch tab; c 'two' }
+
+    cb$    make-list { c 'one'; ch tab; c 'two' };
+    cb$    join
     cb$    w-line
 
 ### Unquoted and Quoted Words - Forth-Style Stack
@@ -300,6 +313,20 @@ Array on the stack
     cb$ w-line
     foo
 
+### Brace Expansion
+
+    sh$ echo {alice,bob}@example.com
+
+    cb$ var names [alice bob]
+    cb$ echo %[names]@example.com   # this can automatically do cartesian product?
+
+    # Or does this make more sense?  Slicing an array can do it
+    cb$ echo %%[names]@example.com 
+
+I guess you can have a uniform PARSING rule for %[] and %%[] ?
+
+Do you need %{}
+
 ## Interlude: Stack Manipulation
 
     dup    # duplicate top element
@@ -323,7 +350,7 @@ Array on the stack
 
     ysh$  var mydict = {key1: 'value1', key2: 'value2'}
 
-    cb$   array {  # no first class dict type?
+    cb$   map {  # no first class dict type?
             pair key1 value1
             pair key2 value2
           }
@@ -334,11 +361,11 @@ Array on the stack
     sh$  echo hi > out.txt
     sh$  sort < in.txt
 
-    ysh$ fopen >out.txt { echo hi }
-    ysh$ fopen <in.txt { sort }
+    ysh$ redir >out.txt { echo hi }
+    ysh$ redir <in.txt { sort }
 
-    cb$  fopen '>' out.txt { echo hi }
-    cb$  fopen '<' in.txt { sort }
+    cb$  redir '>' out.txt { echo hi }
+    cb$  redir '<' in.txt { sort }
 
 ## Compound Commands
 
@@ -366,7 +393,9 @@ Array on the stack
 
     cb$ { echo 1; echo 2 } | wc -l
 
-    cb$ pipelne { echo 1; echo 2 } { wc -l } 
+Desugars to:
+
+    cb$ pipeline { echo 1; echo 2 } { wc -l } 
 
 Shelling Out:
 
@@ -446,16 +475,16 @@ TODO
       }
     }
 
-## Defining Procs
+## Defining Fn
 
 Not done:
 
-    def f {
+    fn myfn {
       w-line foo
       w-line bar
     }
 
-    def f a b c {  # are these the things on the stack?
+    fn myfn a b c {  # are these the things on the stack?
       w '['
       w $x
       w ']'
@@ -463,7 +492,7 @@ Not done:
 
 So
 
-    f foo
+    myfn foo
 
 is short for
 
@@ -508,7 +537,10 @@ Error code:
     cb$  try {
            x false
          }
-         echo status=$_  # top?
+         # _ is top value?
+         # and maybe !_ pops it
+
+         echo %[_ caught status]; pop  # discard t
 
 ## Hay
 
@@ -531,9 +563,9 @@ Declaring data:
 
 Only in interpolation:
 
-    cb$  echo foo=$x-$[a.b[0]]
+    cb$  echo foo=%[x]-%[a b .0]
 
-    cb$  array {
+    cb$  make-list {
            const 'foo='
            getvar x
            const '-'
@@ -582,9 +614,8 @@ YSH
     ysh$  var ex = ^[2 + 3]
     ysh$  var result = evalExpr(ex)
 
-
-    cb$   const-array expr 2 '+' 3 
-    cb$   command-sub { @_ }  
+    cb$   const [expr 2 '+' 3 ]
+    cb$   capture { %%_ }  # splice the top value
     cb$   assign result
 
 Problem: what if there is nested structure?  Does @_ still work?
@@ -705,5 +736,3 @@ Feed:
            r 2     # read 2 bytes 'oo'
            echo
          }  # output is pushed as value on top of stack
-    f
-    oo
