@@ -9,7 +9,7 @@ set -o nounset
 set -o pipefail
 set -o errexit
 
-OILS_REPO=~/git/oilshell/oil
+OILS_REPO=~/git/oils-for-unix/oils
 
 : ${LIB_OSH=$OILS_REPO/stdlib/osh}
 
@@ -372,8 +372,7 @@ wait
 }
 
 all() {
-  ~/git/oilshell/oil/bin/osh \
-    ~/git/oilshell/oil/devtools/byo.sh test ./run.sh
+  $OILS_REPO/bin/osh $OILS_REPO/devtools/byo.sh test ./run.sh
 }
 
 task-five "$@"  
