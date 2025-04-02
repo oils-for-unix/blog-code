@@ -458,11 +458,11 @@ with the exit code of the process.
 
 ## Case
 
-TODO
-
-    case $x {
+    case %x {
       regex 'README(\.md)?' {
         echo README
+      }
+      regex [a b] {
       }
       glob '*.py' {
         echo python
@@ -470,7 +470,7 @@ TODO
       glob '*.h' '*.cc' {
         echo 'C++'
       }
-      default {
+      else {
         echo 'other'
       }
     }

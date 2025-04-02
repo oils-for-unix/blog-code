@@ -3,82 +3,94 @@ catbrain
 
 Slogans:
 
-    A {Tcl, Lisp, Forth } that can express
+    A { Tcl, Lisp, Forth } that can express
       { Shell, Awk, Make, find, xargs } and
       { Python, JavaScript and node.js event loop, R data frames } and
       { YAML, Dockerfiles, HTML Templates, ...}  and
       {JSON, TSV, S-expressions, ...} ?
 
-All with Ruby-like blocks
-  
-- "A shell you can't use at work"
-- But derived from existing practice
+Shell is the Language of
 
-- A mix of **practicality** and **purity**, honed over 8+ years
-- A readable language that must be driven by data
-- A language for STREAMING j8 notation!
-  - and working with pure text
-  - Oils table.ysh is row-wise or column-wise
-  - although stream.ysh does work column-wise, with more computation!
-- A Language for Generating Workloads, With 4 Runtimes
-  - heating up the CPU, forknig threads, switching, etc.
+- Process-based Concurrency
+- the Control Plane - also xargs -P, make
+- Inter-Process Communication - Byte and Text streams over Pipes
 
-This language has some reminders of Hay too
+But catbrain is also:
 
-    foo { echo hi }   
+- Coroutines-based concurrency
+  - because coroutines are good for controlling concurrent Unix processes
+- MAYBE Data Plane 
+  - Awk and R need to be fast
+  - we will have a fast GC and interpreter ... but we might need static types
+    too, not sure
+- Intra-process communication
+  - embeddable/extensable in C - like Lua, Tcl, Wren, ...
+  - We might also be able to memcpy() heaps between threads?
+    - threads trust each other - processes don't
 
-v Oils:
-    - no types
-    - no expressions
-    - no string interpolation
-
-Features:
-
-- Restricted language
-  - Output size is limited to a constant function of (input size, program size)
-  - No variables
-  - no infinite loops
-- Embeddable - can safetly execute it within your programs
-  - it does zero memory allocation
-- Extendable
-  - provide your own functions - you can provide the user with arbitrary
-    computation and I/O
-
-- PUNTING ON THIS: Syntax is a subset of YSH
-  - Well specified grammar 
+## Influences
 
 Flavors of:
 
 - POSIX shell - words
-- YSH for the { } syntax
-- Tcl - shell + Lisp
+- YSH/Tcl/Ruby for the { } blocks
+- Tcl (which is shell + Lisp)
   - also has [] and {} evaluation model
 - jq 
-  - because it has  an implicit "this" or satck
+  - because it has an implicit "this" or satck
   - it has not variables!  (jq has variables, but you do most things without
     them)
 - Forth because it has a stack
-- node.js - if we have an event loop with the self-pipe trick for process
+
+For the runtimes:
+
+- node.js - event loop/async runtime, with the self-pipe trick for process
   completion?
-- Brainfuck 
-  - I think this is covered by forth?  This was the "no variables" dialect, but
-    now we have variables
+  - also works on Windows
 
-Comparisons:
+### es shell Influence
 
-- Forth: catbrain has a stack, but it's block-structured like ALGOL
-- Shell: looks similar - based on "words", but it has a stack like forth
-- YSH: has block args, but uses them for EVRYTHING, including control flow
-- Tcl: it's based more on arrays of strings rather than strings
-- jq: it's command-based, rather than expression based (and doesn't have cross
-  product / "PEG semantics")
+    Tcl      =               shell + Lisp
+    es shell =         Tcl + shell + Lisp
+    catbrain = Forth + Tcl + shell + Lisp
+
+### Comparisons
+
+- [Shell vs. Catbrain](shell-vs-catbrain.md)
+  - similar syntax, has "words", meant for typing
+  - oriented around ARGV and ENV interface, but we add Lisp-like recursive data structures
+- YSH vs. Catbrain
+  - also has block args, but uses them for EVERYTHING, including control flow, fn, etc.
+  - catbrain is intended to be faster, for the data plane too
+  - catbrain is an embeddable / extendable / sandboxed / pure language; YSH is
+    a shell language
+- [Tcl vs. Catbrain](tcl-vs-catbrain.md)
+  - In Tcl, everything is a string.  There are special dynamic parsing rules
+    for splitting and command blocks.
+  - catbrain is statically parsed, and it has `Error Str List Obj Fn` types
+- YSH vs. Catbrain
+  - YSH is for "using at work" (familiar to Python and JS programmers)
+  - Catbrain is a bit esoteric - for Forth, Tcl, Lisp users
+- vs. Forth
+  - catbrain has a stack, but it's block-structured like ALGOL
+- vs. jq: it's command-based, rather than expression based (and doesn't have cross
+  product aka "PEG backtracking semantics")
 - brainfuck: it's also minimal, with a "basic input and output" model `. ,`
   - but catbrain programs are not "obfuscated"
   - it's designed to be very readable, within the constraints model
 
+## Features
+
+- Extendable
+  - provide your own functions - you can provide the user with arbitrary
+    computation and I/O
+- Well specified grammar 
+  - PUNTING ON THIS: Syntax is a subset of YSH
+
 ## Where did catbrain come from?
 
 - protobuf tools - I always wanted to have something you could "append code to"
+  - I had this "Cpp stack" idea
 - "shell has a forth-like quality"
   - can we preserve "bernstein chaining" in an actual stack-based language?
 - jq in jq thread - streaming language with no vars
@@ -89,48 +101,12 @@ Comparisons:
 
 ## 4 Runtimes
 
-- `cb-pure` - a language with no input or output
-  - WASM runtime 
-  - no memory allocation - globals
-
-- `cb-filter` - stdin/stdout/argv/env/status - Unix filter like awk
-  - basic Unix cat/tac/echo
-  - pid
-  - no memory allocation - fixed
-
-- `cb-sh` - everything a shell has?  synchronous runtime?
-  - arbitrary I/O and syscalls
-  - exec
-  - wait
-
-  - unfortunately we can't share the runtime?  Because we have SmallStr?
-  - it would be nice
-  - async runtime
-
-- `cb-ev` - shell event loop?
-  - node.js style runtime
-
-- `cb-busy` - workloads
-  - can start threads, e.g. so you can inspect them
-  - fork
-  - malloc
-
-- `cb-bad`
-  - I don't know all of these
-  - seg faults
-    - dereference null
-    - divide by zero
-  - ubsan - integer behavior
-  - asan - overflow
-  - syscalls?
-  - blowing the C call stack
-    - how?
-    - I think you just create a malicious stack
+See [Runtimes][runtimes.md]
 
 ## Help Wanted
 
-- I know how to implement cb-sh and cb-ev
-- I don't know how to implement (all of) cb-bad
+- TODO: Python prototype with test cases
+- Example programs should work
 
 ## Programs It can Run
 
@@ -143,68 +119,3 @@ Comparisons:
   argv - definitely - tnet equivalent
   printenv
 - write arbitrary TSV8
-
-## Builtins
-
-### Control Flow / Compound Commands
-
-- arbitrary loop may be disallowed in catbrain, allowed in shbrain, etc.
-  - `loop` - 
-- limited to data
-  - `for` - loop that is limited to data
-- `break`
-- `if`
-- `capture feed`
-
-Question: `def` is like a macro?
-
-### Stack
-
-- `const'
-- `getvar'
-- 'dup`
-- TODO: `pop`, `clear`
-- `empty-stack`
-  - extensions: is-zero, empty-string
-- `ch`
-  - `ch tab space newline sq` - or `apos` is HTML name?
-
-### I/O
-
-- `w; r 3`
-- `w-line r-line`
-- `log`
-- `flush`
-
-### Compute
-
-- `op`
-  - `fib` - to generate work without writing `bf`
-  -  rotate` - trivial string function
-
-### Process
-
-- exit
-- msleep
-- load
-  - argv
-  - now
-  - pid
-  - env
-  - counter - TODO: fix counter
-
-### Transform
-
-- decode
-  - json string
-  - j8 string
-  - netstr
-- encode
-  - json string
-  - j8 string
-  - netstr
-
-### Protocols
-
-- FANOS
-  - todo: hook up py_fanos?

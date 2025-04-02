@@ -16,8 +16,20 @@ OILS_REPO=~/git/oils-for-unix/oils
 source $LIB_OSH/task-five.sh
 source $LIB_OSH/no-quotes.sh
 
+cb-assert() {
+  local expected_stdout=$1
+  local prog=$2
+
+  local status stdout
+  nq-capture status stdout \
+    ./catbrain.py -c "$prog"
+  nq-assert "$expected_stdout" = "$stdout"
+}
+
 test-hello() {
-  ./catbrain.py -c 'w-line hi'
+  # could be write --end '' etc.
+
+  cb-assert 'hi' 'w-line hi'
 }
 
 test-seq() {
@@ -369,6 +381,28 @@ fork { sleep 0.2 }
 wait
 wait
 '
+}
+
+test-add() {
+  # TODO: Make this work
+  return
+  ./catbrain.py -c '
+
+# the signature means the stack effect is checked
+
+fn add -- x y -- result {
+  # This is exactly what we want
+  stdout { extern expr %x + %y }
+}
+'
+
+# cb$ add 2 3
+# (Str)   5
+
+# (Atom)  5  # atom might be a better name
+#
+# cb$ x ls
+# leaves nothing on the stack if the status is 0
 }
 
 all() {

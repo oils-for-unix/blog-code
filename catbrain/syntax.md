@@ -3,6 +3,10 @@ Syntax
 
 ## Operator Chars
 
+Lexical
+
+- # for comments
+
 Words:
 
 - '' single quotes
@@ -10,7 +14,13 @@ Words:
 - %[expression sub] %%[expression splice]
 - %{command sub}
   - and %%{command splice}  (placeholder for this; requires j8 lines)
-  - issue: catbrain doesn't have j8 strings?
+  - issue: does catbrain have j8 strings?
+    - yes, you can write j8 parser in catbrain itself
+
+Special
+  - ^ pop-top
+  - ^^ pop-top-splice
+  - % is the top?
 
 (no double quotes)
 
@@ -20,11 +30,24 @@ Commands:
 - | pipeline
 - { } blocks
 
+- I guess & for function its its own keyword, like | and { } ;
+
 Expressions
 
 - [list literal [is nested]]
 - %[expression .0 a foo] including %[var]
 - %%[splice expression]
+
+
+### Other Reserved Chars
+
+- () - not doing anything with these now
+- <> - not sure if we have redirects, can hardcode them I guess
+  - 2>&1 - not sure
+
+probably
+
+    redir '>out.txt' { echo hi }
 
 ### Notes on Top Value
 
@@ -35,8 +58,6 @@ Expressions
   - or maybe ^ and ^^
     - this is kind of like "history" , so it could work
     - this is the top value, but POPPED
-
-
 
 ```
 fn open {  # any args are the top value?
@@ -50,6 +71,7 @@ fn open {  # any args are the top value?
   ls --verbose %
 }
 ```
+
 
 Does YSH need this?
 
@@ -80,6 +102,21 @@ Otherwise it would be
   - it has to be, for YSH and catbrain to talk to each other
   - however I would like to implement the j8 string parser purely in catbrain
     - probably with regexes?  But in UTF-8 mode
+
+
+### Notes on Splicing
+
+```
+var expr [people 0 .name]
+= expr
+
+%%[expr]  # evaluates it, puts result on the stack
+
+# Splice the expression, and then put the result into 'var'
+
+var name %[%%expr]
+
+```
 
 ### j8 idea
 
@@ -138,6 +175,107 @@ Or maybe you can install a default hook, like
 Yeah that is probably more practical
 
 Could do that in YSH too
+
+### Lambda Syntax brainstorming
+
+Es shell
+
+    fn identity x { return x }
+
+    fn identity = @ x { return x }
+
+So you can pass stuff with
+
+    apply @ i {cd $i; rm -f *} \
+      /tmp /usr/tmp
+
+So what is it in catbrain?
+
+    apply { (i) cd $i; rm -f %%[io glob '*'] } /tmp /usr/tmp
+
+    apply (i, j) { cd $i; rm -f %%[glob '*'] } /tmp /usr/tmp
+
+This is SIGNATURE objects
+
+    fn foo (i Str, j Str) {
+      cd $i; rm -f %%[glob '*']
+    } /tmp /usr/tmp
+
+
+OR You can have a single "fn" keyword
+
+    apply fn { cd $i; rm -f %%[glob '*'] } /tmp /usr/tmp
+
+Or you can have a greedy rule?
+
+The first { } goes with
+
+    fn -- x y -- result
+
+    fn ident -- x -- result {
+      getvar x     
+    }
+
+Other symbols besides @ and (i)
+
+It's like pipelines
+
+    apply & x -- result { getvar x } \
+      a b c d
+
+That's not bad I think.  & is for function.
+
+---
+
+Open or closed
+
+    # does nothing, doesn't affect the top of stack
+    fn ident {
+      pass
+    }
+
+    # does nothing EXPLICITLY
+    fn ident -- x -- out {
+      getvar x
+    }
+
+So then you also have
+
+    # anon identity function!
+
+    & { }
+
+    # explicit anon identity function!
+
+    & x -- out { getvar x }
+
+I think this is equivalent to & { }
+
+    & -- { }
+
+But yeah I don't think this anonymous form should be used that often?
+
+### Multi-line commands?
+
+This makes it hard
+
+   ... foo --verbose
+       ;
+
+     ls --hello \
+     # can we allow this
+   | other
+
+     # I think we could change this empty lines rulwe
+     ls -l \
+       # can we allow this
+       the directory
+
+       ls -l \
+       # comment
+     | grep foo \
+       # comment
+     | sed foo \
 
 ### Lexer
 

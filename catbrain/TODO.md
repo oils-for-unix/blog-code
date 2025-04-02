@@ -9,6 +9,24 @@ TODO
 - Check signatures of commands more tightly
   - `_DataArg`, `_OneArg`, etc.
 
+- Tests should be in YSH?
+  - then we need YSH test framework - yblocks
+
+### Self hosting TODO
+
+- provide parser in Python
+  - that provides some kind of "TERM" format
+  - I think this is a binary format you can load in memory
+  - is it netstring based?
+
+
+Is it tagged?
+
+Well I guess everything is an Obj almost
+
+Error Str List Obj  FN
+
+
 ## Notes
 
 - async runtime!
