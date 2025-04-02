@@ -3,7 +3,26 @@ Notes
 
 ## 2025 Updates
 
-- Types
+### Rationale
+
+- Coroutines and async runtime
+- Powerful enough to parse arbitrary messages fast, quickly
+  - it parses itself, so it's partly self-hosted
+- embeddable and sandboxed
+
+### Example program
+
+- xargs -P
+- ninja
+- on Windows too
+
+### TODO in Python
+
+- add process API with self-pipe trick
+  - maybe I should try Claude Code
+
+### Types
+
   - Error Str List Obj Fn 
     - Error type, in place of exceptions
     - no Null then?  try can turn %error into ''
@@ -96,18 +115,14 @@ YSH uses [x > 3] as expressions
 
     # and if you leave status?
 
-
-fn a b {
-}
-
-### try turns :error into :null
+### try turns :error into 'caught'
 
    cb$ false
    [:error [status 1]]
    [:error [status 1]]
 
    cb$ try { false }
-   [:null [status 1]]  # now you can inspect it
+   [caught [status 1]]  # now you can inspect it
 
 ### Implementation
 
@@ -145,23 +160,19 @@ fn a b {
 
     my-vec # => 5
 
-
-### TODO
-
-- add process API with self-pipe trick
-  - maybe I should try Claude Code
-
 ### Homoiconicity
 
-I think it pairs of (TAG VALUE)
+I think it is pairs of (TAG VALUE) or (TAG LOCATION VALUE)
 
     [WORD 'foo']     foo or 'foo'
     [LIST [a b c]]   [a b c] 
-    [GETVAR [EXPR foo]]     %foo
-    [SPLICE [EXPR array]]   %%array
+
     [COMMAND [echo hi]]     echo hi
     [BLOCK [COMMAND [echo 1]] [COMMAND [echo 2]]]   { echo 1; echo 2}
     [PIPELINE [COMMAND [echo 1]] [COMMAND [echo 2]]]  cat foo | grep | sed
+
+    [GETVAR [EXPR foo]]     %foo
+    [SPLICE [EXPR array]]   %%array
 
 TODO:
 
@@ -169,9 +180,23 @@ TODO:
 - maybe it is similar to the HASH PART of the List?
 
 
+LOCATION is just a map
+
+    [id Lit_Chars
+     col 5
+     length 3
+     line [source [file [name x]] ]]
+
+- TODO:
+  - need pretty printing
+
+### Data format
+
+- tagged varint
+
 ### No Expressions
 
-    [EXPR foo 0 bz   # this is the syntax %[foo[0].baz] ??
+    [EXPR foo 0 bz]   # this is the syntax %[foo[0].baz] ??
                      # or maybe lists and maps are callable
                      # [foo 0 baz]
                      # Yeah that isn't bad
@@ -182,12 +207,32 @@ TODO:
                      # Yes I like that
                      # So it's just a command
 
+- Problem: can there be map keys that look like numbres?
+
+    var mylist [55 foo 55 bar]
+
+    mylist 55  # what does this give you?
+
+    So I think you need
+
+    mylist .foo .0 .bar
+    mylist foo .0 bar  # for string keys, it's optional
+
+    mylist 0  # this is always indexing
+    mylist .0  # this is always property lookup
 
 
-###  proc
+### fn
 
-    proc foo -- a b -- result {  # what's left on the stack is checked
+    fn foo -- a b -- result {  # what's left on the stack is checked
       echo
+    }
+
+    fn closed -- {
+    }
+
+    fn open {
+      write %%ARGV  # special var?  Or just leave it out
     }
 
 ## Missing in the Oils Runtime
@@ -239,12 +284,6 @@ Example:
 - GC
   - an idea is to allow copying between VMs, rather than GC
   - rooting is still annoying
-- O(1) list and dict
-  - I think the array type could be a linked list, like bash?
-  - then you don't have to worry about growing?
-    - stack append is always just bumping pointers
-- expressions and types
-
 
 ### Bernstein chaining / composable blocks
 
