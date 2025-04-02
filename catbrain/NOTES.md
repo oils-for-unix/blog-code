@@ -16,10 +16,6 @@ Notes
 - ninja
 - on Windows too
 
-### TODO in Python
-
-- add process API with self-pipe trick
-  - maybe I should try Claude Code
 
 ### Types
 
@@ -119,6 +115,22 @@ YSH uses [x > 3] as expressions
    cb$ try { false }
    [caught [status 1]]  # now you can inspect it
 
+### Scope
+
+- lexical scope
+
+### Mutation
+
+   clear! mylist  # just use ! maybe
+
+### Methods
+
+    obj method a b c  # OK so this object is invokable
+
+    make-object [x 3 y 4] [__invoke__ print-mag other]; assign my-vec
+
+    my-vec # => 5
+
 ### Implementation
 
 - Cheney collector
@@ -139,21 +151,11 @@ YSH uses [x > 3] as expressions
   - no special async
   - this makes it like Tcl, Forth, node.js (except everything is async/await)
 
-### Scope
+### Self Hosting
 
-- lexical scope
-
-### Mutation
-
-   clear! mylist  # just use ! maybe
-
-### Methods
-
-    obj method a b c  # OK so this object is invokable
-
-    make-object [x 3 y 4] [__invoke__ print-mag other]; assign my-vec
-
-    my-vec # => 5
+- The parser is definitely self-hosted
+- Not sure if the call stack is a catbrain data structure
+  - sort of like Ribbit Scheme
 
 ### Homoiconicity
 
