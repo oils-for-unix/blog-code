@@ -3,16 +3,16 @@ catbrain
 
 Slogans:
 
-- A {Tcl, Lisp, Forth } that can express
-    { Shell, Awk, Make, find, xargs } and
-    { Python, JavaScript and node.js event loop, R data frames } and
-    { YAML, Dockerfiles, HTML Templates, ...}  and
-    {JSON, TSV, S-expressions, ...} ?
+    A {Tcl, Lisp, Forth } that can express
+      { Shell, Awk, Make, find, xargs } and
+      { Python, JavaScript and node.js event loop, R data frames } and
+      { YAML, Dockerfiles, HTML Templates, ...}  and
+      {JSON, TSV, S-expressions, ...} ?
 
-    All with Ruby-like blocks
+All with Ruby-like blocks
   
-  - "A shell you can't use at work"
-  - But derived from existing practice
+- "A shell you can't use at work"
+- But derived from existing practice
 
 - A mix of **practicality** and **purity**, honed over 8+ years
 - A readable language that must be driven by data
@@ -31,7 +31,6 @@ v Oils:
     - no types
     - no expressions
     - no string interpolation
-    - no variables
 
 Features:
 
@@ -39,14 +38,14 @@ Features:
   - Output size is limited to a constant function of (input size, program size)
   - No variables
   - no infinite loops
-- Syntax is a subset of YSH
-  - Well specified grammar
 - Embeddable - can safetly execute it within your programs
   - it does zero memory allocation
 - Extendable
   - provide your own functions - you can provide the user with arbitrary
     computation and I/O
-- TODO: comes with 4 runtimes
+
+- PUNTING ON THIS: Syntax is a subset of YSH
+  - Well specified grammar 
 
 Flavors of:
 
@@ -61,7 +60,9 @@ Flavors of:
 - Forth because it has a stack
 - node.js - if we have an event loop with the self-pipe trick for process
   completion?
-- Brainfuck - do we still need this?
+- Brainfuck 
+  - I think this is covered by forth?  This was the "no variables" dialect, but
+    now we have variables
 
 Comparisons:
 
@@ -86,31 +87,35 @@ Comparisons:
   synchronous style
   - need that for the "Ninja problem" (which make -j doesn't do)
 
-## Runtimes
+## 4 Runtimes
 
-- `nullcat` - a language with no input or output
+- `cb-pure` - a language with no input or output
   - WASM runtime 
   - no memory allocation - globals
 
-- `kcat` - stdin/stdout/argv/env/status - Unix filter like awk
+- `cb-filter` - stdin/stdout/argv/env/status - Unix filter like awk
   - basic Unix cat/tac/echo
   - pid
   - no memory allocation - fixed
 
-- `ycat` - everything a shell has?
+- `cb-sh` - everything a shell has?  synchronous runtime?
   - arbitrary I/O and syscalls
   - exec
   - wait
 
   - unfortunately we can't share the runtime?  Because we have SmallStr?
   - it would be nice
+  - async runtime
 
-- `workcat` - workloads
+- `cb-ev` - shell event loop?
+  - node.js style runtime
+
+- `cb-busy` - workloads
   - can start threads, e.g. so you can inspect them
   - fork
   - malloc
 
-- `badcat`
+- `cb-bad`
   - I don't know all of these
   - seg faults
     - dereference null
@@ -181,29 +186,34 @@ We can disallow it statically in catbrain if there is always a rewrite
 
 ### Keyword/Builtin Conflicts
 
-- Get rid of YSH keywords
-  - .if .for .try
+Get rid of YSH keywords?
+
+- .if .for .try
   - x or .extern
   - const -> .const or val, lit
   - fork forkwait builtin
-    - TBH I like using the same name
-    - as long as they do SIMILAR things, not identical, it could be OK
-    - I think the YSH convention could be to add it
+- TBH I like using the same name
+  - as long as they do SIMILAR things, not identical, it could be OK
+  - I think the YSH convention could be to add it
 
-   if empty-stack {
-     break
-   }
+```
+if empty-stack {
+  break
+}
+```
 
 YSH
 
-   .if empty-stack {
-     .break
-   }
+```
+.if empty-stack {
+  .break
+}
+```
 
 ## Help Wanted
 
-- I know how to implement cat-brain and sh-brain
-- I don't know how to implement null-brain and (all of) bad-brain!
+- I know how to implement cb-sh and cb-ev
+- I don't know how to implement (all of) cb-bad
 
 ## Programs It can Run
 
@@ -211,6 +221,7 @@ YSH
 - CGI hello
   - print env as J8 notation
   - print argv as J8 Notation
+  - can it parse HTTP post?
 - spec/bin
   argv - definitely - tnet equivalent
   printenv
@@ -222,10 +233,8 @@ YSH
 
 - arbitrary loop may be disallowed in catbrain, allowed in shbrain, etc.
   - `loop` - 
-
 - limited to data
   - `for` - loop that is limited to data
-
 - `break`
 - `if`
 - `capture feed`
@@ -252,7 +261,6 @@ Question: `def` is like a macro?
 
 ### Compute
 
-- `bf`
 - `op`
   - `fib` - to generate work without writing `bf`
   -  rotate` - trivial string function
