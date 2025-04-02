@@ -65,6 +65,12 @@ Consider different sigil, since it's not stringify
 
     echo %myvalue  # not just a string
 
+    # what about interpolation
+
+    ls --verbose=%val  # I think this should be allowed
+                       # '--verbose=%val' is the way to quote a whole word?
+                       # no backslashes
+
     echo @splice
 
     echo %%splice  # multiple, this is like * or **
@@ -99,21 +105,10 @@ YSH uses [x > 3] as expressions
   - external command leaves '0' to '255'
     - how to we avoid conflating the result, and failure?
   - or maybe it leaves a special error value - this is a map
-    [error 255]  # might be special value
 
-    [:error 255]  
-
-    # any List with a :null key is an error?
-    [:null 255 'command failed']
-
-    # I think special :error is better
-    [:error 255 'command failed']
-
-    # this is a special map
-    [status 0]
-    [status 1]
-
-    # and if you leave status?
+```
+[:error [status 255 msg 'foo']]  
+```
 
 ### try turns :error into 'caught'
 
