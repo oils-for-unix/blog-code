@@ -32,4 +32,8 @@ diff-main() {
   git diff main..
 }
 
+log-main() {
+  git log main..
+}
+
 "$@"
