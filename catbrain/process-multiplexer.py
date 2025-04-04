@@ -45,25 +45,6 @@ class Event:
             return f"Process {self.pid}: exited with code {self.exit_code}"
 
 
-async def start_workers(argv_list: List[List[str]], event_queue: Queue[Event]) -> Dict[int, Process]:
-    """Start all worker processes."""
-    processes: Dict[int, asyncio.subprocess.Process] = {}
-
-    for argv in argv_list:
-        process = await asyncio.create_subprocess_exec(
-            *argv,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        processes[process.pid] = process
-
-        # monitor output and exit
-        asyncio.create_task(monitor_output(process, event_queue))
-        asyncio.create_task(monitor_exit(process, event_queue))
-
-    return processes
-
-
 async def monitor_output(process: Process, event_queue: Queue[Event]) -> None:
     """Monitor and parse netstrings from the process stdout."""
     assert process.stdout is not None
@@ -71,12 +52,19 @@ async def monitor_output(process: Process, event_queue: Queue[Event]) -> None:
     while True:
         try:
             # Read the length part until ':' delimiter
+
             length_bytes = await process.stdout.readuntil(b":")
             if not length_bytes:
                 break
             
+            #log('LEN %r', type(length_bytes[-1]))
+            # bytearray
+            assert length_bytes[-1:] == b':', 'Expected colon in %r' % length_bytes
+
             # Parse the length (remove the trailing ':')
+
             length = int(length_bytes[:-1].decode())
+            # NOTE: can raise ValueError!
             
             # Read the content based on the length
             content = await process.stdout.readexactly(length)
@@ -96,14 +84,24 @@ async def monitor_output(process: Process, event_queue: Queue[Event]) -> None:
             # Put it in a queue, good
             await event_queue.put(event)
             
-        except asyncio.IncompleteReadError:
+        except asyncio.IncompleteReadError as e:  # exceptional case broken!
             # EOF reached
 
             # ANDY: This is a PROTOCOL ERROR
-            # TODO: test this case!  Test invalid netstrings
+            #
+            # This is from readexactly(length) !
+            # We need this API too
+            # Well I want an error value too
+            # I want the ability to signal:
+            # - error for incomplete readexactly(n)
+            # - user error: comma not found
+            # - maybe: delimited not found - reached EOF
+
+            print(f"INCOMPLETE READ from PID {process.pid}: {e}", file=sys.stderr)
             break
         except Exception as e:
             # ANDY: Do you need this?
+            # this keeps other tasks from failing I guess
             print(f"Error processing output from PID {process.pid}: {e}", file=sys.stderr)
             break
 
@@ -147,23 +145,46 @@ async def main() -> None:
         new = []
         for argv in argv_list:
             # trickle ALL output
-            #new.append(['sh', '-c', ' '.join(argv) + ' | ./trickle.py 2 100 0.3'])
+            new.append(['sh', '-c', ' '.join(argv) + ' | ./trickle.py 2 100 0.3'])
+
+            # corrupt trailing comma
+            #new.append(['sh', '-c', ' '.join(argv) + ' | sed "s/,/@/"'])
+
+            # corrupt : 
+            # Then it gets the whole message
+            #new.append(['sh', '-c', ' '.join(argv) + ' | sed "s/:/@/"'])
 
             # trickle PARTIAL output
-            # TODO: we should detect this?
-            new.append(['sh', '-c', ' '.join(argv) + ' | ./trickle.py 2 2 0.3'])
+            #new.append(['sh', '-c', ' '.join(argv) + ' | ./trickle.py 2 2 0.3'])
         argv_list = new
 
     print(argv_list)
 
     event_queue: asyncio.Queue[Event] = asyncio.Queue()
+
+    processes: Dict[int, asyncio.subprocess.Process] = {}
+
+    log('STARTING')
+
+    # Start the worker processes, and tasks
+    for argv in argv_list:
+        process = await asyncio.create_subprocess_exec(
+            *argv,
+            stdout=asyncio.subprocess.PIPE,
+        )
+        processes[process.pid] = process
+
+        # monitor output and exit
+        asyncio.create_task(monitor_output(process, event_queue))
+        asyncio.create_task(monitor_exit(process, event_queue))
     
-    # Start the worker processes
-    processes = await start_workers(argv_list, event_queue)
-    
+    log('EVENTS')
+
     # Process events from all workers as they arrive
-    async for event in events(event_queue, len(processes)):
+    async for event in events(event_queue, len(argv_list)):
         print(event)
+
+    log('DONE')
 
 
 if __name__ == "__main__":

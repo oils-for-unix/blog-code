@@ -11,6 +11,8 @@ fi
 sleep_interval="$1"
 shift
 
+echo "WORKER $$ sleeping $sleep_interval with $# args" >&2
+
 # Process each argument
 for arg in "$@"; do
     # Calculate the length of the argument
