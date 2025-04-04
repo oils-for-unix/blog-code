@@ -4,9 +4,28 @@ import sys
 from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union
 
+"""
+Original prompt:
+
+now write a process multiplexer with python asyncio.  It should start 2
+worker.sh processes in parallel.  it should parse a netstring, using
+readuntil(":") and read(N).   it should create events for a new netstring, and
+process exit.   the events will be tagged with PID.   it should merge these all
+into a single awaitable stream
+"""
+
+def log(msg, *args):
+    if args:
+        msg = msg % args
+    print(msg, file=sys.stderr)
+
+
 class EventType(Enum):
     NETSTRING = "netstring"
     PROCESS_EXIT = "process_exit"
+
+# Note: this could use a data class
+# It has Optional data and Optional exit code, which is a bit weird
 
 class Event:
     def __init__(self, pid: int, event_type: EventType, data: Optional[str] = None, exit_code: Optional[int] = None):
@@ -22,23 +41,26 @@ class Event:
             return f"Process {self.pid}: exited with code {self.exit_code}"
 
 class ProcessMultiplexer:
-    def __init__(self, worker_script: str, sleep_interval: float, args_list: List[List[str]]):
-        self.worker_script = worker_script
-        self.sleep_interval = sleep_interval
-        self.args_list = args_list
+    # ANDY: doesn't need to be a class
+    # Should be more functional
+
+    def __init__(self, argv_list: List[List[str]]):
+        self.argv_list = argv_list
         self.event_queue: asyncio.Queue[Event] = asyncio.Queue()
+        # these are the active processes
         self.processes: Dict[int, asyncio.subprocess.Process] = {}
     
     async def start_workers(self):
         """Start all worker processes."""
-        for args in self.args_list:
-            cmd = [self.worker_script, str(self.sleep_interval)] + args
+        for argv in self.argv_list:
             process = await asyncio.create_subprocess_exec(
-                *cmd,
+                *argv,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
             self.processes[process.pid] = process
+
+            # monitor output and exit
             asyncio.create_task(self.monitor_output(process))
             asyncio.create_task(self.monitor_exit(process))
     
@@ -70,17 +92,28 @@ class ProcessMultiplexer:
                     event_type=EventType.NETSTRING,
                     data=content.decode()
                 )
+
+                # Put it in a queue, good
                 await self.event_queue.put(event)
                 
             except asyncio.IncompleteReadError:
                 # EOF reached
+
+                # ANDY: This is a PROTOCOL ERROR
+                # TODO: test this case!  Test invalid netstrings
                 break
             except Exception as e:
+                # ANDY: Do you need this?
                 print(f"Error processing output from PID {process.pid}: {e}", file=sys.stderr)
                 break
     
     async def monitor_exit(self, process: asyncio.subprocess.Process):
         """Monitor the process exit and create an event when it exits."""
+
+        # ANDY: OK we start a concurrent task for waiting?
+        # Well why not just wait until you've reached EOF?
+
+        #log('await process exit %r', process)
         exit_code = await process.wait()
         event = Event(
             pid=process.pid,
@@ -91,6 +124,9 @@ class ProcessMultiplexer:
     
     async def events(self):
         """Generator that yields events from all processes."""
+
+        # Can't we just wait for 2 EOF events?
+        # I think that's better
         active_processes = len(self.processes)
         
         while active_processes > 0:
@@ -102,13 +138,21 @@ class ProcessMultiplexer:
 
 async def main():
     # Define arguments for two worker processes
-    args_list = [
-        ["foo", "bar", "baz"],
-        ["hello", "world", "asyncio"]
+    argv_list = [
+        ["./worker.sh", "0.2"] + ['foo%d' % i for i in range(10)],
+        ["./worker.sh", "0.5", "world", "asyncio"]
     ]
+    if 1:
+        new = []
+        for argv in argv_list:
+            # trickle output
+            new.append(['sh', '-c', ' '.join(argv) + ' | ./trickle.py 2 100 0.3'])
+        argv_list = new
+
+    print(argv_list)
     
     # Create the multiplexer
-    multiplexer = ProcessMultiplexer("./worker.sh", 0.5, args_list)
+    multiplexer = ProcessMultiplexer(argv_list)
     
     # Start the worker processes
     await multiplexer.start_workers()

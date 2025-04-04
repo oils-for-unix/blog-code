@@ -116,4 +116,13 @@ Python 3.12 is very different than the earlier byterun ones:
 
 - then port the whole thing to catbrain/YSH!
 
+## Claude AI
+
+- first pass worked pretty well
+  - need to test all sorts of errors
+  - protocol errors
+  - killing the process
+  - maybe interleaved output and so forth
+    - well you can write another filter to sleep between messages
+
 
