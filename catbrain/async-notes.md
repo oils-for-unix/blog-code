@@ -242,4 +242,3 @@ from Twisted.
    events.  The 'close' event is echoed.
    """
 
-

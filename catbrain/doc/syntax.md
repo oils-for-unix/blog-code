@@ -49,6 +49,15 @@ probably
 
     redir '>out.txt' { echo hi }
 
+#### Reserving all for future extension
+
+- <>
+- %
+- ^ ! history
+- ~ tilde sub
+- `* []` globbing
+
+
 ### Notes on Top Value
 
 - and I think _ means the top value?
