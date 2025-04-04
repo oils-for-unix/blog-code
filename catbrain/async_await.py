@@ -4,6 +4,11 @@
 
 import asyncio
 
+# Realization: this is not idiomatc!  It works though.  I think it should use
+# await?  Well then you need an awaitable?  OK interesting
+#
+# Will catbrain/YSH have yield?  I think the problem might be exceptions
+
 async def counter(start=0):
     count = start
     while True:
