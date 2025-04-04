@@ -1,7 +1,7 @@
 catbrain
 ========
 
-Slogans:
+## Slogans
 
     A { Tcl, Lisp, Forth } that can express
       { Shell, Awk, Make, find, xargs } and
@@ -27,6 +27,12 @@ But catbrain is also:
   - embeddable/extensable in C - like Lua, Tcl, Wren, ...
   - We might also be able to memcpy() heaps between threads?
     - threads trust each other - processes don't
+
+Slogan for async features:
+
+  Processes, Pipes, and Robust "forward" parsing
+  Queues/Backpressure
+  Timeouts/Cancellation
 
 ## Influences
 

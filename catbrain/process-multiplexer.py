@@ -18,6 +18,43 @@ process exit.   the events will be tagged with PID.   it should merge these all
 into a single awaitable stream
 """
 
+"""
+More features to use:
+
+    await wait_for(w, timeout=)
+    this throws TimeoutError, interesting
+
+await sleep()
+
+Have another process that outputs lines, and do lines()
+
+BACKPRESSURE
+
+- Queue should have max size
+
+- Ambitious
+  - sockets
+  - this would be the PGI server / CGI version 2
+  - you receive connections, and the main a pool of processes
+
+- cancellation after timeout
+  - task.cancel()
+  - oh then every operation raises an exception?
+  - I mean I guess we can use exceptions for that ...
+- there is asyncio.CancelledError
+
+- how do you maintain a pool of processes?
+  - with a sempahore?
+
+- the PGI/coprocess server is really the ultimate test
+  - it would need graceful restarting too?  Don't kill pending requests?
+
+- WATCHDOG thread
+  - print process usage
+  - print number of tasks, etc.
+
+"""
+
 def log(msg: str, *args: List[Any]) -> None:
     if args:
         msg = msg % args
