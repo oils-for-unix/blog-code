@@ -26,7 +26,7 @@ class ProcessMultiplexer:
         self.worker_script = worker_script
         self.sleep_interval = sleep_interval
         self.args_list = args_list
-        self.event_queue = asyncio.Queue()
+        self.event_queue: asyncio.Queue[Event] = asyncio.Queue()
         self.processes: Dict[int, asyncio.subprocess.Process] = {}
     
     async def start_workers(self):
