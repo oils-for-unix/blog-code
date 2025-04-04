@@ -1,6 +1,14 @@
 Notes on async/await
 ----------------
 
+## Some Lessons Learned
+
+- type annotation: AsyncIterator[Event]
+  - for 'yield' within 'async def'
+  - AsyncGenerator[None,Event] - for type
+
+- I am not sure we need that?
+
 ## Python History
 
 - generators were just 'yield' - I think Python 2.4

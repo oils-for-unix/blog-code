@@ -16,7 +16,8 @@ make-venv() {
 check-types() {
   # I installed mypy
   . _tmp/multi-env/bin/activate
-  python3 -m mypy process-multiplexer.py
+
+  python3 -m mypy --strict process-multiplexer.py 
 }
 
 "$@"
