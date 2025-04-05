@@ -16,24 +16,6 @@ Notes
 - ninja
 - on Windows too
 
-
-### Types
-
-- Error Str List Obj Fn 
-  - Error type, in place of exceptions
-  - no Null then?  try can turn %error into ''
-    - yeah I think that is reasonable
-- Str used as Int and Bool; List used as Dict with PList representation
-  - List has optional "HASH PART" - this is lazily computed whenever you do
-    "getvar", on anything that's more than say 10 properties
-    - so you don't use extra GC space on non-lists
-- Obj is a pair of List and Obj
-- Fn is used for both proc and func
-  - oh and it's also used for "block"?  It has no params
-  - then you can call 'eval(vars=vars)' as long as there are no params?
-
-Place is not necessary?  I think you just use the 'command ...; assign foo pattern
-
 ### List literals
 
 Since we don't have expressions, we should break YSH compat and add this

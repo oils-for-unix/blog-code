@@ -1,6 +1,19 @@
 Catbrain Runtimes and Commands
 -------------
 
+## Memory Management
+
+Two strategies:
+
+- simple fixed-size arena strategy - allow 1 MB - compile it
+  - exceeding the limit will make any command return [%error Memory] or something
+- moving garbage collector
+  - why?  Because serializing the entire heap to a data structure requires the
+    same metadata: the value LENGTH.
+    - (Our mark and sweep collector doesn't require the length.  It does
+      require an integer object ID in order to be "fork friendly", i.e. as an
+      index into the mark bitmap)
+  - moving collector is more similar to arena allocator
 
 ## Intro
 

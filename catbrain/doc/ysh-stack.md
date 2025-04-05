@@ -32,7 +32,13 @@ stack show  # same as =
 
 Yeah that's not bad
 
-### More
+## What is the value stack?  What are errors?
+
+- It's a list of values?"
+- So can it be represented by `List`?
+  - or make it Obj?
+
+I guess catbrain has Str and List for efficiency?  For pure data?
 
 ## Notes
 

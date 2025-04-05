@@ -20,6 +20,16 @@ I think it should be
   - so in that case you can memcpy
   - and maybe you can cache on disk, not sure if that's safe
 
+### Things We Learned
+
+- to be fork friendly
+  - mark and sweep collector should have separate bits
+- Copying Cheney GC requires length in header; mark and sweep does no
+- Cheney seemed to require more rooting
+  - because allocation can happen anywhere
+- you can use our trick of having a **manual** collection point in the
+  interpreter loop
+
 ### Does catbrain have an AST?
 
 - In addition to the CST / "token tree"
@@ -64,6 +74,28 @@ Tnen it would need an AST, for all the control flow:
 
 Although then it wouldn't be as extensible/programmable?
 
+## WebAssembly
+
+### WASM 1  
+
+- It's perfectly possible to implement you rown GC, but put it inside the VM.
+
+### WASM2
+
+anyref - A reference to any garbage-collected object
+funcref - A reference to a function
+externref - A reference to a host (JavaScript) object
+eqref - A reference type that supports equality testing
+i31ref - A special reference type for efficiently representing small integers
+
+
+- Small strings can be i31ref I think?
+- anyref is for Obj
+
+So you only use 2 of htose
+
+Not sure about eqref - is that for symbols?
+
 ## 2024 Notes
 
 - Hm should have immediate string / small string optimization
@@ -106,3 +138,19 @@ Notes:
   - and Cheney GC
 
 (unlike CPython or Lua -- both of them use pointers, and non-moving GC)
+
+## Techniques I don't quite understand, but could be useful
+
+- The copy and patch stuff of "Lua Jit Remake"
+  - maybe this is a good "testbad" for it
+
+I think you can do
+
+    push '1'
+    push '2'
+    add %%2
+
+and make it machine code?  Could be fast?   But note that 1 and 2 are stored as strings.
+
+Compile away the interpreter loop?
+

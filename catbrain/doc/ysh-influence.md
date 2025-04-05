@@ -80,6 +80,72 @@ Punting on:
 - embedding API, for now
 
 
+- error OBJECTS - `__error__()` is true?
+  - does this mask data?
+- capability OBJECTS - `__cap__()` ?
+
+### Any prior art for async shells?
+
+- Only one I can think of is the Julia library
+  - because Julia uses libuv!
+  - and libuv uses Unix primitives or IOCP under the hood
+  - TODO: maybe I should build a minimal libuv hello world
+
+- Julia REPL is written in Julia too?
+  - but it's not a shell ... TODO: try out  running multiple pipelines in Julia
+
+## Justifications
+
+Batch:
+
+- Python speed (or more), instead of shell speed
+  - Will C wanted to due Awk-like stuff, and Awk is fast
+  - and there is also the C++ exception issue, where we are slower than other shells
+  - this is "data plane" vs. "control plane"
+- because I wanted to make YSH the language of process-based concurrency, for
+  xargs -P/Ninja/process supervisors (the aurea project is basically a process
+  supervisor with an RPC protocol)
+  - and you need **coroutines** with async/await to control processes - this is
+    the most natural way
+
+Interactive:
+
+- Koichi wrote shell in shell
+  - ble.sh may be more driven by keyboard events
+- Fish shell uses threads; that's why they ported to Rust
+  - we can use coroutines
+- Subhav and #shell-gui
+  - a web shell might benefit from coroutines too?
+
+Not for YSH, but for catbrain:
+
+- intra process glue, not just inter-process glue
+  - some things happen in the same process
+  - we should make "glue" orthogonal from whether it's intra-process or inter-process
+  - C ABI blog posts - C ABI is still the ultimate intra-process glue
+- again Koichi wrote shell in shell
+  - ble.sh may be more driven by keyboard events
+  - we need a strict separation/reification of the VM !!
+  - I want to make YSH VMs in YSH, and catbrain VMs in catbrain
+    - YSH is close to that, but it's not easy.  We MAY be able to refactor to
+      it
+
+- Maybe: terminal click
+  - they did not get rid of the shell; they wrote a shell inside a terminal
+    emulator (globbing, etc.)
+  - I think the **intra-process** glue might be better for some things
+  - So yeah I want people to be able to put a shell inside the SAME PROCESS as
+    a terminal
+    - although dealing with the I/O is going to be very interesting
+    - I'm not sure if it will need a global event loop
+    - should look up GUI event loops ... Windows message  pump, etc.?  SDL?
+- Look at what ghostty does -- does it **own** the main?
+
+- https://claude.ai/chat/5cfbf712-0d41-45a1-accb-5cceb27c948e
+  - Yes it's the message pump / event loop on windows
+  - OS X - NSApplication run method
+  - Linux: GTK and windows have signals and slots
+
 ## YSH vs. Catbrain
 
 Main differences

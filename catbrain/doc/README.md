@@ -34,6 +34,17 @@ Slogan for async features:
   Queues/Backpressure
   Timeouts/Cancellation
 
+- The future of shell is "asynchronous / event-based"
+  - e.g. for embedding in a GUI
+
+- Closer to the metal than most small Lisps/schemes!
+  - designed to talk to operating system kernels
+  - it's designed around an efficient GC
+  - Lisps aren't great for parsing!  catbrain has more locality
+    - we will have a special `[_type Token]` field I believe
+- Closer to the user than Lisp!
+  - easy to type syntax, that can be used directly
+
 ## Influences
 
 Flavors of:
@@ -95,15 +106,8 @@ For the runtimes:
 
 ## Where did catbrain come from?
 
-- protobuf tools - I always wanted to have something you could "append code to"
-  - I had this "Cpp stack" idea
-- "shell has a forth-like quality"
-  - can we preserve "bernstein chaining" in an actual stack-based language?
-- jq in jq thread - streaming language with no vars
-- generating testdata for xargs -P
-- realizing that shell could have an async-style runtime (event loop), not a
-  synchronous style
-  - need that for the "Ninja problem" (which make -j doesn't do)
+See [story.md](story.md)
+
 
 ## 4 Runtimes
 
