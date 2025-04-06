@@ -26,6 +26,11 @@ class ParseError(RuntimeError):
     pass
 
 
+# More:
+# [] for list literal
+# & x y { echo hi } - lambda with args, I think this is fundamental
+# I think %[] %{} is some kind of "expression/command subst/splice"
+
 # See README.md
 UNQUOTED = r'[a-zA-Z0-9_/.-]+'  # /. for filenames
 LBRACE = r'{'

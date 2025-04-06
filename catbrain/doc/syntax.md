@@ -1,13 +1,13 @@
 Syntax
 ======
 
-
 ## Syntax Design issues
 
 - operator char issue
   b'hi'
   that's different than b 'hi'
   - I don't want a special rule for  this
+  - I think this is solved by the grammar
 
 - %error is not splicing?
   - maybe it's !error or &error
@@ -37,8 +37,18 @@ Syntax
 - Quoted    'hi'
 - Operator  ; |    % [ ]   & { }
 
+  - I think I am relenting on $ " " - it causes more complexity, but users will want it
+    - well it depends if it is a low level language or not
+    - it's similar to the | problem ...
+    - if it's low level, then you punt | to something else
+    - ES shell rewrites it ...  I guess we can rewrite |  - it's not the lowest level for sure
+
+  - LEAVE OUT OF FIRST PASS ~ * - these are commonly typed
+  - catbrain is a shell
+
 - anything else: lexical error
   - that means ( ) is reserved, but not used
+
 
 ## Grammar
 
@@ -103,6 +113,44 @@ So these are exterior:
 Is everything  else interior?  We could have redirects later
 
 I guess
+
+## Word Part: glob, tilde, subst, Cartesian Product Idea
+
+there is
+
+- $[string expr]
+- %[anyvalue]
+  - this does splicing if it's a list?
+  - oh the problem is that you may want to PASS a list
+  - how do you PASS a list
+- @[splice] - like YSH
+  - splice a value
+
+- %{echo hi; echo bye}
+  - but isn't it?
+- ${echo hi; echo bye}
+  - this conflicts in syntax.  But I want the syntax consistent
+
+- word level
+  - %foo %bar %{echo hi}
+- part level
+  - $foo $bar - no command sub?
+
+and then word parts
+
+- $string
+- $[string]
+
+    ls --verbose=$val
+    #ls --verbose=@val  # this cartesian product then?
+
+Or a better one:
+
+    # Yes this is better
+    ls @[exp [alice bob] '@example.com']
+
+
+
 
 ## Operator Chars
 
