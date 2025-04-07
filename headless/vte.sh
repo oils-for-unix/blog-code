@@ -16,15 +16,9 @@ OILS_REPO=~/git/oils-for-unix/oils
 source $LIB_OSH/task-five.sh
 source $LIB_OSH/no-quotes.sh
 
-make-venv() {
-  python3 -m venv _tmp/venv
-}
-
-deps() {
-  . _tmp/venv/bin/activate
-  # Claude AI hallucinated this
-  # pyqt5-qtermwidget
-  python3 -m pip install PyQt5 
+deb-deps() {
+  # For Debian/Ubuntu:
+  sudo apt-get install python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-vte-2.91
 }
 
 task-five "$@"  
