@@ -24,7 +24,7 @@ deps() {
   . _tmp/venv/bin/activate
   # Claude AI hallucinated this
   # pyqt5-qtermwidget
-  python3 -m pip install PyQt5 
+  python3 -m pip install PyQt5 PyQTWebEngine
 }
 
 task-five "$@"  
