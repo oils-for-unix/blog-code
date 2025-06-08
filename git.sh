@@ -16,6 +16,7 @@ merge-to-main() {
     git checkout main &&
     git merge $branch &&
     git push &&
+    time git push codeberg &&
     git checkout $branch
   else
     git checkout main &&
